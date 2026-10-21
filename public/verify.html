@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Verified</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Card */
+        .id-card {
+            width: 100%;
+            max-width: 700px;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(5, 150, 105, 0.15);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Green Header */
+        .card-top {
+            background: linear-gradient(135deg, #059669, #047857);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .school-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            background-image: url('tullulogo.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .school-info-top {
+            flex: 1;
+        }
+
+        .school-name-top {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .school-location {
+            font-size: 10px;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        .verify-tag {
+            background: rgba(255,255,255,0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Body */
+        .card-body {
+            padding: 24px 28px;
+        }
+
+        /* Student Row - Large Photo */
+        .student-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #d1fae5;
+            margin-bottom: 20px;
+        }
+
+        /* LARGE Passport Photo */
+        .photo-container {
+            width: 190px;
+            height: 180px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 4px solid #059669;
+            flex-shrink: 0;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 65px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.2);
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-check {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            background: #059669;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid white;
+        }
+
+        .student-details {
+            flex: 1;
+        }
+
+        .student-name-big {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .class-badge-lg {
+            display: inline-block;
+            background: #d1fae5;
+            color: #047857;
+            padding: 5px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .roll-display {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .roll-display strong {
+            color: #1e293b;
+            font-size: 15px;
+        }
+
+        /* Info Grid - 2 Columns */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border-left: 4px solid #059669;
+            transition: all 0.2s;
+        }
+
+        .info-box:nth-child(1) { border-left-color: #059669; }
+        .info-box:nth-child(2) { border-left-color: #f59e0b; }
+        .info-box:nth-child(3) { border-left-color: #3b82f6; }
+        .info-box:nth-child(4) { border-left-color: #8b5cf6; }
+        .info-box:nth-child(5) { border-left-color: #06b6d4; }
+        .info-box:nth-child(6) { border-left-color: #f97316; }
+
+        .info-box:hover {
+            background: #f0fdf4;
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .info-label-sm {
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
+        }
+
+        .info-value-md {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            word-break: break-all;
+        }
+
+        
+
+        /* Footer */
+        .card-footer {
+            padding: 14px 28px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .footer-school {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .footer-cert {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .footer-time {
+            font-size: 9px;
+            color: #cbd5e1;
+        }
+
+        /* Loading & Error */
+        .loading-card, .error-card {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(5, 150, 105, 0.15);
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #059669;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-title { font-weight: 700; color: #1e293b; font-size: 16px; }
+        .loading-sub { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+        .error-emoji { font-size: 50px; margin-bottom: 10px; }
+        .error-title { font-size: 18px; font-weight: 700; color: #dc2626; }
+        .error-sub { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+        /* Print */
+        @media print {
+            body { background: white; }
+            .id-card { box-shadow: none; border: 1px solid #e2e8f0; }
+            .card-top { background: #059669 !important; -webkit-print-color-adjust: exact; }
+        }
+
+        @media (max-width: 500px) {
+            .card-body { padding: 16px; }
+            .student-row { gap: 14px; flex-direction: column; align-items: flex-start; }
+            .photo-container { width: 120px; height: 155px; }
+            .student-name-big { font-size: 22px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .card-footer { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div class="loading-card">
+            <div class="spinner"></div>
+            <div class="loading-title">Verifying Certificate</div>
+            <div class="loading-sub">Fetching student information...</div>
+        </div>
+    </div>
+
+    <script>
+        const id = new URLSearchParams(window.location.search).get('id');
+        const BASE = window.location.origin;
+
+        if (!id) {
+            document.getElementById('app').innerHTML = `
+                <div class="error-card">
+                    <div class="error-emoji">🔍</div>
+                    <div class="error-title">No Student ID Found</div>
+                    <div class="error-sub">Please scan a valid certificate QR code.</div>
+                </div>`;
+        } else {
+            fetch(`${BASE}/api/verify/student/${id}`)
+                .then(r => {
+                    if (!r.ok) throw new Error('Student not found');
+                    return r.json();
+                })
+                .then(data => {
+                    const s = data.student;
+                    
+                    document.getElementById('app').innerHTML = `
+                    <div class="id-card">
+                        <!-- Green Top Bar -->
+                        <div class="card-top">
+                            <div class="school-icon"></div>
+                            <div class="school-info-top">
+                                <div class="school-name-top">Tulu Dimtu General Secondary School</div>
+                                <div class="school-location">Koye Feche, Shaggar City</div>
+                            </div>
+                            <div class="verify-tag"> VERIFIED</div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body">
+                            <!-- Student with Large Photo -->
+                            <div class="student-row">
+                                <div class="photo-container">
+                                    ${s.profileImage ? 
+                                        `<img src="${s.profileImage}" alt="${s.name}" onerror="this.innerHTML='👨‍🎓';">` : 
+                                        '👨‍🎓'}
+                                    <div class="photo-check">✓</div>
+                                </div>
+                                <div class="student-details">
+                                    <div class="student-name-big">${s.name}</div>
+                                    <div class="class-badge-lg">📚 Grade ${s.grade || 'N/A'} - Section ${s.section || 'N/A'}</div>
+                                    <div class="roll-display">Roll Number: <strong>${s.rollNumber || 'N/A'}</strong></div>
+                                </div>
+                            </div>
+
+                            <!-- Info Grid -->
+                            <div class="info-grid">
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-venus-mars"></i> Gender</div>
+                                    <div class="info-value-md">${s.sex || 'N/A'}</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-envelope"></i> Email</div>
+                                    <div class="info-value-md" style="font-size:11px;">${s.email || 'N/A'}</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-phone-alt"></i> Phone</div>
+                                    <div class="info-value-md">${s.phone || 'N/A'}</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-book-open"></i> Program</div>
+                                    <div class="info-value-md">${s.programs || 'N/A'}</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-building"></i> School</div>
+                                    <div class="info-value-md" style="font-size:11px;">Tulu Dimtu General Secondary School</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-label-sm"><i class="fas fa-map-marker-alt"></i> Location</div>
+                                    <div class="info-value-md">Koye Feche, Shaggar City</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="card-footer">
+                            <div class="footer-school">Tulu Dimtu General Secondary School</div>
+                            <div class="footer-cert">🔒 Verified Document</div>
+                            <div class="footer-time">Scanned: ${new Date().toLocaleString('en-US', { 
+                                month: 'short', day: 'numeric', year: 'numeric',
+                                hour: '2-digit', minute: '2-digit'
+                            })}</div>
+                        </div>
+                    </div>`;
+                })
+                .catch(err => {
+                    document.getElementById('app').innerHTML = `
+                        <div class="error-card">
+                            <div class="error-emoji">❌</div>
+                            <div class="error-title">Verification Failed</div>
+                            <div class="error-sub">Could not load student profile.</div>
+                            <div class="error-sub" style="font-size:10px;margin-top:8px;">ID: ${id}</div>
+                        </div>`;
+                });
+        }
+    </script>
+</body>
+</html>

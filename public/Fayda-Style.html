@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Student ID Card - Holographic Fingerprint Wave</title>
+  <style>
+    /* ========== BASE SETUP - NO STRUCTURAL CHANGES TO EXISTING CARD ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Poppins', 'Inter', sans-serif;
+      background: linear-gradient(145deg, #d9dce3 0%, #bdc1cb 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    /* ========== CARD CONTAINER (FLIP 3D EFFECT ON HOVER FOR MODERN SHOWCASE) ========== */
+    .card-flip-container {
+      perspective: 1800px;
+      cursor: pointer;
+    }
+
+    .card-flipper {
+      position: relative;
+      width: 750px;
+      height: 450px;
+      transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+      border-radius: 24px;
+    }
+
+    .card-flip-container:hover .card-flipper {
+      transform: rotateY(180deg);
+    }
+
+    /* front & back face styling */
+    .front-face, .back-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      backface-visibility: hidden;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(184, 98, 41, 0.4);
+      overflow: hidden;
+    }
+
+    .front-face {
+      transform: rotateY(0deg);
+    }
+
+    .back-face {
+      transform: rotateY(180deg);
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ========== ORIGINAL ID CARD STYLES (INTACT, NO CHANGES) ========== */
+    .id-card {
+      width: 60%;
+      height: 60%;
+      background-color: #f8fafc;
+      border-radius: 24px;
+      box-shadow: none;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      background-image: url('log.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+      background-blend-mode: overlay, overlay, normal, normal;
+    }
+    
+    .id-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 80%;
+      height: 100%;
+      background: linear-gradient(115deg, transparent, rgba(184,98,41,0.12), rgba(221,138,82,0.08), transparent);
+      transform: skewX(-12deg);
+      animation: fingerWaveScan 7s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 20px;
+    }
+    
+    
+    
+    .id-card::after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      bottom: 15px;
+      background: repeating-linear-gradient(45deg, rgba(210, 180, 70, 0.1) 0px, rgba(210, 180, 70, 0.1) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      border-radius: 20px;
+      z-index: 0;
+    }
+    
+    .id-header {
+      background: linear-gradient(180deg, #062346 0%, #021327 100%);
+      height: 95px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      color: #ffffff;
+      border-bottom: 3px solid #b86229;
+      position: relative;
+      z-index: 5;
+    }
+   
+    .header-titles {
+      text-align: center;
+      flex-grow: 1;
+      padding: 0 15px;
+    }
+    .header-titles h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    .header-titles h1 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #df9b6d;
+      letter-spacing: 1px;
+    }
+
+    .id-subtitle {
+      text-align: center;
+      background-color: #ffffff;
+      color: #021327;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(203, 161, 53, 0.12) 0px, rgba(203, 161, 53, 0.12) 2px, transparent 2px, transparent 12px),
+                        repeating-linear-gradient(135deg, rgba(80, 60, 20, 0.05) 0px, rgba(80, 60, 20, 0.05) 1px, transparent 1px, transparent 10px);
+    }
+
+    .id-body {
+      display: flex;
+      flex-grow: 1;
+      padding: 16px 20px;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(203, 161, 53, 0.12) 0px, rgba(203, 161, 53, 0.12) 2px, transparent 2px, transparent 12px),
+                        repeating-linear-gradient(135deg, rgba(80, 60, 20, 0.05) 0px, rgba(80, 60, 20, 0.05) 1px, transparent 1px, transparent 10px);
+    }
+
+    .info-grid {
+      width: 62%;
+      display: flex;
+      flex-direction: column;
+    }
+    .grid-row {
+      display: flex;
+    }
+    .grid-label {
+      width: 32%;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #021327;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      font-family: 'Inter', system-ui;
+      letter-spacing: 0.4px;
+    }
+    .grid-value {
+      width: 68%;
+      padding: 8px 8px 8px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      font-family: 'Segoe UI', 'Poppins', system-ui;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px dashed rgba(184,98,41,0.3);
+    }
+    /* improved academic divider typography */
+    .grid-divider {
+      margin: 8px 0 4px 0;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #b86229;
+      background: rgba(184,98,41,0.08);
+      letter-spacing: 2px;
+      border-radius: 20px;
+      width: fit-content;
+      text-transform: uppercase;
+    }
+    .right-column {
+      width: 34%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      height: 100%;
+      position: relative;
+    }
+    
+    .photo-frame {
+      width: 150px;
+      height: 185px;
+      border: 2px solid #b86229;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background-color: #cbd5e1;
+      margin-right: 35px;
+    }
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .security-codes {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: auto;
+      margin-bottom: 4px;
+      width: 100%;
+      padding-right: 35px;
+    }
+    .qr-box {
+      width: 48px;
+      height: 48px;
+      background-color: #ffffff;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: #334155;
+    }
+    .barcode-box {
+      width: 120px;
+      height: 38px;
+      background-color: #ffffff;
+      border: 1px solid #94a3b8;
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .barcode-lines {
+      letter-spacing: 1.5px;
+      font-size: 14px;
+      font-weight: normal;
+      font-family: monospace;
+      color: #000;
+    }
+
+    .side-badge {
+      position: absolute;
+      right: 0;
+      top: -16px;
+      width: 26px;
+      height: 254px;
+      background: linear-gradient(135deg, #b86229 0%, #dd8a52 50%, #b86229 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom-left-radius: 6px;
+    }
+    .side-badge-text {
+      transform: rotate(90deg);
+      white-space: nowrap;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .id-footer {
+      margin-top: auto;
+      height: 45px;
+      display: flex;
+      border-top: 3px solid #b86229;
+      position: relative;
+      z-index: 5;
+    }
+    .footer-left-accent {
+      width: 200px;
+      background: linear-gradient(90deg, #b86229 0%, #a2521f 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      padding-left: 20px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .footer-main-dark {
+      flex-grow: 1;
+      background-color: #021327;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .footer-qr-anchor {
+      width: 44px;
+      height: 44px;
+      background-color: #ffffff;
+      border: 2px solid #021327;
+      border-radius: 4px;
+      margin-top: -20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7px;
+      font-weight: bold;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+    }
+    .footer-url {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-left: auto;
+    }
+    .image-logo{
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+    }
+
+    /* ========== BACK DESIGN – AMAZING & MATCHING COLOR PALETTE ========== */
+    .back-card {
+      background: radial-gradient(circle at 70% 20%, rgba(184,98,41,0.03) 0%, rgba(2,19,39,0.04) 100%),
+                  repeating-linear-gradient(45deg, rgba(184,98,41,0.03) 0px, rgba(184,98,41,0.03) 2px, transparent 2px, transparent 10px);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background-color: #fefaf5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* elegant watermark fingerprint wave behind */
+    .back-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400' opacity='0.12'%3E%3Cpath fill='none' stroke='%23b86229' stroke-width='3.5' d='M300,120 L300,80 M300,160 L300,200 M280,100 Q300,70 320,100 M265,125 Q300,85 335,125 M255,150 Q300,100 345,150 M248,175 Q300,115 352,175 M242,200 Q300,130 358,200 M238,225 Q300,145 362,225 M235,250 Q300,160 365,250 M232,275 Q300,170 368,275' stroke-dasharray='6 8' /%3E%3Cpath d='M430,220 C400,280 360,340 300,360 C240,340 200,280 170,220' stroke='%23b86229' stroke-width='5' fill='none' opacity='0.25' /%3E%3C/svg%3E") center/cover no-repeat;
+      pointer-events: none;
+    }
+
+    .back-header {
+      background: linear-gradient(90deg, #021327 0%, #0a2a4e 100%);
+      padding: 20px 25px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 3px solid #b86229;
+      z-index: 2;
+    }
+    .back-university {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .back-university small {
+      font-size: 11px;
+      opacity: 0.85;
+      display: block;
+    }
+
+    .back-content {
+      flex: 1;
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 2;
+    }
+
+    .info-block {
+      background: rgba(255,255,240,0.75);
+      backdrop-filter: blur(3px);
+      border-radius: 16px;
+      padding: 12px 18px;
+      border-left: 5px solid #b86229;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .info-block h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #b86229;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+    .student-data {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+    }
+    .data-item {
+      font-size: 15px;
+      font-weight: 600;
+      color: #021327;
+    }
+    .data-item span {
+      font-weight: 400;
+      color: #4b5563;
+      display: block;
+      font-size: 12px;
+    }
+
+    .signature-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      border-top: 1px dashed rgba(184,98,41,0.4);
+      padding-top: 14px;
+    }
+    .signature-area {
+      font-size: 11px;
+      color: #334155;
+      font-weight: 600;
+    }
+    .signature-line {
+      width: 140px;
+      height: 1px;
+      border-bottom: 2px solid #b86229;
+      margin-top: 6px;
+    }
+    .finger-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 0 2px rgba(184,98,41,0.4));
+    }
+
+    .back-footer {
+      background: #021327;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #f1f5f9;
+      font-size: 10px;
+      font-weight: 600;
+      border-top: 2px solid #b86229;
+      z-index: 2;
+    }
+
+    .hologram-badge {
+      background: linear-gradient(145deg, #b86229, #e9b17a);
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 10px;
+      text-align: center;
+    }
+    
+    /* additional typography refinements for student info */
+    .grid-value {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .grid-label {
+      font-weight: 800;
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="id-card">
+    
+    <header class="id-header">
+      <div class="header-logo"><img class="image-logo" src="png.png" alt="Logo 1"></div>
+      <div class="header-titles">
+        <h2>MANA BARUMSAA SADARK 2FFAA TULLU DIMTU</h2>
+        <h1>TULLU DIMTU SECONDARY SCHOOL</h1>
+      </div>
+      <div class="header-logo" ><img class="image-logo" src="shagger.png" alt="Logo 2"></div>
+    </header>
+
+    <div class="id-subtitle">STUDENT'S IDENTIFICATION CARD</div>
+
+    <div class="id-body">
+      
+      <div class="info-grid">
+        <div class="grid-row">
+          <div class="grid-label">Full Name</div>
+          <div class="grid-value">NUHAMIN TAYE LEMA</div>
+        </div>
+        
+        <div class="grid-row">
+          <div class="grid-label">Gender</div>
+          <div class="grid-value">Female</div>
+        </div>
+        
+        <div class="grid-row">
+          <div class="grid-label">Email</div>
+          <div class="grid-value" style="font-weight: 600; color: #334155;">nio@gmail.com</div>
+        </div>
+
+        <!-- <div class="grid-divider">[Academic Information]</div> -->
+        
+        <div class="grid-row">
+          <div class="grid-label">College</div>
+          <div class="grid-value">Tullu Dimtu School</div>
+        </div>
+        
+        <div class="grid-row">
+          <div class="grid-label">Study Level</div>
+          <div class="grid-value">Grade 10</div>
+        </div>
+        
+        <div class="grid-row">
+          <div class="grid-label">Admission</div>
+          <div class="grid-value">Social</div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="photo-frame">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Student Portrait">
+        </div>
+
+        <div class="security-codes">
+          <div class="qr-box">QR Code</div>
+          <div class="barcode-box">
+            <span class="barcode-lines">|||||||||||||||</span>
+          </div>
+        </div>
+
+        <div class="side-badge">
+          <div class="side-badge-text">Public ID 1</div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="id-footer">
+      <div class="footer-left-accent">TULLU DIMTU SCHOOL</div>
+      <div class="footer-main-dark">
+        <div class="footer-qr-anchor">QR-2</div>
+        <a href="https://www.tuludimtuschool.com" class="footer-url" target="_blank">www.tuludimtuschool.com</a>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html> 
+
+
+
