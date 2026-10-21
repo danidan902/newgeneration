@@ -901,7 +901,7 @@ const SuperAdminHome = ({ isSuperAdmin = false, theme, isDarkMode }) => {
                 style={{ 
                   height: `${(cls.students / Math.max(...classData.map(c => c.students), 1)) * 100}%`,
                   background: index % 3 === 0 ? '#34d399' : index % 3 === 1 ? '#2563eb' : '#ef4444',
-                }}
+                }} 
               />
             ))}
           </div>
@@ -1380,6 +1380,16 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ===== MOBILE SIDEBAR EFFECTS =====
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileSidebarOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileSidebarOpen]);
+
   const toggleTheme = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
@@ -1547,15 +1557,48 @@ const AdminDashboard = () => {
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       <div className="flex h-screen overflow-hidden" style={{ background: t.bg, fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
-        {mobileSidebarOpen && (
-          <div className="fixed inset-0 z-40 lg:hidden backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.6)' }}
-            onClick={() => setMobileSidebarOpen(false)} />
-        )}
+        {/* ===== MOBILE TOP BAR: LOGO LEFT · TOGGLE · HAMBURGER RIGHT ===== */}
+        <div className="mobile-topbar">
+          {/* School logo (LEFT) */}
+          <div className="mobile-logo-wrap">
+            <div className="mobile-logo-circle">🎓</div>
+            <div className="mobile-logo-text">
+              <span className="mobile-logo-title">New Generation</span>
+              <span className="mobile-logo-sub">SCHOOL</span>
+            </div>
+          </div>
+
+          {/* Right side: toggle + hamburger */}
+          <div className="mobile-topbar-right">
+            <button
+              onClick={toggleTheme}
+              className="mobile-theme-toggle"
+              aria-label="Toggle theme"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
+            <button
+              className={`hamburger-btn ${mobileSidebarOpen ? 'is-open' : ''}`}
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              aria-label="Toggle menu"
+            >
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+        </div>
+
+        {/* ===== MOBILE OVERLAY ===== */}
+        <div
+          className={`sidebar-overlay ${mobileSidebarOpen ? 'active' : ''}`}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
 
         <aside className={`
+          admin-sidebar-mobile
           fixed lg:relative z-50 h-full flex flex-col flex-shrink-0
           transition-all duration-300 ease-out
-          ${mobileSidebarOpen ? 'left-0' : '-left-80 lg:left-0'}
+          ${mobileSidebarOpen ? 'open' : ''}
           ${sidebarCollapsed ? 'w-20' : 'w-64'}
           lg:left-0
         `} style={{ background: t.sidebar, boxShadow: '4px 0 24px rgba(0,0,0,0.25)' }}>
@@ -1572,13 +1615,23 @@ const AdminDashboard = () => {
             </div>
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-white hover:opacity-80"
+              className="text-white hover:opacity-80 hidden lg:block"
             >
               {sidebarCollapsed ? (
                 <Menu className="w-5 h-5" />
               ) : (
                 <X className="w-5 h-5" />
               )}
+            </button>
+
+            {/* Mobile close button */}
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-white transition-transform active:scale-90"
+              style={{ background: 'rgba(255,255,255,0.18)' }}
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -1690,9 +1743,9 @@ const AdminDashboard = () => {
           </nav>
         </aside>
 
-        <div className="flex-1 flex flex-col overflow-hidden relative" style={{ background: t.bg }}>
+        <div className="dashboard-content-wrap flex-1 flex flex-col overflow-hidden relative" style={{ background: t.bg }}>
 
-          <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-20 flex-shrink-0"
+          <header className="desktop-header h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-20 flex-shrink-0"
             style={{ background: t.topbar, borderColor: t.border }}>
             <div className="flex items-center gap-6 w-96">
               <div className="relative w-full">
@@ -1876,6 +1929,177 @@ const AdminDashboard = () => {
           .stat-card:hover { border-color: rgba(217, 27, 36, 0.5); box-shadow: 0 12px 48px rgba(0,0,0,0.2); }
           .glass-card { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
           a { text-decoration: none; }
+
+          /* ============================================================
+             📱 MOBILE: LOGO LEFT · TOGGLE · HAMBURGER RIGHT
+             SIDEBAR SLIDES IN FROM RIGHT
+             ONLY affects screens ≤ 1024px. Desktop unchanged.
+             ============================================================ */
+          .mobile-topbar { display: none; }
+
+          @media (max-width: 1024px) {
+
+            /* ===== MOBILE TOP BAR ===== */
+            .mobile-topbar {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 10px;
+              position: fixed; top: 0; left: 0; right: 0; height: 60px;
+              padding: 0 14px;
+              background: ${t.topbar};
+              border-bottom: 1px solid ${t.border};
+              box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+              z-index: 90;
+            }
+
+            /* School logo — LEFT */
+            .mobile-logo-wrap {
+              display: flex; align-items: center; gap: 8px;
+              min-width: 0; flex: 1;
+            }
+            .mobile-logo-circle {
+              width: 38px; height: 38px; border-radius: 50%;
+              background: linear-gradient(135deg, #D91B24, #1E3A8A);
+              display: flex; align-items: center; justify-content: center;
+              font-size: 18px; flex-shrink: 0;
+              box-shadow: 0 4px 14px rgba(217,27,36,0.35);
+            }
+            .mobile-logo-text {
+              display: flex; flex-direction: column; line-height: 1.05;
+              min-width: 0;
+            }
+            .mobile-logo-title {
+              font-size: 13px; font-weight: 800; color: ${t.text};
+              letter-spacing: 0.2px; text-transform: uppercase;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            }
+            .mobile-logo-sub {
+              font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+              color: #D91B24; text-transform: uppercase;
+            }
+
+            /* Right side: toggle + hamburger */
+            .mobile-topbar-right {
+              display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+            }
+            .mobile-theme-toggle {
+              width: 40px; height: 40px; border: none; border-radius: 12px;
+              display: flex; align-items: center; justify-content: center;
+              cursor: pointer; transition: transform .2s ease;
+              background: ${t.bg};
+              color: ${isDarkMode ? '#FDB813' : '#1E3A8A'};
+              box-shadow: inset 0 0 0 1.5px ${t.border};
+            }
+            .mobile-theme-toggle:active { transform: scale(0.9); }
+
+            /* Hamburger — RIGHT */
+            .hamburger-btn {
+              display: flex; flex-direction: column; justify-content: center;
+              gap: 5px; width: 44px; height: 44px; padding: 11px;
+              border: none; border-radius: 12px;
+              background: linear-gradient(135deg, #D91B24, #1E3A8A);
+              cursor: pointer;
+              box-shadow: 0 6px 18px rgba(217,27,36,0.35);
+              transition: transform .2s ease, box-shadow .2s ease;
+              flex-shrink: 0;
+            }
+            .hamburger-btn:active { transform: scale(0.93); box-shadow: 0 3px 10px rgba(217,27,36,0.4); }
+            .hamburger-btn span {
+              display: block; height: 2.5px; width: 100%;
+              border-radius: 2px; background: #fff;
+              transition: transform .4s cubic-bezier(.4,0,.2,1), opacity .25s ease;
+            }
+            .hamburger-btn.is-open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+            .hamburger-btn.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+            .hamburger-btn.is-open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+            /* ===== OVERLAY ===== */
+            .sidebar-overlay {
+              display: block; position: fixed; inset: 0;
+              background: rgba(0,0,0,0.55);
+              backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+              opacity: 0; visibility: hidden;
+              transition: opacity .35s ease, visibility .35s ease;
+              z-index: 95;
+            }
+            .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+            /* ===== SIDEBAR — SLIDES FROM RIGHT ===== */
+            .admin-sidebar-mobile {
+              position: fixed !important;
+              top: 0; right: 0; bottom: 0; left: auto !important;
+              width: 82%; max-width: 300px; height: 100vh;
+              z-index: 100;
+              transform: translateX(100%);
+              transition: transform .4s cubic-bezier(.4,0,.2,1);
+              border-radius: 22px 0 0 22px;
+              box-shadow: -12px 0 40px rgba(0,0,0,0.4);
+              overflow-y: auto;
+            }
+            .admin-sidebar-mobile.open { transform: translateX(0); }
+
+            .admin-sidebar-mobile.open nav li {
+              opacity: 0; transform: translateX(14px);
+              animation: slideInLink .4s ease forwards;
+            }
+            .admin-sidebar-mobile.open nav li:nth-child(1)  { animation-delay: .04s; }
+            .admin-sidebar-mobile.open nav li:nth-child(2)  { animation-delay: .07s; }
+            .admin-sidebar-mobile.open nav li:nth-child(3)  { animation-delay: .10s; }
+            .admin-sidebar-mobile.open nav li:nth-child(4)  { animation-delay: .13s; }
+            .admin-sidebar-mobile.open nav li:nth-child(5)  { animation-delay: .16s; }
+            .admin-sidebar-mobile.open nav li:nth-child(6)  { animation-delay: .19s; }
+            .admin-sidebar-mobile.open nav li:nth-child(7)  { animation-delay: .22s; }
+            .admin-sidebar-mobile.open nav li:nth-child(8)  { animation-delay: .25s; }
+            .admin-sidebar-mobile.open nav li:nth-child(9)  { animation-delay: .28s; }
+            .admin-sidebar-mobile.open nav li:nth-child(10) { animation-delay: .31s; }
+            @keyframes slideInLink { to { opacity: 1; transform: translateX(0); } }
+
+            .dashboard-content-wrap { padding-top: 60px !important; }
+            .desktop-header { display: none !important; }
+
+            main.custom-scrollbar { padding: 12px !important; }
+
+            .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+              grid-template-columns: 1fr !important;
+              gap: 10px !important;
+            }
+            .grid.grid-cols-1.lg\\:grid-cols-12,
+            .grid.grid-cols-1.xl\\:grid-cols-2 {
+              grid-template-columns: 1fr !important;
+              gap: 14px !important;
+            }
+            .lg\\:col-span-6,
+            .lg\\:col-span-3 {
+              grid-column: span 1 / span 1 !important;
+            }
+            .edu-card { padding: 14px !important; border-radius: 14px !important; }
+
+            .grid.grid-cols-2.sm\\:grid-cols-3.md\\:grid-cols-6 {
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 8px !important;
+            }
+
+            h1 { font-size: 20px !important; }
+            h3 { font-size: 14px !important; }
+
+            .recharts-responsive-container { max-height: 240px !important; }
+            .grid.grid-cols-7 { gap: 2px !important; }
+            .grid.grid-cols-7 > div { padding: 6px 2px !important; font-size: 11px !important; }
+
+            table { font-size: 11px !important; }
+            .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+          }
+
+          @media (max-width: 380px) {
+            .mobile-logo-title { font-size: 11px; }
+            .mobile-logo-circle { width: 34px; height: 34px; font-size: 16px; }
+            .mobile-theme-toggle { width: 36px; height: 36px; }
+            .hamburger-btn { width: 40px; height: 40px; padding: 10px; }
+            .grid.grid-cols-2.sm\\:grid-cols-3.md\\:grid-cols-6 {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
         `}</style>
       </div>
     </ThemeContext.Provider>
