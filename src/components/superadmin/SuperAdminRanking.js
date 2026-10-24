@@ -369,7 +369,7 @@ const StudentReportCard = () => {
   };
 
   // ==========================================
-  // REPORT CARD COMPONENT (Responsive)
+  // REPORT CARD COMPONENT — front + back responsive
   // ==========================================
 
   const ReportCardView = ({ student, sortedStudents, yearly }) => {
@@ -474,11 +474,11 @@ const StudentReportCard = () => {
               const finalScore = subjectScores[subject]?.final || 0;
               
               return (
-                <tr key={index} className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-                  <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-normal">{subject}</td>
-                  <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{sem1Score}</td>
-                  <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{sem2Score}</td>
-                  <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{finalScore.toFixed(1)}</td>
+                <tr key={index} className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+                  <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-normal">{subject}</td>
+                  <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">{sem1Score}</td>
+                  <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">{sem2Score}</td>
+                  <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">{finalScore.toFixed(1)}</td>
                 </tr>
               );
             });
@@ -498,11 +498,11 @@ const StudentReportCard = () => {
             totalSem1 += score;
             
             return (
-              <tr key={index} className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-                <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-normal">{subjectName}</td>
-                <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
-                <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">—</td>
-                <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
+              <tr key={index} className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+                <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-normal">{subjectName}</td>
+                <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
+                <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">—</td>
+                <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
               </tr>
             );
           });
@@ -623,39 +623,39 @@ const StudentReportCard = () => {
 
     const totalsRows = (
       <>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px] border-t-2 border-t-slate-900">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Total Sum</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem1Total?.toFixed(1) : totals.totalMarks.toFixed(1)}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem2Total?.toFixed(1) : '—'}</td>
-          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.totalMarks.toFixed(1)}</td>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px] border-t-2 border-t-slate-900">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Total Sum</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem1Total?.toFixed(1) : totals.totalMarks.toFixed(1)}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem2Total?.toFixed(1) : '—'}</td>
+          <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.totalMarks.toFixed(1)}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Average</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem1?.toFixed(2) : totals.overallAverage.toFixed(2)}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem2?.toFixed(2) : '—'}</td>
-          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.overallAverage.toFixed(2)}</td>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Average</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem1?.toFixed(2) : totals.overallAverage.toFixed(2)}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem2?.toFixed(2) : '—'}</td>
+          <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.overallAverage.toFixed(2)}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Rank</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.rank : '—'}/{sortedStudents.length}</td>
-          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Rank</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.rank : '—'}/{sortedStudents.length}</td>
+          <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Conduct</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.grade?.letter : '—'}</td>
-          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Conduct</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{yearly ? totals.grade?.letter : '—'}</td>
+          <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Absent</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
-          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Absent</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900">—</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900">—</td>
+          <td className="text-center font-sans text-[10px] sm:text-[12px] lg:text-[14px] text-blue-900">—</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px] bg-cyan-100/30">
-          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Promotion</td>
-          <td colSpan="3" className="text-center font-sans text-[13px] sm:text-[16px] font-bold" style={{ color: totals.promoted ? '#059669' : '#dc2626' }}>
+        <tr className="border-b border-slate-900 h-[22px] sm:h-[26px] lg:h-[29px] bg-cyan-100/30">
+          <td className="border-r border-slate-900 text-left pl-1.5 sm:pl-2 lg:pl-3 font-serif text-[9px] sm:text-[11px] lg:text-[13px] text-slate-900 font-bold">Promotion</td>
+          <td colSpan="3" className="text-center font-sans text-[11px] sm:text-[13px] lg:text-[16px] font-bold" style={{ color: totals.promoted ? '#059669' : '#dc2626' }}>
             {promotionText}
           </td>
         </tr>
@@ -663,27 +663,40 @@ const StudentReportCard = () => {
     );
 
     return (
-      <div className="min-h-screen bg-slate-100 p-3 sm:p-8 flex flex-col gap-6 sm:gap-12 justify-center items-center font-serif text-slate-900 select-none print:p-0 print:bg-white">
+      <div className="min-h-screen bg-slate-100 p-2 sm:p-4 md:p-8 flex flex-col gap-4 sm:gap-8 md:gap-12 justify-center items-center font-serif text-slate-900 select-none print:p-0 print:bg-white">
         
-        {/* WRAPPER: makes report cards horizontally scrollable / scaled on small screens */}
-        <div className="w-full flex flex-col items-center gap-6 sm:gap-12 overflow-x-auto">
-          
-          {/* VIEW 1: FRONT AND BACK COVERS */}
-          <div 
-            ref={page1Ref} 
-            className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-6 sm:p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break flex-shrink-0 origin-top scale-[0.32] sm:scale-[0.55] md:scale-[0.75] lg:scale-100 -mb-[540px] sm:-mb-[360px] md:-mb-[200px] lg:mb-0"
+        {/* WRAPPER: scroll + center + scale */}
+        <div className="w-full flex flex-col items-center gap-6 sm:gap-10 md:gap-12 overflow-x-auto">
+
+          {/* ============================================================ */}
+          {/* CERTIFICATE FRONT (PAGE 1) — responsive scale + typography   */}
+          {/* ============================================================ */}
+          <div
+            ref={page1Ref}
+            className="
+              w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex
+              p-4 sm:p-6 md:p-10
+              relative overflow-hidden border border-cyan-700
+              print:shadow-none print:border-none page-break flex-shrink-0
+              origin-top
+              scale-[0.28] xs:scale-[0.33] sm:scale-[0.5] md:scale-[0.7] lg:scale-[0.85] xl:scale-100
+              -mb-[575px] xs:-mb-[540px] sm:-mb-[400px] md:-mb-[240px] lg:-mb-[120px] xl:mb-0
+            "
           >
-            
             {/* LEFT PANEL: BACK COVER (Method of Marking) */}
-            <div className="w-1/2 h-full pr-6 sm:pr-10 border-r flex flex-col items-center relative text-[12px] sm:text-[14px]">
-              <div className="flex items-center justify-center mb-4">
+            <div className="w-1/2 h-full pr-3 sm:pr-6 md:pr-10 border-r flex flex-col items-center relative text-[10px] sm:text-[12px] md:text-[14px]">
+              <div className="flex items-center justify-center mb-2 sm:mb-4">
                 <span className="text-[10px] text-center font-sans font-bold leading-tight px-1 text-slate-800">
-                  <img src={Logo1} alt="Logo" />
+                  <img src={Logo1} alt="Logo" className="w-14 sm:w-16 md:w-auto" />
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold tracking-wide uppercase mb-4 sm:mb-6 text-slate-800">METHOD OF MARKING</h2>
-              <p className="w-full text-justify mb-6 sm:mb-8 leading-relaxed">Student achievement in each class will be assigned the following values</p>
-              <div className="w-full space-y-3 px-2 sm:px-4 mb-8 sm:mb-12">
+              <h2 className="text-sm sm:text-lg md:text-xl font-bold tracking-wide uppercase mb-3 sm:mb-4 md:mb-6 text-slate-800">
+                METHOD OF MARKING
+              </h2>
+              <p className="w-full text-justify mb-3 sm:mb-6 md:mb-8 leading-relaxed">
+                Student achievement in each class will be assigned the following values
+              </p>
+              <div className="w-full space-y-1.5 sm:space-y-2 md:space-y-3 px-1 sm:px-2 md:px-4 mb-4 sm:mb-8 md:mb-12">
                 {[
                   { range: "90%-100%", label: "Excellent" },
                   { range: "80%- 89%", label: "very good" },
@@ -692,64 +705,64 @@ const StudentReportCard = () => {
                   { range: "49%- and below", label: "law" }
                 ].map((item, idx) => (
                   <div key={idx} className="flex justify-between items-end">
-                    <span className="whitespace-nowrap text-slate-800">{item.range}</span>
+                    <span className="whitespace-nowrap text-slate-800 text-[9px] sm:text-[11px] md:text-[14px]">{item.range}</span>
                     <div className="flex-grow mx-2 border-b border-dotted border-slate-700 h-1"></div>
-                    <span className="whitespace-nowrap w-24 text-left text-slate-800">{item.label}</span>
+                    <span className="whitespace-nowrap w-16 sm:w-20 md:w-24 text-left text-slate-800 text-[9px] sm:text-[11px] md:text-[14px]">{item.label}</span>
                   </div>
                 ))}
               </div>
-              <p className="w-full text-justify leading-relaxed tracking-wide text-slate-800">
+              <p className="w-full text-justify leading-relaxed tracking-wide text-slate-800 text-[9px] sm:text-[11px] md:text-[13px]">
                 A mark Zero (0%) should never be given, since it would mean no work has been done absolutely . If a student has been absent from class for the whole period covered and has not made up any of the work ,He/she should be marked 'AB' for 'absent'
               </p>
-              <div className="absolute bottom-6 right-6 flex flex-col gap-3 font-bold text-slate-700 text-lg">
+              <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 flex flex-col gap-2 sm:gap-3 font-bold text-slate-700 text-sm sm:text-lg">
                 <span>:</span><span>:</span><span>:</span>
               </div>
             </div>
 
             {/* RIGHT PANEL: FRONT COVER (Student Profile) */}
-            <div className="w-1/2 h-full pl-6 sm:pl-10 flex flex-col items-center text-[11px] sm:text-[13px] text-slate-900">
-              <div className="w-full flex justify-between items-start mb-3 sm:mb-4">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center flex-shrink-0">
+            <div className="w-1/2 h-full pl-3 sm:pl-6 md:pl-10 flex flex-col items-center text-[10px] sm:text-[11px] md:text-[13px] text-slate-900">
+              <div className="w-full flex justify-between items-start mb-2 sm:mb-3 md:mb-4">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 flex items-center justify-center flex-shrink-0">
                   <span className="text-[10px] text-center font-sans font-bold leading-tight px-1 text-slate-800">
-                    <img src={Logo} alt="Logo" />
+                    <img src={Logo} alt="Logo" className="w-full h-full object-contain" />
                   </span>
                 </div>
                 <div className="flex-shrink-0">
-                  <img 
-                    src={studentPhotoUrl} 
-                    alt="Student" 
-                    className="w-[120px] h-[150px] sm:w-[150px] sm:h-[180px] object-cover border-3 border-[#b88728] shadow-md"
+                  <img
+                    src={studentPhotoUrl}
+                    alt="Student"
+                    className="w-[80px] h-[100px] sm:w-[120px] sm:h-[150px] md:w-[150px] md:h-[180px] object-cover border-3 border-[#b88728] shadow-md"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'flex';
                     }}
                   />
-                  <div className="w-[120px] h-[150px] sm:w-[150px] sm:h-[180px] bg-gray-100 flex items-center justify-center text-xs text-gray-500 hidden">
+                  <div className="w-[80px] h-[100px] sm:w-[120px] sm:h-[150px] md:w-[150px] md:h-[180px] bg-gray-100 flex items-center justify-center text-xs text-gray-500 hidden">
                     No Photo
                   </div>
                 </div>
               </div>
 
-              <div className="text-center space-y-0.5 mb-4 sm:mb-6">
-                <h1 className="text-[12px] sm:text-sm font-bold tracking-wide text-slate-800 uppercase">WAAJJIRA BARNOOTA MAGAALAA SHAGGAR</h1>
-                <h1 className="text-[12px] sm:text-sm font-bold tracking-wide text-slate-800 uppercase">KUTAA MAGAALAA KOYYEE FACCEE</h1>
-                <h2 className="text-[13px] sm:text-[15px] font-sans font-semibold tracking-normal text-slate-800">በሸገር ከተማ ትምህርት ጽሕፈት ቤት የኮዬ ፈጬ ክ/ከተማ</h2>
-                <h2 className="text-[13px] sm:text-[15px] font-sans font-semibold tracking-normal text-slate-800 mb-2">ትምህርት ጽሕፈት ቤት</h2>
-                <h3 className="text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-700 uppercase">KAARDII GABAASA FIRII BARATTOOTA SAD. 2FFAA</h3>
-                <h3 className="text-[11px] sm:text-[12px] font-sans font-semibold text-slate-700">የ2ኛ ደረጃ ተማሪዎች የውጤት ሪፖርት ካርድ</h3>
-                <p className="text-[11px] sm:text-[12px] font-medium text-slate-800 mt-1">Shaggar City Education Office</p>
-                <p className="text-[11px] sm:text-[12px] font-medium text-slate-800">Secondary School Student Report Card</p>
+              <div className="text-center space-y-0.5 mb-2 sm:mb-4 md:mb-6">
+                <h1 className="text-[9px] sm:text-[12px] md:text-sm font-bold tracking-wide text-slate-800 uppercase">WAAJJIRA BARNOOTA MAGAALAA SHAGGAR</h1>
+                <h1 className="text-[9px] sm:text-[12px] md:text-sm font-bold tracking-wide text-slate-800 uppercase">KUTAA MAGAALAA KOYYEE FACCEE</h1>
+                <h2 className="text-[10px] sm:text-[13px] md:text-[15px] font-sans font-semibold tracking-normal text-slate-800">በሸገር ከተማ ትምህርት ጽሕፈት ቤት የኮዬ ፈጬ ክ/ከተማ</h2>
+                <h2 className="text-[10px] sm:text-[13px] md:text-[15px] font-sans font-semibold tracking-normal text-slate-800 mb-2">ትምህርት ጽሕፈት ቤት</h2>
+                <h3 className="text-[8px] sm:text-[10px] md:text-[11px] font-bold tracking-wider text-slate-700 uppercase">KAARDII GABAASA FIRII BARATTOOTA SAD. 2FFAA</h3>
+                <h3 className="text-[9px] sm:text-[11px] md:text-[12px] font-sans font-semibold text-slate-700">የ2ኛ ደረጃ ተማሪዎች የውጤት ሪፖርት ካርድ</h3>
+                <p className="text-[9px] sm:text-[11px] md:text-[12px] font-medium text-slate-800 mt-1">Shaggar City Education Office</p>
+                <p className="text-[9px] sm:text-[11px] md:text-[12px] font-medium text-slate-800">Secondary School Student Report Card</p>
               </div>
 
-              <div className="w-full space-y-3 sm:space-y-4">
+              <div className="w-full space-y-2 sm:space-y-3 md:space-y-4">
                 <div className="flex items-end w-full">
                   <span className="whitespace-nowrap mr-2">Name of School</span>
                   <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 font-medium tracking-wide">Tulu Dimtu GSS</span>
+                    <span className="absolute left-3 sm:left-4 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl text-blue-900 font-medium tracking-wide">Tulu Dimtu GSS</span>
                   </div>
                 </div>
 
-                <div className="flex items-end w-full text-[11px] sm:text-[12px]">
+                <div className="flex items-end w-full text-[9px] sm:text-[11px] md:text-[12px]">
                   <span className="whitespace-nowrap mr-1 font-bold">Address :</span>
                   <span className="whitespace-nowrap font-bold mr-1">Oromia Region</span>
                   <span className="whitespace-nowrap mr-1 text-slate-800">Shaggar City</span>
@@ -757,11 +770,11 @@ const StudentReportCard = () => {
                   <span className="whitespace-nowrap text-slate-800">Sub city</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full">
                   <div className="flex items-end">
                     <span className="whitespace-nowrap mr-2">Woreda</span>
                     <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                      <span className="absolute left-2 bottom-0.5 font-sans text-base sm:text-lg text-blue-900">Tulu Dimtu</span>
+                      <span className="absolute left-2 bottom-0.5 font-sans text-xs sm:text-base md:text-lg text-blue-900">Tulu Dimtu</span>
                     </div>
                   </div>
                   <div className="flex items-end">
@@ -770,26 +783,26 @@ const StudentReportCard = () => {
                   </div>
                 </div>
 
-                <h3 className="text-center font-bold text-[13px] sm:text-[15px] tracking-wide pt-2">Student's Profile</h3>
+                <h3 className="text-center font-bold text-[11px] sm:text-[13px] md:text-[15px] tracking-wide pt-1 sm:pt-2">Student's Profile</h3>
 
                 <div className="flex items-end w-full">
                   <span className="whitespace-nowrap mr-2">Name of Student</span>
                   <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-4 bottom-0.5 font-sans text-xl sm:text-2xl text-blue-900 tracking-wide font-light">{student.name}</span>
+                    <span className="absolute left-3 sm:left-4 bottom-0.5 font-sans text-base sm:text-xl md:text-2xl text-blue-900 tracking-wide font-light">{student.name}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 w-full">
+                <div className="grid grid-cols-3 gap-1 sm:gap-2 w-full">
                   <div className="flex items-end col-span-1">
                     <span className="whitespace-nowrap mr-2">Sex</span>
                     <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                      <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 font-medium">{studentSex}</span>
+                      <span className="absolute left-3 sm:left-4 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl text-blue-900 font-medium">{studentSex}</span>
                     </div>
                   </div>
                   <div className="flex items-end col-span-1">
                     <span className="whitespace-nowrap mr-2">Age</span>
                     <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                      <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900">{studentAge}</span>
+                      <span className="absolute left-3 sm:left-4 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl text-blue-900">{studentAge}</span>
                     </div>
                   </div>
                   <div className="flex items-end col-span-1">
@@ -798,7 +811,7 @@ const StudentReportCard = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 w-full">
+                <div className="grid grid-cols-3 gap-1 sm:gap-2 w-full">
                   <div className="flex items-end"><span className="mr-1">Sub City</span><div className="flex-grow border-b border-slate-800"></div></div>
                   <div className="flex items-end"><span className="mr-1">Woreda</span><div className="flex-grow border-b border-slate-800"></div></div>
                   <div className="flex items-end"><span className="mr-1">House no</span><div className="flex-grow border-b border-slate-800"></div></div>
@@ -807,31 +820,31 @@ const StudentReportCard = () => {
                 <div className="flex items-end w-full">
                   <span className="whitespace-nowrap mr-2">Academic Year</span>
                   <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-6 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 tracking-wider">{academicYear}</span>
+                    <span className="absolute left-4 sm:left-6 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl text-blue-900 tracking-wider">{academicYear}</span>
                   </div>
                 </div>
 
                 <div className="flex items-end w-full">
                   <span className="whitespace-nowrap mr-2">Class(Grade)</span>
                   <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-6 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 tracking-wider font-light">{selectedClass.grade}th</span>
+                    <span className="absolute left-4 sm:left-6 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl text-blue-900 tracking-wider font-light">{selectedClass.grade}th</span>
                   </div>
                 </div>
 
                 <div className="flex items-end w-full relative">
                   <span className="whitespace-nowrap mr-2">Promotion Status</span>
                   <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className={`absolute left-8 bottom-0.5 font-sans text-lg sm:text-xl font-medium ${totals.promoted ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`absolute left-4 sm:left-8 bottom-0.5 font-sans text-sm sm:text-lg md:text-xl font-medium ${totals.promoted ? 'text-green-600' : 'text-red-600'}`}>
                       {promotionText}
                     </span>
                   </div>
-                  <div className={`absolute right-4 -top-6 transform rotate-[-12deg] border-4 px-3 py-1 rounded font-sans font-black text-lg sm:text-xl tracking-wider uppercase opacity-85 ${
-                    totals.promoted 
-                      ? 'border-green-600 text-green-600' 
+                  <div className={`absolute right-2 sm:right-4 -top-4 sm:-top-6 transform rotate-[-12deg] border-2 sm:border-4 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded font-sans font-black text-[10px] sm:text-lg md:text-xl tracking-wider uppercase opacity-85 ${
+                    totals.promoted
+                      ? 'border-green-600 text-green-600'
                       : 'border-red-600 text-red-600'
                   }`}>
                     {promotionStampText}
-                    <div className={`text-[10px] text-center font-normal block leading-none ${
+                    <div className={`text-[6px] sm:text-[10px] text-center font-normal block leading-none ${
                       totals.promoted ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {promotionSubText}
@@ -839,15 +852,15 @@ const StudentReportCard = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 w-full pt-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full pt-2 sm:pt-4">
                   <div className="flex items-end">
-                    <span className="whitespace-nowrap text-[11px] sm:text-[12px] mr-1">Director's Name</span>
+                    <span className="whitespace-nowrap text-[9px] sm:text-[11px] md:text-[12px] mr-1">Director's Name</span>
                     <div className="flex-grow border-b border-slate-800 relative">
-                      <span className="absolute bottom-0 text-[9px] sm:text-[10px] font-sans text-blue-800/70 truncate max-w-full">Gammadaa Milkiyaas Oncho</span>
+                      <span className="absolute bottom-0 text-[8px] sm:text-[9px] md:text-[10px] font-sans text-blue-800/70 truncate max-w-full">Gammadaa Milkiyaas Oncho</span>
                     </div>
                   </div>
                   <div className="flex items-end">
-                    <span className="whitespace-nowrap text-[11px] sm:text-[12px] mr-1">Signature</span>
+                    <span className="whitespace-nowrap text-[9px] sm:text-[11px] md:text-[12px] mr-1">Signature</span>
                     <div className="flex-grow border-b border-slate-800"></div>
                   </div>
                 </div>
@@ -855,50 +868,59 @@ const StudentReportCard = () => {
             </div>
           </div>
 
-          {/* VIEW 2: INNER GRADES & REMARKS */}
-          <div 
-            ref={page2Ref} 
-            className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-6 sm:p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break flex-shrink-0 origin-top scale-[0.32] sm:scale-[0.55] md:scale-[0.75] lg:scale-100 -mt-[540px] sm:-mt-[360px] md:-mt-[200px] lg:mt-0"
+          {/* ============================================================ */}
+          {/* CERTIFICATE BACK (PAGE 2) — responsive scale + typography    */}
+          {/* ============================================================ */}
+          <div
+            ref={page2Ref}
+            className="
+              w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex
+              p-4 sm:p-6 md:p-10
+              relative overflow-hidden border border-cyan-700
+              print:shadow-none print:border-none page-break flex-shrink-0
+              origin-top
+              scale-[0.28] xs:scale-[0.33] sm:scale-[0.5] md:scale-[0.7] lg:scale-[0.85] xl:scale-100
+              -mt-[575px] xs:-mt-[540px] sm:-mt-[400px] md:-mt-[240px] lg:-mt-[120px] xl:mt-0
+            "
           >
-            
             {/* LEFT PANEL: GRADES TABLE */}
-            <div className="w-1/2 h-full pr-2 sm:pr-4 flex flex-col justify-between">
-              <table className="w-full border-collapse border border-slate-900 text-center text-[10px] sm:text-[12px] bg-cyan-50/10">
+            <div className="w-1/2 h-full pr-2 sm:pr-3 md:pr-4 flex flex-col justify-between">
+              <table className="w-full border-collapse border border-slate-900 text-center text-[8px] sm:text-[10px] md:text-[12px] bg-cyan-50/10">
                 <thead>
                   <tr className="border-b border-slate-900">
-                    <th className="border-r border-slate-900 p-1 sm:p-2 font-bold w-[35%] text-left pl-2 sm:pl-3">Subject</th>
-                    <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-[10px] sm:text-xs leading-tight">First<br/>Semester</th>
-                    <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-[10px] sm:text-xs leading-tight">Second<br/>Semester</th>
-                    <th className="p-1 font-bold w-[23%] text-[10px] sm:text-xs">AVERAGE</th>
+                    <th className="border-r border-slate-900 p-0.5 sm:p-1 md:p-2 font-bold w-[35%] text-left pl-1.5 sm:pl-2 md:pl-3">Subject</th>
+                    <th className="border-r border-slate-900 p-0.5 sm:p-1 font-bold w-[21%] text-[7px] sm:text-[10px] md:text-xs leading-tight">First<br/>Semester</th>
+                    <th className="border-r border-slate-900 p-0.5 sm:p-1 font-bold w-[21%] text-[7px] sm:text-[10px] md:text-xs leading-tight">Second<br/>Semester</th>
+                    <th className="p-0.5 sm:p-1 font-bold w-[23%] text-[7px] sm:text-[10px] md:text-xs">AVERAGE</th>
                   </tr>
                 </thead>
-                <tbody className="font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">
+                <tbody className="font-sans text-[10px] sm:text-[12px] md:text-[14px] text-blue-900 font-medium">
                   {subjectRows}
                   {totalsRows}
                 </tbody>
               </table>
 
-              <div className="flex items-end w-full text-[11px] sm:text-[13px] font-serif pt-2">
+              <div className="flex items-end w-full text-[9px] sm:text-[11px] md:text-[13px] font-serif pt-2">
                 <span className="whitespace-nowrap mr-1">Director's Name</span>
                 <div className="flex-grow border-b border-slate-900"></div>
-                <span className="whitespace-nowrap mx-2">Signature</span>
+                <span className="whitespace-nowrap mx-1 sm:mx-2">Signature</span>
                 <div className="flex-grow border-b border-slate-900"></div>
               </div>
             </div>
 
             {/* RIGHT PANEL: REMARKS & SIGNATURES */}
-            <div className="w-1/2 h-full pl-4 sm:pl-8 flex flex-col justify-start relative pt-4">
-              <h2 className="text-center font-bold text-[12px] sm:text-sm tracking-wide uppercase text-slate-800 mb-4 sm:mb-8">
+            <div className="w-1/2 h-full pl-2 sm:pl-4 md:pl-8 flex flex-col justify-start relative pt-2 sm:pt-4">
+              <h2 className="text-center font-bold text-[9px] sm:text-[12px] md:text-sm tracking-wide uppercase text-slate-800 mb-2 sm:mb-4 md:mb-8">
                 REMARKS FROM THE HOME – ROOM TEACHER
               </h2>
 
-              <div className="w-full mb-6 sm:mb-12">
-                <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1">First Semester</h3>
-                <div className="w-full space-y-5 sm:space-y-7 pt-4">
+              <div className="w-full mb-3 sm:mb-6 md:mb-12">
+                <h3 className="font-bold text-[10px] sm:text-sm md:text-base text-slate-900 mb-1">First Semester</h3>
+                <div className="w-full space-y-3 sm:space-y-5 md:space-y-7 pt-2 sm:pt-4">
                   <div className="border-b border-slate-800/70 h-0.5"></div>
                   <div className="border-b border-slate-800/70 h-0.5"></div>
                 </div>
-                <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4 text-[11px] sm:text-[13px]">
+                <div className="mt-4 sm:mt-6 md:mt-8 space-y-2 sm:space-y-3 md:space-y-4 text-[9px] sm:text-[11px] md:text-[13px]">
                   <div className="flex items-end">
                     <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
                     <div className="flex-grow border-b border-slate-800/70"></div>
@@ -911,20 +933,20 @@ const StudentReportCard = () => {
               </div>
 
               <div className="w-full relative">
-                <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1">Second Semester</h3>
-                <div className="absolute left-6 top-8 font-sans text-lg sm:text-2xl text-blue-900 tracking-wide transform -rotate-1 opacity-90 z-10 leading-relaxed">
+                <h3 className="font-bold text-[10px] sm:text-sm md:text-base text-slate-900 mb-1">Second Semester</h3>
+                <div className="absolute left-4 sm:left-6 top-6 sm:top-8 font-sans text-sm sm:text-lg md:text-2xl text-blue-900 tracking-wide transform -rotate-1 opacity-90 z-10 leading-relaxed">
                   <p className="font-light italic">Satisfactory !</p>
-                  <p className="pl-12 pt-1 font-normal">Needs Improvement</p>
+                  <p className="pl-8 sm:pl-12 pt-1 font-normal">Needs Improvement</p>
                 </div>
-                <div className="w-full space-y-5 sm:space-y-7 pt-4">
+                <div className="w-full space-y-3 sm:space-y-5 md:space-y-7 pt-2 sm:pt-4">
                   <div className="border-b border-slate-800/70 h-0.5"></div>
                   <div className="border-b border-slate-800/70 h-0.5"></div>
                 </div>
-                <div className="mt-10 sm:mt-14 space-y-3 sm:space-y-4 text-[11px] sm:text-[13px] relative z-20">
+                <div className="mt-8 sm:mt-10 md:mt-14 space-y-2 sm:space-y-3 md:space-y-4 text-[9px] sm:text-[11px] md:text-[13px] relative z-20">
                   <div className="flex items-end">
                     <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
                     <div className="flex-grow border-b border-slate-800/70 relative">
-                      <span className="absolute right-4 bottom-[-4px] font-sans text-2xl sm:text-3xl text-blue-900 italic opacity-80 select-none">Stf</span>
+                      <span className="absolute right-2 sm:right-4 bottom-[-4px] font-sans text-xl sm:text-2xl md:text-3xl text-blue-900 italic opacity-80 select-none">Stf</span>
                     </div>
                   </div>
                   <div className="flex items-end">
@@ -934,10 +956,10 @@ const StudentReportCard = () => {
                 </div>
               </div>
 
-              <div className="absolute bottom-4 left-[-40px] w-28 h-28 sm:w-36 sm:h-36 border-4 border-dashed border-blue-500/60 rounded-full flex items-center justify-center transform rotate-12 opacity-75 pointer-events-none">
-                <div className="w-20 h-20 sm:w-28 sm:h-28 border border-blue-500/40 rounded-full flex flex-col items-center justify-center text-[6px] sm:text-[7px] text-blue-600 font-sans text-center p-1 leading-tight font-bold">
+              <div className="absolute bottom-2 sm:bottom-4 left-[-20px] sm:left-[-40px] w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 border-2 sm:border-4 border-dashed border-blue-500/60 rounded-full flex items-center justify-center transform rotate-12 opacity-75 pointer-events-none">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-28 md:h-28 border border-blue-500/40 rounded-full flex flex-col items-center justify-center text-[4px] sm:text-[6px] md:text-[7px] text-blue-600 font-sans text-center p-1 leading-tight font-bold">
                   <span>ትምህርት ቤት</span>
-                  <span className="text-[5px] sm:text-[6px] my-0.5">★ TULU DIMTU ★</span>
+                  <span className="text-[3px] sm:text-[5px] md:text-[6px] my-0.5">★ TULU DIMTU ★</span>
                   <span>SECONDARY SCHOOL</span>
                 </div>
               </div>
@@ -945,15 +967,16 @@ const StudentReportCard = () => {
           </div>
         </div>
 
+        {/* ACTIONS */}
         <div className="no-print flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-4 w-full">
-          <button 
+          <button
             onClick={handleDownload}
             className="w-full sm:w-auto bg-[#31b4cc] text-white px-6 sm:px-8 py-3 rounded-full font-bold hover:bg-[#2a9db3] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             <Download size={20} />
             DOWNLOAD REPORT CARD
           </button>
-          <button 
+          <button
             onClick={handleClose}
             className="w-full sm:w-auto bg-gray-500 text-white px-6 sm:px-8 py-3 rounded-full font-bold hover:bg-gray-600 transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
           >
@@ -1051,7 +1074,7 @@ const StudentReportCard = () => {
   }
   
   // ==========================================
-  // CLASS SELECTOR VIEW — responsive
+  // CLASS SELECTOR VIEW
   // ==========================================
   if (!selectedClass) {
     return (
@@ -1194,7 +1217,7 @@ const StudentReportCard = () => {
   }
 
   // ==========================================
-  // STUDENT DETAIL VIEW — responsive
+  // STUDENT DETAIL VIEW
   // ==========================================
   if (viewMode === 'student' && selectedStudent) {
     const overallAverage = calculateOverallAverage(selectedStudent._id);
@@ -1410,7 +1433,7 @@ const StudentReportCard = () => {
   }
 
   // ==========================================
-  // MAIN DASHBOARD VIEW — responsive
+  // MAIN DASHBOARD VIEW
   // ==========================================
   const maxPossible = allSubjectsList.length * 100;
   const passedCount = sortedStudents.filter(s => s.overallAverage >= 50).length;
@@ -1567,7 +1590,7 @@ const StudentReportCard = () => {
         </div>
       </div>
       
-      {/* Stats Cards — responsive 1 → 2 → 3 → 6 cols */}
+      {/* Stats Cards */}
       {!loading && sortedStudents.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-4 sm:mb-6">
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 sm:p-4 rounded-xl border border-green-200">
@@ -1602,7 +1625,6 @@ const StudentReportCard = () => {
       )}
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Search Bar */}
         <div className="p-3 sm:p-6 border-b border-gray-200">
           <div className="relative">
             <Search className="absolute left-3 sm:left-4 top-3 text-gray-400" size={18} />
@@ -1798,7 +1820,7 @@ const StudentReportCard = () => {
               </table>
             </div>
             
-            {/* Pagination — responsive */}
+            {/* Pagination */}
             {sortedStudents.length > 0 && (
               <div className="border-t border-gray-200 p-3 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
@@ -1816,37 +1838,17 @@ const StudentReportCard = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => goToPage(1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                  >
+                  <button onClick={() => goToPage(1)} disabled={currentPage === 1} className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50">
                     <ChevronsLeft size={16} />
                   </button>
-                  <button
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                  >
+                  <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50">
                     <ChevronLeft size={16} />
                   </button>
-                  
-                  <span className="px-2 sm:px-4 py-1 text-xs sm:text-sm">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  
-                  <button
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                  >
+                  <span className="px-2 sm:px-4 py-1 text-xs sm:text-sm">Page {currentPage} of {totalPages}</span>
+                  <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50">
                     <ChevronRight size={16} />
                   </button>
-                  <button
-                    onClick={() => goToPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
-                  >
+                  <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages} className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50">
                     <ChevronsRight size={16} />
                   </button>
                 </div>
