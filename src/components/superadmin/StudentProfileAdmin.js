@@ -24,12 +24,12 @@ const StatCard = ({ icon: Icon, label, value, color = 'blue' }) => {
 
   return (
     <div className={`stat-card border rounded-lg p-3 ${colorMap[color]}`}>
-      <div className="stat-card-inner flex items-center justify-between">
-        <div className="stat-card-content">
+      <div className="stat-card-inner flex items-center justify-between gap-3">
+        <div className="stat-card-content min-w-0">
           <p className="stat-card-label text-xs font-medium opacity-75">{label}</p>
-          <p className="stat-card-value text-xl font-bold mt-1">{value}</p>
+          <p className="stat-card-value text-xl font-bold mt-1 truncate">{value}</p>
         </div>
-        <Icon className="stat-card-icon w-8 h-8 opacity-30" />
+        <Icon className="stat-card-icon w-8 h-8 opacity-30 flex-shrink-0" />
       </div>
     </div>
   );
@@ -45,7 +45,7 @@ const Badge = ({ text, color = 'blue' }) => {
   };
 
   return (
-    <span className={`badge px-2.5 py-1 rounded-md text-xs font-semibold ${colorMap[color]}`}>
+    <span className={`badge px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${colorMap[color]}`}>
       {text}
     </span>
   );
@@ -154,20 +154,20 @@ const EditStudentModal = ({ student, onClose, onUpdate, loading }) => {
   if (!student) return null;
 
   return (
-    <div className="edit-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="edit-modal bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="edit-modal-header sticky top-0 bg-blue-600 text-white p-4 rounded-t-xl flex justify-between items-center">
-          <h2 className="edit-modal-title text-xl font-bold flex items-center gap-2">
-            <Edit2 className="edit-modal-title-icon w-5 h-5" />
-            Edit Student
+    <div className="edit-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4">
+      <div className="edit-modal bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="edit-modal-header sticky top-0 bg-blue-600 text-white p-3 sm:p-4 rounded-t-xl flex justify-between items-center gap-2">
+          <h2 className="edit-modal-title text-base sm:text-xl font-bold flex items-center gap-2 min-w-0">
+            <Edit2 className="edit-modal-title-icon w-5 h-5 flex-shrink-0" />
+            <span className="truncate">Edit Student</span>
           </h2>
-          <button onClick={onClose} className="edit-modal-close-btn p-1 hover:bg-blue-700 rounded-lg transition">
+          <button onClick={onClose} className="edit-modal-close-btn p-1 hover:bg-blue-700 rounded-lg transition flex-shrink-0">
             <X className="edit-modal-close-icon w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="edit-modal-form p-6">
-          <div className="edit-form-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="edit-modal-form p-4 sm:p-6">
+          <div className="edit-form-grid grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="edit-form-field">
               <label className="edit-form-label block text-sm font-semibold text-gray-700 mb-1">Full Name *</label>
               <input
@@ -282,18 +282,18 @@ const EditStudentModal = ({ student, onClose, onUpdate, loading }) => {
             </div>
           </div>
 
-          <div className="edit-form-actions mt-6 flex justify-end gap-3">
+          <div className="edit-form-actions mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="edit-form-cancel-btn px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold"
+              className="edit-form-cancel-btn w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="edit-form-submit-btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
+              className="edit-form-submit-btn w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2"
             >
               {loading ? 'Saving...' : <><Save className="edit-form-submit-icon w-4 h-4" /> Save Changes</>}
             </button>
@@ -342,12 +342,12 @@ const StudentDetailPage = ({ student, onBack }) => {
   };
 
   return (
-    <div className="student-detail-page min-h-screen bg-[#f8fafc] p-6">
+    <div className="student-detail-page min-h-screen bg-[#f8fafc] p-3 sm:p-6">
       <div className="student-detail-wrapper max-w-6xl mx-auto">
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="student-detail-back-btn flex items-center gap-2 text-blue-600 hover:text-blue-800 transition font-semibold mb-6"
+          className="student-detail-back-btn flex items-center gap-2 text-blue-600 hover:text-blue-800 transition font-semibold mb-4 sm:mb-6"
         >
           <ArrowLeft className="student-detail-back-icon w-5 h-5" />
           Back to Student List
@@ -355,26 +355,26 @@ const StudentDetailPage = ({ student, onBack }) => {
 
         <div className="student-detail-card bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="student-detail-header bg-blue-600 text-white p-6">
-            <h2 className="student-detail-title text-2xl font-bold">Student Profile</h2>
-            <p className="student-detail-subtitle text-blue-100">Complete student information</p>
+          <div className="student-detail-header bg-blue-600 text-white p-4 sm:p-6">
+            <h2 className="student-detail-title text-xl sm:text-2xl font-bold">Student Profile</h2>
+            <p className="student-detail-subtitle text-blue-100 text-sm">Complete student information</p>
           </div>
 
-          <div className="student-detail-body p-6">
-            {/* Profile Header */}
-            <div className="detail-profile-header flex items-center gap-6 mb-6 pb-6 border-b border-gray-200">
+          <div className="student-detail-body p-4 sm:p-6">
+            {/* Profile Header — responsive row/column */}
+            <div className="detail-profile-header flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 mb-6 pb-6 border-b border-gray-200">
               <img
                 src={studentImage}
                 alt={student.name}
-                className="detail-profile-image w-32 h-32 rounded-full object-cover border-4 border-blue-200"
+                className="detail-profile-image w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-200 flex-shrink-0"
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=4F46E5&color=fff&size=120&font-size=0.5&bold=true`;
                 }}
               />
-              <div className="detail-profile-info">
-                <h3 className="detail-profile-name text-2xl font-bold text-gray-900">{student.name}</h3>
-                <p className="detail-profile-roll text-gray-600">Roll No: {student.rollNumber || '-'}</p>
-                <div className="detail-profile-badges flex gap-2 mt-2 flex-wrap">
+              <div className="detail-profile-info min-w-0">
+                <h3 className="detail-profile-name text-xl sm:text-2xl font-bold text-gray-900 break-words">{student.name}</h3>
+                <p className="detail-profile-roll text-gray-600 text-sm">Roll No: {student.rollNumber || '-'}</p>
+                <div className="detail-profile-badges flex gap-2 mt-2 flex-wrap justify-center sm:justify-start">
                   <Badge text={student.grade || 'No Grade'} color="blue" />
                   {isGraduated && <Badge text="🎓 Graduated" color="purple" />}
                   {student.academicStatus === 'Active' && <Badge text="Active" color="green" />}
@@ -382,8 +382,8 @@ const StudentDetailPage = ({ student, onBack }) => {
               </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="detail-stats-grid grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Stats Grid — 1 col mobile, 3 col desktop */}
+            <div className="detail-stats-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
               <StatCard icon={User} label="Age" value={student.age || '-'} color="blue" />
               <StatCard icon={GraduationCap} label="Status" value={student.academicStatus || 'Active'} color={isGraduated ? 'purple' : 'green'} />
               <StatCard icon={Calendar} label="Joined" value={formatDate(student.createdAt)} color="orange" />
@@ -391,16 +391,16 @@ const StudentDetailPage = ({ student, onBack }) => {
 
             {/* Personal Information */}
             <div className="detail-personal-info mb-6">
-              <h4 className="detail-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <User className="detail-section-icon w-5 h-5 text-blue-600" />
+              <h4 className="detail-section-title text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <User className="detail-section-icon w-5 h-5 text-blue-600 flex-shrink-0" />
                 Personal Information
               </h4>
-              <div className="detail-table-container overflow-x-auto">
-                <table className="detail-table w-full border-collapse text-sm">
+              <div className="detail-table-container overflow-x-auto rounded-lg">
+                <table className="detail-table w-full border-collapse text-xs sm:text-sm min-w-[320px]">
                   <thead className="detail-table-header">
                     <tr className="detail-table-header-row bg-blue-600 text-white">
-                      <th className="detail-table-header-cell px-4 py-2 text-left font-bold border border-blue-700">Field</th>
-                      <th className="detail-table-header-cell px-4 py-2 text-left font-bold border border-blue-700">Value</th>
+                      <th className="detail-table-header-cell px-3 sm:px-4 py-2 text-left font-bold border border-blue-700">Field</th>
+                      <th className="detail-table-header-cell px-3 sm:px-4 py-2 text-left font-bold border border-blue-700">Value</th>
                     </tr>
                   </thead>
                   <tbody className="detail-table-body">
@@ -408,13 +408,13 @@ const StudentDetailPage = ({ student, onBack }) => {
                       const IconComponent = item.icon;
                       return (
                         <tr key={idx} className="detail-table-row hover:bg-blue-50 transition even:bg-gray-50">
-                          <td className="detail-table-cell px-4 py-2 font-medium text-gray-700 border border-gray-200">
+                          <td className="detail-table-cell px-3 sm:px-4 py-2 font-medium text-gray-700 border border-gray-200">
                             <div className="detail-table-cell-content flex items-center gap-2">
-                              <IconComponent className="detail-table-cell-icon w-4 h-4 text-blue-600" />
+                              <IconComponent className="detail-table-cell-icon w-4 h-4 text-blue-600 flex-shrink-0" />
                               {item.label}
                             </div>
                           </td>
-                          <td className="detail-table-cell px-4 py-2 text-gray-900 border border-gray-200">
+                          <td className="detail-table-cell px-3 sm:px-4 py-2 text-gray-900 border border-gray-200 break-words">
                             {item.value}
                           </td>
                         </tr>
@@ -427,16 +427,16 @@ const StudentDetailPage = ({ student, onBack }) => {
 
             {/* Academic Information */}
             <div className="detail-academic-info mb-6">
-              <h4 className="detail-section-title text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <BookOpen className="detail-section-icon w-5 h-5 text-blue-600" />
+              <h4 className="detail-section-title text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <BookOpen className="detail-section-icon w-5 h-5 text-blue-600 flex-shrink-0" />
                 Academic Information
               </h4>
-              <div className="detail-table-container overflow-x-auto">
-                <table className="detail-table w-full border-collapse text-sm">
+              <div className="detail-table-container overflow-x-auto rounded-lg">
+                <table className="detail-table w-full border-collapse text-xs sm:text-sm min-w-[320px]">
                   <thead className="detail-table-header">
                     <tr className="detail-table-header-row bg-blue-600 text-white">
-                      <th className="detail-table-header-cell px-4 py-2 text-left font-bold border border-blue-700">Field</th>
-                      <th className="detail-table-header-cell px-4 py-2 text-left font-bold border border-blue-700">Value</th>
+                      <th className="detail-table-header-cell px-3 sm:px-4 py-2 text-left font-bold border border-blue-700">Field</th>
+                      <th className="detail-table-header-cell px-3 sm:px-4 py-2 text-left font-bold border border-blue-700">Value</th>
                     </tr>
                   </thead>
                   <tbody className="detail-table-body">
@@ -444,13 +444,13 @@ const StudentDetailPage = ({ student, onBack }) => {
                       const IconComponent = item.icon;
                       return (
                         <tr key={idx} className="detail-table-row hover:bg-blue-50 transition even:bg-gray-50">
-                          <td className="detail-table-cell px-4 py-2 font-medium text-gray-700 border border-gray-200">
+                          <td className="detail-table-cell px-3 sm:px-4 py-2 font-medium text-gray-700 border border-gray-200">
                             <div className="detail-table-cell-content flex items-center gap-2">
-                              <IconComponent className="detail-table-cell-icon w-4 h-4 text-blue-600" />
+                              <IconComponent className="detail-table-cell-icon w-4 h-4 text-blue-600 flex-shrink-0" />
                               {item.label}
                             </div>
                           </td>
-                          <td className="detail-table-cell px-4 py-2 text-gray-900 border border-gray-200">
+                          <td className="detail-table-cell px-3 sm:px-4 py-2 text-gray-900 border border-gray-200 break-words">
                             {item.value}
                           </td>
                         </tr>
@@ -634,7 +634,7 @@ const StudentProfilePage = () => {
 
   // Main view - All Active Students
   return (
-    <div className="student-list-container min-h-screen bg-[#f8fafc] p-6">
+    <div className="student-list-container min-h-screen bg-[#f8fafc] p-3 sm:p-4 md:p-6">
       {showEditModal && (
         <EditStudentModal 
           student={editingStudent}
@@ -648,37 +648,37 @@ const StudentProfilePage = () => {
       )}
 
       <div className="student-list-wrapper max-w-full mx-auto">
-        {/* Header Section */}
-        <div className="student-list-header mb-6">
-          <div className="student-list-header-inner flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="student-list-header-left">
+        {/* Header Section — stacks on mobile, row on desktop */}
+        <div className="student-list-header mb-5 sm:mb-6">
+          <div className="student-list-header-inner flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="student-list-header-left min-w-0">
               <div className="student-list-title-group">
-                <h1 className="student-list-title text-3xl font-bold text-gray-900">Active Students</h1>
-                <p className="student-list-subtitle text-gray-600 mt-1">
+                <h1 className="student-list-title text-2xl sm:text-3xl font-bold text-gray-900">Active Students</h1>
+                <p className="student-list-subtitle text-gray-600 mt-1 text-sm sm:text-base">
                   View and manage all active student profiles (A-Z sorted)
                 </p>
-                <p className="student-list-total text-sm text-gray-500 mt-1">
+                <p className="student-list-total text-xs sm:text-sm text-gray-500 mt-1">
                   Total Active Students: <span className="student-list-total-count font-semibold text-green-600">{students.length}</span>
                 </p>
               </div>
             </div>
-            <div className="student-list-header-actions flex gap-2 flex-wrap">
+            <div className="student-list-header-actions flex flex-wrap gap-2">
               <button 
                 onClick={toggleSortOrder}
-                className="student-sort-btn px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2"
+                className="student-sort-btn flex-1 sm:flex-initial px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center justify-center gap-2 text-sm"
               >
                 {sortOrder === 'asc' ? '↑ A-Z' : '↓ Z-A'}
               </button>
               <button 
                 onClick={refreshData} 
-                className="student-refresh-btn px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
+                className="student-refresh-btn flex-1 sm:flex-initial px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2 text-sm"
               >
                 <RefreshCw className="student-refresh-btn-icon w-4 h-4" />
                 Refresh
               </button>
               <button 
                 onClick={() => window.print()} 
-                className="student-print-btn px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold flex items-center gap-2"
+                className="student-print-btn flex-1 sm:flex-initial px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold flex items-center justify-center gap-2 text-sm"
               >
                 <Printer className="student-print-btn-icon w-4 h-4" />
                 Print
@@ -687,10 +687,10 @@ const StudentProfilePage = () => {
           </div>
         </div>
 
-        {/* Search & Filter Section */}
-        <div className="student-search-filter bg-white border border-gray-200 rounded-lg p-4 mb-6">
-          <div className="student-search-filter-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
-            <div className="student-search-field lg:col-span-2">
+        {/* Search & Filter Section — responsive grid */}
+        <div className="student-search-filter bg-white border border-gray-200 rounded-lg p-3 sm:p-4 mb-5 sm:mb-6">
+          <div className="student-search-filter-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div className="student-search-field sm:col-span-2 lg:col-span-2">
               <label className="student-search-label block text-xs font-semibold text-gray-700 mb-1.5">Search</label>
               <div className="student-search-input-wrapper relative">
                 <Search className="student-search-icon absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -771,13 +771,13 @@ const StudentProfilePage = () => {
               </select>
             </div>
           </div>
-          <div className="student-search-results mt-3 text-sm text-gray-500">
+          <div className="student-search-results mt-3 text-xs sm:text-sm text-gray-500">
             Found {filteredStudents.length} active student{filteredStudents.length !== 1 ? 's' : ''}
           </div>
         </div>
 
-        {/* Students Table */}
-        <div className="student-table-container bg-white border border-gray-200 overflow-hidden">
+        {/* Students Table — horizontally scrollable on phones */}
+        <div className="student-table-container bg-white border border-gray-200 rounded-lg overflow-hidden">
           {loading ? (
             <div className="student-table-loading flex justify-center items-center py-12">
               <div className="student-table-loading-spinner animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -790,23 +790,23 @@ const StudentProfilePage = () => {
             </div>
           ) : (
             <div className="student-table-scroll overflow-x-auto">
-              <table className="student-table w-full border-collapse">
+              <table className="student-table w-full border-collapse min-w-[1100px]">
                 <thead className="student-table-header">
                   <tr className="student-table-header-row bg-blue-600 text-white">               
-                    <th className="student-table-header-cell px-3 py-2 text-left text-sm font-bold border border-blue-700">Roll No</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Photo</th>
-                    <th className="student-table-header-cell px-3 py-2 text-left text-sm font-bold border border-blue-700 cursor-pointer hover:bg-blue-700 transition" onClick={toggleSortOrder}>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-left text-xs sm:text-sm font-bold border border-blue-700 whitespace-nowrap">Roll No</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Photo</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-left text-xs sm:text-sm font-bold border border-blue-700 cursor-pointer hover:bg-blue-700 transition whitespace-nowrap" onClick={toggleSortOrder}>
                       Student Name {sortOrder === 'asc' ? '↑' : '↓'}
                     </th>
-                    <th className="student-table-header-cell px-3 py-2 text-left text-sm font-bold border border-blue-700">StudentId</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Gender</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Age</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Grade</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Section</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Program</th>
-                        <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700 whitespace-nowrap min-w-[42px]">Parent Phone</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Status</th>
-                    <th className="student-table-header-cell px-3 py-2 text-center text-sm font-bold border border-blue-700">Actions</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-left text-xs sm:text-sm font-bold border border-blue-700 whitespace-nowrap">StudentId</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Gender</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Age</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Grade</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Section</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Program</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700 whitespace-nowrap min-w-[42px]">Parent Phone</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Status</th>
+                    <th className="student-table-header-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm font-bold border border-blue-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="student-table-body">
@@ -816,21 +816,21 @@ const StudentProfilePage = () => {
                     
                     return (
                       <tr key={student._id || index} className="student-table-row hover:bg-blue-50 transition even:bg-gray-50">
-                        <td className="student-table-cell px-3 py-2 text-sm text-gray-700 border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 border border-gray-200 whitespace-nowrap">
                           {student.rollNumber || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center border border-gray-200">
                           <img 
                             src={studentImage} 
                             alt={student.name}
-                            className="student-table-avatar w-10 h-10 rounded-full object-cover border-2 border-blue-200 mx-auto cursor-pointer"
+                            className="student-table-avatar w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-blue-200 mx-auto cursor-pointer"
                             onClick={() => handleViewDetails(student)}
                             onError={(e) => {
                               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=4F46E5&color=fff&size=40&font-size=0.5&bold=true`;
                             }}
                           />
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-sm font-medium text-gray-900 border border-gray-200 whitespace-nowrap min-w-[42px]">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-900 border border-gray-200 whitespace-nowrap min-w-[42px]">
                           <button
                             onClick={() => handleViewDetails(student)}
                             className="student-name-btn hover:text-blue-600 hover:underline transition"
@@ -838,32 +838,32 @@ const StudentProfilePage = () => {
                             {student.name}
                           </button>
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-sm text-gray-700 border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-700 border border-gray-200 whitespace-nowrap">
                           {student.studentId || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center text-sm text-gray-700 border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200">
                           {student.sex || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center text-sm text-gray-700 border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200">
                           {student.age || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
                           {student.grade || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center text-sm text-gray-700 border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200">
                           {student.section || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-4 text-center text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
                           {student.programs || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center text-xs sm:text-sm text-gray-700 border border-gray-200 whitespace-nowrap min-w-[42px]">
                           {student.parentPhone || '-'}
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center border border-gray-200">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center border border-gray-200">
                           <Badge text="Active" color="green" />
                         </td>
-                        <td className="student-table-cell px-3 py-2 text-center border border-gray-200">
-                          <div className="student-actions flex gap-1 justify-center">
+                        <td className="student-table-cell px-2 sm:px-3 py-2 text-center border border-gray-200">
+                          <div className="student-actions flex gap-1 justify-center flex-wrap">
                             <button
                               onClick={() => handleViewDetails(student)}
                               className="student-view-btn px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
@@ -890,11 +890,11 @@ const StudentProfilePage = () => {
                 </tbody>
                 <tfoot className="student-table-footer bg-gray-100 border-t-2 border-gray-300">
                   <tr className="student-table-footer-row">
-                    <td colSpan="6" className="student-table-footer-cell px-3 py-2 text-sm font-semibold text-gray-700">
+                    <td colSpan="6" className="student-table-footer-cell px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700">
                       Total Active Students
                     </td>
                     <td colSpan="5" className="student-table-footer-cell px-3 py-2 text-center border border-gray-200">
-                      <span className="student-table-footer-total text-sm font-semibold text-green-600">
+                      <span className="student-table-footer-total text-xs sm:text-sm font-semibold text-green-600">
                         {filteredStudents.length} Students
                       </span>
                     </td>
@@ -905,50 +905,50 @@ const StudentProfilePage = () => {
           )}
         </div>
 
-        {/* Pagination */}
+        {/* Pagination — wraps nicely on small screens */}
         {totalPages > 1 && (
-          <div className="student-pagination flex justify-center gap-3 mt-6">
+          <div className="student-pagination flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-5 sm:mt-6">
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="student-pagination-prev px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+              className="student-pagination-prev px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm"
             >
               Previous
             </button>
-            <span className="student-pagination-current px-4 py-2 font-bold text-gray-700">
+            <span className="student-pagination-current px-3 sm:px-4 py-2 font-bold text-gray-700 text-sm">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="student-pagination-next px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+              className="student-pagination-next px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm"
             >
               Next
             </button>
           </div>
         )}
 
-        {/* Summary Cards - Only Active Students */}
-        <div className="student-summary-grid mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="student-summary-card bg-white border border-green-200 rounded-lg p-4">
+        {/* Summary Cards — responsive 1 → 2 → 4 columns */}
+        <div className="student-summary-grid mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="student-summary-card bg-white border border-green-200 rounded-lg p-3 sm:p-4">
             <p className="student-summary-label text-xs font-medium text-green-600">Active Students</p>
-            <p className="student-summary-value text-2xl font-bold text-green-600">{students.length}</p>
+            <p className="student-summary-value text-xl sm:text-2xl font-bold text-green-600">{students.length}</p>
           </div>
-          <div className="student-summary-card bg-white border border-blue-200 rounded-lg p-4">
+          <div className="student-summary-card bg-white border border-blue-200 rounded-lg p-3 sm:p-4">
             <p className="student-summary-label text-xs font-medium text-blue-600">Grades</p>
-            <p className="student-summary-value text-2xl font-bold text-blue-600">
+            <p className="student-summary-value text-xl sm:text-2xl font-bold text-blue-600">
               {[...new Set(students.map(s => s.grade).filter(Boolean))].length}
             </p>
           </div>
-          <div className="student-summary-card bg-white border border-purple-200 rounded-lg p-4">
+          <div className="student-summary-card bg-white border border-purple-200 rounded-lg p-3 sm:p-4">
             <p className="student-summary-label text-xs font-medium text-purple-600">Programs</p>
-            <p className="student-summary-value text-2xl font-bold text-purple-600">
+            <p className="student-summary-value text-xl sm:text-2xl font-bold text-purple-600">
               {[...new Set(students.map(s => s.programs).filter(Boolean))].length}
             </p>
           </div>
-          <div className="student-summary-card bg-white border border-orange-200 rounded-lg p-4">
+          <div className="student-summary-card bg-white border border-orange-200 rounded-lg p-3 sm:p-4">
             <p className="student-summary-label text-xs font-medium text-orange-600">Sections</p>
-            <p className="student-summary-value text-2xl font-bold text-orange-600">
+            <p className="student-summary-value text-xl sm:text-2xl font-bold text-orange-600">
               {[...new Set(students.map(s => s.section).filter(Boolean))].length}
             </p>
           </div>
