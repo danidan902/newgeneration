@@ -39,18 +39,13 @@ const StudentReportCard = () => {
     return localStorage.getItem('ranking_save_space') === 'true';
   });
   
-  // Report card state
   const [reportCardData, setReportCardData] = useState(null);
   const [showReportCard, setShowReportCard] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
   
-  // Student profile images cache
   const [studentImages, setStudentImages] = useState({});
-  
-  // Student details cache (gender, age, etc.)
   const [studentDetails, setStudentDetails] = useState({});
   
-  // Refs for report card pages
   const page1Ref = useRef();
   const page2Ref = useRef();
   
@@ -119,7 +114,6 @@ const StudentReportCard = () => {
     }
   };
 
-  // Get subjects from class data
   const getClassSubjects = (classData) => {
     if (!classData) return [];
     return classData.subjects || [];
@@ -133,11 +127,9 @@ const StudentReportCard = () => {
       const studentsList = classData.students || [];
       setStudents(studentsList);
       
-      // Get subjects from class data
       const subjects = getClassSubjects(classData);
       setAllSubjectsList(subjects);
       
-      // Fetch profile images and details for all students
       const images = {};
       const details = {};
       for (const student of studentsList) {
@@ -169,13 +161,11 @@ const StudentReportCard = () => {
         return;
       }
       
-      // Fetch marks for all students
       const marksResponse = await api.get(`/marks/class/${classId}`, {
         params: { semester: semester, academicYear: academicYear }
       });
       const allMarksData = marksResponse.data;
       
-      // Initialize marks map with all subjects from class
       const marksMap = {};
       studentsList.forEach(student => {
         marksMap[student._id] = {};
@@ -187,7 +177,6 @@ const StudentReportCard = () => {
         });
       });
       
-      // Populate marks from API
       allMarksData.forEach(mark => {
         const studentId = mark.studentId?._id || mark.studentId;
         const subject = mark.subject;
@@ -203,7 +192,6 @@ const StudentReportCard = () => {
         }
       });
       
-      // Fetch individual student marks for more data
       for (const student of studentsList) {
         try {
           const studentMarksResponse = await api.get(`/marks/student/${student._id}`, {
@@ -252,7 +240,6 @@ const StudentReportCard = () => {
     const exams = subjectData.exams;
     let totalScore = 0;
     
-    // Quiz marks excluded
     if (exams.test?.score) totalScore += exams.test.score;
     if (exams.midterm?.score) totalScore += exams.midterm.score;
     if (exams.textbook?.score) totalScore += exams.textbook.score;
@@ -268,11 +255,9 @@ const StudentReportCard = () => {
     };
   };
 
-  // Calculate overall average: Sum all subject totals, divide by TOTAL number of subjects in the class
-  // This gives the average percentage (each subject is out of 100)
   const calculateOverallAverage = (studentId) => {
     let totalSubjectScores = 0;
-    let subjectCount = allSubjectsList.length; // Use total number of subjects in the class
+    let subjectCount = allSubjectsList.length;
     
     allSubjectsList.forEach(subject => {
       const subjectName = typeof subject === 'string' ? subject : subject.name;
@@ -284,8 +269,6 @@ const StudentReportCard = () => {
     
     if (subjectCount === 0) return 0;
     
-    // Average = Total marks / Total number of subjects in the class
-    // This gives the average percentage (each subject is out of 100)
     return totalSubjectScores / subjectCount;
   };
 
@@ -386,7 +369,7 @@ const StudentReportCard = () => {
   };
 
   // ==========================================
-  // REPORT CARD COMPONENT
+  // REPORT CARD COMPONENT (Responsive)
   // ==========================================
 
   const ReportCardView = ({ student, sortedStudents, yearly }) => {
@@ -465,7 +448,6 @@ const StudentReportCard = () => {
               totalFinal += finalAverage;
             });
             
-            // Divide by TOTAL number of subjects in the class
             const avgSem1 = totalSubjects > 0 ? totalSem1 / totalSubjects : 0;
             const avgSem2 = totalSubjects > 0 ? totalSem2 / totalSubjects : 0;
             const avgFinal = totalSubjects > 0 ? totalFinal / totalSubjects : 0;
@@ -492,11 +474,11 @@ const StudentReportCard = () => {
               const finalScore = subjectScores[subject]?.final || 0;
               
               return (
-                <tr key={index} className="border-b border-slate-900 h-[29px]">
-                  <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-normal">{subject}</td>
-                  <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-medium">{sem1Score}</td>
-                  <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-medium">{sem2Score}</td>
-                  <td className="text-center font-sans text-[14px] text-blue-900 font-medium">{finalScore.toFixed(1)}</td>
+                <tr key={index} className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+                  <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-normal">{subject}</td>
+                  <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{sem1Score}</td>
+                  <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{sem2Score}</td>
+                  <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{finalScore.toFixed(1)}</td>
                 </tr>
               );
             });
@@ -516,16 +498,15 @@ const StudentReportCard = () => {
             totalSem1 += score;
             
             return (
-              <tr key={index} className="border-b border-slate-900 h-[29px]">
-                <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-normal">{subjectName}</td>
-                <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
-                <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-medium">—</td>
-                <td className="text-center font-sans text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
+              <tr key={index} className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+                <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-normal">{subjectName}</td>
+                <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
+                <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">—</td>
+                <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">{subjectTotal ? subjectTotal.total : '—'}</td>
               </tr>
             );
           });
           
-          // Divide by TOTAL number of subjects in the class
           const avgSem1 = totalSubjects > 0 ? totalSem1 / totalSubjects : 0;
           const overallAverage = avgSem1;
           const totalMarks = totalSem1;
@@ -642,39 +623,39 @@ const StudentReportCard = () => {
 
     const totalsRows = (
       <>
-        <tr className="border-b border-slate-900 h-[29px] border-t-2 border-t-slate-900">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Total Sum</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.sem1Total?.toFixed(1) : totals.totalMarks.toFixed(1)}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.sem2Total?.toFixed(1) : '—'}</td>
-          <td className="text-center font-sans text-[14px] text-blue-900 font-bold">{totals.totalMarks.toFixed(1)}</td>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px] border-t-2 border-t-slate-900">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Total Sum</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem1Total?.toFixed(1) : totals.totalMarks.toFixed(1)}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.sem2Total?.toFixed(1) : '—'}</td>
+          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.totalMarks.toFixed(1)}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Average</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem1?.toFixed(2) : totals.overallAverage.toFixed(2)}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem2?.toFixed(2) : '—'}</td>
-          <td className="text-center font-sans text-[14px] text-blue-900 font-bold">{totals.overallAverage.toFixed(2)}</td>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Average</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem1?.toFixed(2) : totals.overallAverage.toFixed(2)}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.avgSem2?.toFixed(2) : '—'}</td>
+          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.overallAverage.toFixed(2)}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Rank</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.rank : '—'}/{sortedStudents.length}</td>
-          <td className="text-center font-sans text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Rank</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.rank : '—'}/{sortedStudents.length}</td>
+          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.rank}/{sortedStudents.length}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Conduct</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900 font-bold">{yearly ? totals.grade?.letter : '—'}</td>
-          <td className="text-center font-sans text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Conduct</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{yearly ? totals.grade?.letter : '—'}</td>
+          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900 font-bold">{totals.grade?.letter || '—'}</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[29px]">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Absent</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900">—</td>
-          <td className="border-r border-slate-900 text-center font-sans text-[14px] text-blue-900">—</td>
-          <td className="text-center font-sans text-[14px] text-blue-900">—</td>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px]">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Absent</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
+          <td className="border-r border-slate-900 text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
+          <td className="text-center font-sans text-[12px] sm:text-[14px] text-blue-900">—</td>
         </tr>
-        <tr className="border-b border-slate-900 h-[29px] bg-cyan-100/30">
-          <td className="border-r border-slate-900 text-left pl-3 font-serif text-[13px] text-slate-900 font-bold">Promotion</td>
-          <td colSpan="3" className="text-center font-sans text-[16px] font-bold" style={{ color: totals.promoted ? '#059669' : '#dc2626' }}>
+        <tr className="border-b border-slate-900 h-[26px] sm:h-[29px] bg-cyan-100/30">
+          <td className="border-r border-slate-900 text-left pl-2 sm:pl-3 font-serif text-[11px] sm:text-[13px] text-slate-900 font-bold">Promotion</td>
+          <td colSpan="3" className="text-center font-sans text-[13px] sm:text-[16px] font-bold" style={{ color: totals.promoted ? '#059669' : '#dc2626' }}>
             {promotionText}
           </td>
         </tr>
@@ -682,290 +663,299 @@ const StudentReportCard = () => {
     );
 
     return (
-      <div className="min-h-screen bg-slate-100 p-8 flex flex-col gap-12 justify-center items-center font-serif text-slate-900 select-none print:p-0 print:bg-white">
+      <div className="min-h-screen bg-slate-100 p-3 sm:p-8 flex flex-col gap-6 sm:gap-12 justify-center items-center font-serif text-slate-900 select-none print:p-0 print:bg-white">
         
-        {/* VIEW 1: FRONT AND BACK COVERS */}
-        <div ref={page1Ref} className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break">
+        {/* WRAPPER: makes report cards horizontally scrollable / scaled on small screens */}
+        <div className="w-full flex flex-col items-center gap-6 sm:gap-12 overflow-x-auto">
           
-          {/* LEFT PANEL: BACK COVER (Method of Marking) */}
-          <div className="w-1/2 h-full pr-10 border-r  flex flex-col items-center relative text-[14px]">
-            <div className="  flex items-center justify-center mb-4">
-              <span className="text-[10px] text-center font-sans font-bold leading-tight px-1 text-slate-800">
-                <img src={Logo1} alt="Logo" />
-              </span>
-            </div>
-            <h2 className="text-xl font-bold tracking-wide uppercase mb-6 text-slate-800">METHOD OF MARKING</h2>
-            <p className="w-full text-justify mb-8 leading-relaxed">Student achievement in each class will be assigned the following values</p>
-            <div className="w-full space-y-3 px-4 mb-12">
-              {[
-                { range: "90%-100%", label: "Excellent" },
-                { range: "80%- 89%", label: "very good" },
-                { range: "60%-79%", label: "Good" },
-                { range: "50%- 59%", label: "satisfactory" },
-                { range: "49%- and below", label: "law" }
-              ].map((item, idx) => (
-                <div key={idx} className="flex justify-between items-end">
-                  <span className="whitespace-nowrap text-slate-800">{item.range}</span>
-                  <div className="flex-grow mx-2 border-b border-dotted border-slate-700 h-1"></div>
-                  <span className="whitespace-nowrap w-24 text-left text-slate-800">{item.label}</span>
-                </div>
-              ))}
-            </div>
-            <p className="w-full text-justify leading-relaxed tracking-wide text-slate-800">
-              A mark Zero (0%) should never be given, since it would mean no work has been done absolutely . If a student has been absent from class for the whole period covered and has not made up any of the work ,He/she should be marked 'AB' for 'absent'
-            </p>
-            <div className="absolute bottom-6 right-6 flex flex-col gap-3 font-bold text-slate-700 text-lg">
-              <span>:</span><span>:</span><span>:</span>
-            </div>
-          </div>
-
-          {/* RIGHT PANEL: FRONT COVER (Student Profile) */}
-          <div className="w-1/2 h-full pl-10 flex flex-col items-center text-[13px] text-slate-900">
-            {/* Top Header with Logo and Photo */}
-            <div className="w-full flex justify-between items-start mb-4">
-              <div className="w-24 h-24 flex items-center justify-center flex-shrink-0">
+          {/* VIEW 1: FRONT AND BACK COVERS */}
+          <div 
+            ref={page1Ref} 
+            className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-6 sm:p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break flex-shrink-0 origin-top scale-[0.32] sm:scale-[0.55] md:scale-[0.75] lg:scale-100 -mb-[540px] sm:-mb-[360px] md:-mb-[200px] lg:mb-0"
+          >
+            
+            {/* LEFT PANEL: BACK COVER (Method of Marking) */}
+            <div className="w-1/2 h-full pr-6 sm:pr-10 border-r flex flex-col items-center relative text-[12px] sm:text-[14px]">
+              <div className="flex items-center justify-center mb-4">
                 <span className="text-[10px] text-center font-sans font-bold leading-tight px-1 text-slate-800">
-                  <img src={Logo} alt="Logo" />
+                  <img src={Logo1} alt="Logo" />
                 </span>
               </div>
-              <div className="flex-shrink-0">
-                <img 
-                  src={studentPhotoUrl} 
-                  alt="Student" 
-                  className="w-[150px] h-[180px] object-cover  border-3 border-[#b88728] shadow-md"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="w-[150px] h-[180px]  bg-gray-100 flex items-center justify-center text-xs text-gray-500 hidden">
-                  No Photo
-                </div>
+              <h2 className="text-lg sm:text-xl font-bold tracking-wide uppercase mb-4 sm:mb-6 text-slate-800">METHOD OF MARKING</h2>
+              <p className="w-full text-justify mb-6 sm:mb-8 leading-relaxed">Student achievement in each class will be assigned the following values</p>
+              <div className="w-full space-y-3 px-2 sm:px-4 mb-8 sm:mb-12">
+                {[
+                  { range: "90%-100%", label: "Excellent" },
+                  { range: "80%- 89%", label: "very good" },
+                  { range: "60%-79%", label: "Good" },
+                  { range: "50%- 59%", label: "satisfactory" },
+                  { range: "49%- and below", label: "law" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-end">
+                    <span className="whitespace-nowrap text-slate-800">{item.range}</span>
+                    <div className="flex-grow mx-2 border-b border-dotted border-slate-700 h-1"></div>
+                    <span className="whitespace-nowrap w-24 text-left text-slate-800">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="w-full text-justify leading-relaxed tracking-wide text-slate-800">
+                A mark Zero (0%) should never be given, since it would mean no work has been done absolutely . If a student has been absent from class for the whole period covered and has not made up any of the work ,He/she should be marked 'AB' for 'absent'
+              </p>
+              <div className="absolute bottom-6 right-6 flex flex-col gap-3 font-bold text-slate-700 text-lg">
+                <span>:</span><span>:</span><span>:</span>
               </div>
             </div>
 
-            <div className="text-center space-y-0.5 mb-6">
-              <h1 className="text-sm font-bold tracking-wide text-slate-800 uppercase">WAAJJIRA BARNOOTA MAGAALAA SHAGGAR</h1>
-              <h1 className="text-sm font-bold tracking-wide text-slate-800 uppercase">KUTAA MAGAALAA KOYYEE FACCEE</h1>
-              <h2 className="text-[15px] font-sans font-semibold tracking-normal text-slate-800">በሸገር ከተማ ትምህርት ጽሕፈት ቤት የኮዬ ፈጬ ክ/ከተማ</h2>
-              <h2 className="text-[15px] font-sans font-semibold tracking-normal text-slate-800 mb-2">ትምህርት ጽሕፈት ቤት</h2>
-              <h3 className="text-[11px] font-bold tracking-wider text-slate-700 uppercase">KAARDII GABAASA FIRII BARATTOOTA SAD. 2FFAA</h3>
-              <h3 className="text-[12px] font-sans font-semibold text-slate-700">የ2ኛ ደረጃ ተማሪዎች የውጤት ሪፖርት ካርድ</h3>
-              <p className="text-[12px] font-medium text-slate-800 mt-1">Shaggar City Education Office</p>
-              <p className="text-[12px] font-medium text-slate-800">Secondary School Student Report Card</p>
-            </div>
-
-            <div className="w-full space-y-4">
-              <div className="flex items-end w-full">
-                <span className="whitespace-nowrap mr-2">Name of School</span>
-                <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                  <span className="absolute left-4 bottom-0.5 font-sans text-xl text-blue-900 font-medium tracking-wide">Tulu Dimtu GSS</span>
-                </div>
-              </div>
-
-              <div className="flex items-end w-full text-[12px]">
-                <span className="whitespace-nowrap mr-1 font-bold">Address :</span>
-                <span className="whitespace-nowrap font-bold mr-1">Oromia Region</span>
-                <span className="whitespace-nowrap mr-1 text-slate-800">Shaggar City</span>
-                <span className="whitespace-nowrap font-bold mr-1">Koye Feche</span>
-                <span className="whitespace-nowrap text-slate-800">Sub city</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Woreda</span>
-                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-2 bottom-0.5 font-sans text-lg text-blue-900">Tulu Dimtu</span>
-                  </div>
-                </div>
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Zone</span>
-                  <div className="flex-grow border-b border-slate-800"></div>
-                </div>
-              </div>
-
-              <h3 className="text-center font-bold text-[15px] tracking-wide pt-2">Student's Profile</h3>
-
-              <div className="flex items-end w-full">
-                <span className="whitespace-nowrap mr-2">Name of Student</span>
-                <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                  <span className="absolute left-4 bottom-0.5 font-sans text-2xl text-blue-900 tracking-wide font-light">{student.name}</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 w-full">
-                <div className="flex items-end col-span-1">
-                  <span className="whitespace-nowrap mr-2">Sex</span>
-                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-4 bottom-0.5 font-sans text-xl text-blue-900 font-medium">{studentSex}</span>
-                  </div>
-                </div>
-                <div className="flex items-end col-span-1">
-                  <span className="whitespace-nowrap mr-2">Age</span>
-                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                    <span className="absolute left-4 bottom-0.5 font-sans text-xl text-blue-900">{studentAge}</span>
-                  </div>
-                </div>
-                <div className="flex items-end col-span-1">
-                  <span className="whitespace-nowrap mr-2">Address</span>
-                  <div className="flex-grow border-b border-slate-800"></div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 w-full">
-                <div className="flex items-end"><span className="mr-1">Sub City</span><div className="flex-grow border-b border-slate-800"></div></div>
-                <div className="flex items-end"><span className="mr-1">Woreda</span><div className="flex-grow border-b border-slate-800"></div></div>
-                <div className="flex items-end"><span className="mr-1">House no</span><div className="flex-grow border-b border-slate-800"></div></div>
-              </div>
-
-              <div className="flex items-end w-full">
-                <span className="whitespace-nowrap mr-2">Academic Year</span>
-                <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                  <span className="absolute left-6 bottom-0.5 font-sans text-xl text-blue-900 tracking-wider">{academicYear}</span>
-                </div>
-              </div>
-
-              <div className="flex items-end w-full">
-                <span className="whitespace-nowrap mr-2">Class(Grade)</span>
-                <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                  <span className="absolute left-6 bottom-0.5 font-sans text-xl text-blue-900 tracking-wider font-light">{selectedClass.grade}th</span>
-                </div>
-              </div>
-
-              <div className="flex items-end w-full relative">
-                <span className="whitespace-nowrap mr-2">Promotion Status</span>
-                <div className="flex-grow border-b border-slate-800 relative pb-0.5">
-                  <span className={`absolute left-8 bottom-0.5 font-sans text-xl font-medium ${totals.promoted ? 'text-green-600' : 'text-red-600'}`}>
-                    {promotionText}
+            {/* RIGHT PANEL: FRONT COVER (Student Profile) */}
+            <div className="w-1/2 h-full pl-6 sm:pl-10 flex flex-col items-center text-[11px] sm:text-[13px] text-slate-900">
+              <div className="w-full flex justify-between items-start mb-3 sm:mb-4">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[10px] text-center font-sans font-bold leading-tight px-1 text-slate-800">
+                    <img src={Logo} alt="Logo" />
                   </span>
                 </div>
-                <div className={`absolute right-4 -top-6 transform rotate-[-12deg] border-4 px-3 py-1 rounded font-sans font-black text-xl tracking-wider uppercase opacity-85 ${
-                  totals.promoted 
-                    ? 'border-green-600 text-green-600' 
-                    : 'border-red-600 text-red-600'
-                }`}>
-                  {promotionStampText}
-                  <div className={`text-[10px] text-center font-normal block leading-none ${
-                    totals.promoted ? 'text-green-600' : 'text-red-600'
+                <div className="flex-shrink-0">
+                  <img 
+                    src={studentPhotoUrl} 
+                    alt="Student" 
+                    className="w-[120px] h-[150px] sm:w-[150px] sm:h-[180px] object-cover border-3 border-[#b88728] shadow-md"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="w-[120px] h-[150px] sm:w-[150px] sm:h-[180px] bg-gray-100 flex items-center justify-center text-xs text-gray-500 hidden">
+                    No Photo
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center space-y-0.5 mb-4 sm:mb-6">
+                <h1 className="text-[12px] sm:text-sm font-bold tracking-wide text-slate-800 uppercase">WAAJJIRA BARNOOTA MAGAALAA SHAGGAR</h1>
+                <h1 className="text-[12px] sm:text-sm font-bold tracking-wide text-slate-800 uppercase">KUTAA MAGAALAA KOYYEE FACCEE</h1>
+                <h2 className="text-[13px] sm:text-[15px] font-sans font-semibold tracking-normal text-slate-800">በሸገር ከተማ ትምህርት ጽሕፈት ቤት የኮዬ ፈጬ ክ/ከተማ</h2>
+                <h2 className="text-[13px] sm:text-[15px] font-sans font-semibold tracking-normal text-slate-800 mb-2">ትምህርት ጽሕፈት ቤት</h2>
+                <h3 className="text-[10px] sm:text-[11px] font-bold tracking-wider text-slate-700 uppercase">KAARDII GABAASA FIRII BARATTOOTA SAD. 2FFAA</h3>
+                <h3 className="text-[11px] sm:text-[12px] font-sans font-semibold text-slate-700">የ2ኛ ደረጃ ተማሪዎች የውጤት ሪፖርት ካርድ</h3>
+                <p className="text-[11px] sm:text-[12px] font-medium text-slate-800 mt-1">Shaggar City Education Office</p>
+                <p className="text-[11px] sm:text-[12px] font-medium text-slate-800">Secondary School Student Report Card</p>
+              </div>
+
+              <div className="w-full space-y-3 sm:space-y-4">
+                <div className="flex items-end w-full">
+                  <span className="whitespace-nowrap mr-2">Name of School</span>
+                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                    <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 font-medium tracking-wide">Tulu Dimtu GSS</span>
+                  </div>
+                </div>
+
+                <div className="flex items-end w-full text-[11px] sm:text-[12px]">
+                  <span className="whitespace-nowrap mr-1 font-bold">Address :</span>
+                  <span className="whitespace-nowrap font-bold mr-1">Oromia Region</span>
+                  <span className="whitespace-nowrap mr-1 text-slate-800">Shaggar City</span>
+                  <span className="whitespace-nowrap font-bold mr-1">Koye Feche</span>
+                  <span className="whitespace-nowrap text-slate-800">Sub city</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Woreda</span>
+                    <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                      <span className="absolute left-2 bottom-0.5 font-sans text-base sm:text-lg text-blue-900">Tulu Dimtu</span>
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Zone</span>
+                    <div className="flex-grow border-b border-slate-800"></div>
+                  </div>
+                </div>
+
+                <h3 className="text-center font-bold text-[13px] sm:text-[15px] tracking-wide pt-2">Student's Profile</h3>
+
+                <div className="flex items-end w-full">
+                  <span className="whitespace-nowrap mr-2">Name of Student</span>
+                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                    <span className="absolute left-4 bottom-0.5 font-sans text-xl sm:text-2xl text-blue-900 tracking-wide font-light">{student.name}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  <div className="flex items-end col-span-1">
+                    <span className="whitespace-nowrap mr-2">Sex</span>
+                    <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                      <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 font-medium">{studentSex}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-end col-span-1">
+                    <span className="whitespace-nowrap mr-2">Age</span>
+                    <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                      <span className="absolute left-4 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900">{studentAge}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-end col-span-1">
+                    <span className="whitespace-nowrap mr-2">Address</span>
+                    <div className="flex-grow border-b border-slate-800"></div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  <div className="flex items-end"><span className="mr-1">Sub City</span><div className="flex-grow border-b border-slate-800"></div></div>
+                  <div className="flex items-end"><span className="mr-1">Woreda</span><div className="flex-grow border-b border-slate-800"></div></div>
+                  <div className="flex items-end"><span className="mr-1">House no</span><div className="flex-grow border-b border-slate-800"></div></div>
+                </div>
+
+                <div className="flex items-end w-full">
+                  <span className="whitespace-nowrap mr-2">Academic Year</span>
+                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                    <span className="absolute left-6 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 tracking-wider">{academicYear}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-end w-full">
+                  <span className="whitespace-nowrap mr-2">Class(Grade)</span>
+                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                    <span className="absolute left-6 bottom-0.5 font-sans text-lg sm:text-xl text-blue-900 tracking-wider font-light">{selectedClass.grade}th</span>
+                  </div>
+                </div>
+
+                <div className="flex items-end w-full relative">
+                  <span className="whitespace-nowrap mr-2">Promotion Status</span>
+                  <div className="flex-grow border-b border-slate-800 relative pb-0.5">
+                    <span className={`absolute left-8 bottom-0.5 font-sans text-lg sm:text-xl font-medium ${totals.promoted ? 'text-green-600' : 'text-red-600'}`}>
+                      {promotionText}
+                    </span>
+                  </div>
+                  <div className={`absolute right-4 -top-6 transform rotate-[-12deg] border-4 px-3 py-1 rounded font-sans font-black text-lg sm:text-xl tracking-wider uppercase opacity-85 ${
+                    totals.promoted 
+                      ? 'border-green-600 text-green-600' 
+                      : 'border-red-600 text-red-600'
                   }`}>
-                    {promotionSubText}
+                    {promotionStampText}
+                    <div className={`text-[10px] text-center font-normal block leading-none ${
+                      totals.promoted ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {promotionSubText}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 w-full pt-4">
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap text-[11px] sm:text-[12px] mr-1">Director's Name</span>
+                    <div className="flex-grow border-b border-slate-800 relative">
+                      <span className="absolute bottom-0 text-[9px] sm:text-[10px] font-sans text-blue-800/70 truncate max-w-full">Gammadaa Milkiyaas Oncho</span>
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap text-[11px] sm:text-[12px] mr-1">Signature</span>
+                    <div className="flex-grow border-b border-slate-800"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* VIEW 2: INNER GRADES & REMARKS */}
+          <div 
+            ref={page2Ref} 
+            className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-6 sm:p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break flex-shrink-0 origin-top scale-[0.32] sm:scale-[0.55] md:scale-[0.75] lg:scale-100 -mt-[540px] sm:-mt-[360px] md:-mt-[200px] lg:mt-0"
+          >
+            
+            {/* LEFT PANEL: GRADES TABLE */}
+            <div className="w-1/2 h-full pr-2 sm:pr-4 flex flex-col justify-between">
+              <table className="w-full border-collapse border border-slate-900 text-center text-[10px] sm:text-[12px] bg-cyan-50/10">
+                <thead>
+                  <tr className="border-b border-slate-900">
+                    <th className="border-r border-slate-900 p-1 sm:p-2 font-bold w-[35%] text-left pl-2 sm:pl-3">Subject</th>
+                    <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-[10px] sm:text-xs leading-tight">First<br/>Semester</th>
+                    <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-[10px] sm:text-xs leading-tight">Second<br/>Semester</th>
+                    <th className="p-1 font-bold w-[23%] text-[10px] sm:text-xs">AVERAGE</th>
+                  </tr>
+                </thead>
+                <tbody className="font-sans text-[12px] sm:text-[14px] text-blue-900 font-medium">
+                  {subjectRows}
+                  {totalsRows}
+                </tbody>
+              </table>
+
+              <div className="flex items-end w-full text-[11px] sm:text-[13px] font-serif pt-2">
+                <span className="whitespace-nowrap mr-1">Director's Name</span>
+                <div className="flex-grow border-b border-slate-900"></div>
+                <span className="whitespace-nowrap mx-2">Signature</span>
+                <div className="flex-grow border-b border-slate-900"></div>
+              </div>
+            </div>
+
+            {/* RIGHT PANEL: REMARKS & SIGNATURES */}
+            <div className="w-1/2 h-full pl-4 sm:pl-8 flex flex-col justify-start relative pt-4">
+              <h2 className="text-center font-bold text-[12px] sm:text-sm tracking-wide uppercase text-slate-800 mb-4 sm:mb-8">
+                REMARKS FROM THE HOME – ROOM TEACHER
+              </h2>
+
+              <div className="w-full mb-6 sm:mb-12">
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1">First Semester</h3>
+                <div className="w-full space-y-5 sm:space-y-7 pt-4">
+                  <div className="border-b border-slate-800/70 h-0.5"></div>
+                  <div className="border-b border-slate-800/70 h-0.5"></div>
+                </div>
+                <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4 text-[11px] sm:text-[13px]">
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
+                    <div className="flex-grow border-b border-slate-800/70"></div>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Signature of Parent or Guardian</span>
+                    <div className="flex-grow border-b border-slate-800/70"></div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 w-full pt-4">
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap text-[12px] mr-1">Director's Name</span>
-                  <div className="flex-grow border-b border-slate-800 relative">
-                    <span className="absolute bottom-0 text-[10px] font-sans text-blue-800/70 truncate max-w-full">Gammadaa Milkiyaas Oncho</span>
+              <div className="w-full relative">
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1">Second Semester</h3>
+                <div className="absolute left-6 top-8 font-sans text-lg sm:text-2xl text-blue-900 tracking-wide transform -rotate-1 opacity-90 z-10 leading-relaxed">
+                  <p className="font-light italic">Satisfactory !</p>
+                  <p className="pl-12 pt-1 font-normal">Needs Improvement</p>
+                </div>
+                <div className="w-full space-y-5 sm:space-y-7 pt-4">
+                  <div className="border-b border-slate-800/70 h-0.5"></div>
+                  <div className="border-b border-slate-800/70 h-0.5"></div>
+                </div>
+                <div className="mt-10 sm:mt-14 space-y-3 sm:space-y-4 text-[11px] sm:text-[13px] relative z-20">
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
+                    <div className="flex-grow border-b border-slate-800/70 relative">
+                      <span className="absolute right-4 bottom-[-4px] font-sans text-2xl sm:text-3xl text-blue-900 italic opacity-80 select-none">Stf</span>
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="whitespace-nowrap mr-2">Signature of Parent or Guardian</span>
+                    <div className="flex-grow border-b border-slate-800/70"></div>
                   </div>
                 </div>
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap text-[12px] mr-1">Signature</span>
-                  <div className="flex-grow border-b border-slate-800"></div>
+              </div>
+
+              <div className="absolute bottom-4 left-[-40px] w-28 h-28 sm:w-36 sm:h-36 border-4 border-dashed border-blue-500/60 rounded-full flex items-center justify-center transform rotate-12 opacity-75 pointer-events-none">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 border border-blue-500/40 rounded-full flex flex-col items-center justify-center text-[6px] sm:text-[7px] text-blue-600 font-sans text-center p-1 leading-tight font-bold">
+                  <span>ትምህርት ቤት</span>
+                  <span className="text-[5px] sm:text-[6px] my-0.5">★ TULU DIMTU ★</span>
+                  <span>SECONDARY SCHOOL</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* VIEW 2: INNER GRADES & REMARKS */}
-        <div ref={page2Ref} className="w-[1123px] h-[794px] bg-[#31b4cc] shadow-2xl flex p-10 relative overflow-hidden border border-cyan-700 print:shadow-none print:border-none page-break">
-          
-          {/* LEFT PANEL: GRADES TABLE */}
-          <div className="w-1/2 h-full pr-4 flex flex-col justify-between">
-            <table className="w-full border-collapse border border-slate-900 text-center text-[12px] bg-cyan-50/10">
-              <thead>
-                <tr className="border-b border-slate-900">
-                  <th className="border-r border-slate-900 p-2 font-bold w-[35%] text-left pl-3">Subject</th>
-                  <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-xs leading-tight">First<br/>Semester</th>
-                  <th className="border-r border-slate-900 p-1 font-bold w-[21%] text-xs leading-tight">Second<br/>Semester</th>
-                  <th className="p-1 font-bold w-[23%] text-xs">AVERAGE</th>
-                </tr>
-              </thead>
-              <tbody className="font-sans text-[14px] text-blue-900 font-medium">
-                {subjectRows}
-                {totalsRows}
-              </tbody>
-            </table>
-
-            <div className="flex items-end w-full text-[13px] font-serif pt-2">
-              <span className="whitespace-nowrap mr-1">Director's Name</span>
-              <div className="flex-grow border-b border-slate-900"></div>
-              <span className="whitespace-nowrap mx-2">Signature</span>
-              <div className="flex-grow border-b border-slate-900"></div>
-            </div>
-          </div>
-
-          {/* RIGHT PANEL: REMARKS & SIGNATURES */}
-          <div className="w-1/2 h-full pl-8 flex flex-col justify-start relative pt-4">
-            <h2 className="text-center font-bold text-sm tracking-wide uppercase text-slate-800 mb-8">
-              REMARKS FROM THE HOME – ROOM TEACHER
-            </h2>
-
-            <div className="w-full mb-12">
-              <h3 className="font-bold text-base text-slate-900 mb-1">First Semester</h3>
-              <div className="w-full space-y-7 pt-4">
-                <div className="border-b border-slate-800/70 h-0.5"></div>
-                <div className="border-b border-slate-800/70 h-0.5"></div>
-              </div>
-              <div className="mt-8 space-y-4 text-[13px]">
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
-                  <div className="flex-grow border-b border-slate-800/70"></div>
-                </div>
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Signature of Parent or Guardian</span>
-                  <div className="flex-grow border-b border-slate-800/70"></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full relative">
-              <h3 className="font-bold text-base text-slate-900 mb-1">Second Semester</h3>
-              <div className="absolute left-6 top-8 font-sans text-2xl text-blue-900 tracking-wide transform -rotate-1 opacity-90 z-10 leading-relaxed">
-                <p className="font-light italic">Satisfactory !</p>
-                <p className="pl-12 pt-1 font-normal">Needs Improvement</p>
-              </div>
-              <div className="w-full space-y-7 pt-4">
-                <div className="border-b border-slate-800/70 h-0.5"></div>
-                <div className="border-b border-slate-800/70 h-0.5"></div>
-              </div>
-              <div className="mt-14 space-y-4 text-[13px] relative z-20">
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Signature of Home-Room Teacher</span>
-                  <div className="flex-grow border-b border-slate-800/70 relative">
-                    <span className="absolute right-4 bottom-[-4px] font-sans text-3xl text-blue-900 italic opacity-80 select-none">Stf</span>
-                  </div>
-                </div>
-                <div className="flex items-end">
-                  <span className="whitespace-nowrap mr-2">Signature of Parent or Guardian</span>
-                  <div className="flex-grow border-b border-slate-800/70"></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-4 left-[-40px] w-36 h-36 border-4 border-dashed border-blue-500/60 rounded-full flex items-center justify-center transform rotate-12 opacity-75 pointer-events-none">
-              <div className="w-28 h-28 border border-blue-500/40 rounded-full flex flex-col items-center justify-center text-[7px] text-blue-600 font-sans text-center p-1 leading-tight font-bold">
-                <span>ትምህርት ቤት</span>
-                <span className="text-[6px] my-0.5">★ TULU DIMTU ★</span>
-                <span>SECONDARY SCHOOL</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="no-print flex justify-center items-center gap-4 mt-4">
+        <div className="no-print flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-4 w-full">
           <button 
             onClick={handleDownload}
-            className="bg-[#31b4cc] text-white px-8 py-3 rounded-full font-bold hover:bg-[#2a9db3] transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="w-full sm:w-auto bg-[#31b4cc] text-white px-6 sm:px-8 py-3 rounded-full font-bold hover:bg-[#2a9db3] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             <Download size={20} />
             DOWNLOAD REPORT CARD
           </button>
           <button 
             onClick={handleClose}
-            className="bg-gray-500 text-white px-8 py-3 rounded-full font-bold hover:bg-gray-600 transition-all shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto bg-gray-500 text-white px-6 sm:px-8 py-3 rounded-full font-bold hover:bg-gray-600 transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
           >
             ✖ CLOSE
           </button>
@@ -1050,7 +1040,6 @@ const StudentReportCard = () => {
     setCurrentPage(1);
   };
 
-  // If showing report card
   if (showReportCard && reportCardData) {
     return (
       <ReportCardView 
@@ -1062,11 +1051,11 @@ const StudentReportCard = () => {
   }
   
   // ==========================================
-  // CLASS SELECTOR VIEW
+  // CLASS SELECTOR VIEW — responsive
   // ==========================================
   if (!selectedClass) {
     return (
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
           .class-selector-container { animation: fadeIn 0.5s ease-out; }
@@ -1074,18 +1063,26 @@ const StudentReportCard = () => {
           .hero-section {
             background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
             color: white;
-            padding: 50px;
+            padding: 24px;
             border-radius: 15px;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             text-align: center;
             box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
           }
-          .hero-title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 800; margin-bottom: 15px; letter-spacing: 1px; }
-          .hero-subtitle { font-size: 16px; opacity: 0.9; }
-          .classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+          @media (min-width: 768px) {
+            .hero-section { padding: 50px; margin-bottom: 40px; }
+          }
+          .hero-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px; }
+          .hero-subtitle { font-size: 13px; opacity: 0.9; }
+          @media (min-width: 768px) {
+            .hero-title { font-size: 42px; margin-bottom: 15px; }
+            .hero-subtitle { font-size: 16px; }
+          }
+          .classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+          @media (min-width: 768px) { .classes-grid { gap: 20px; } }
           .class-card {
             background: white;
-            padding: 30px;
+            padding: 18px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -1094,6 +1091,7 @@ const StudentReportCard = () => {
             position: relative;
             overflow: hidden;
           }
+          @media (min-width: 768px) { .class-card { padding: 30px; } }
           .class-card::before {
             content: '';
             position: absolute;
@@ -1108,34 +1106,45 @@ const StudentReportCard = () => {
             box-shadow: 0 12px 30px rgba(8, 145, 178, 0.2);
             border-color: #0891b2;
           }
-          .class-icon { font-size: 48px; margin-bottom: 15px; }
-          .class-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 10px; }
-          .class-info { color: #666; font-size: 14px; margin-bottom: 15px; }
-          .class-stats { display: flex; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; }
+          .class-icon { font-size: 32px; margin-bottom: 10px; }
+          .class-title { font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+          .class-info { color: #666; font-size: 13px; margin-bottom: 12px; }
+          @media (min-width: 768px) {
+            .class-icon { font-size: 48px; margin-bottom: 15px; }
+            .class-title { font-size: 22px; margin-bottom: 10px; }
+            .class-info { font-size: 14px; margin-bottom: 15px; }
+          }
+          .class-stats { display: flex; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
           .stat-item { flex: 1; text-align: center; }
-          .stat-number { font-size: 18px; font-weight: 700; color: #0891b2; }
-          .stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+          .stat-number { font-size: 16px; font-weight: 700; color: #0891b2; }
+          .stat-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+          @media (min-width: 768px) {
+            .stat-number { font-size: 18px; }
+            .stat-label { font-size: 11px; }
+          }
           .class-button {
             width: 100%;
             background: linear-gradient(135deg, #0e7490, #0891b2);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 12px;
             transition: all 0.3s;
+            font-size: 13px;
           }
+          @media (min-width: 768px) { .class-button { padding: 12px; font-size: 14px; } }
           .class-button:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3); }
-          .empty-state { text-align: center; padding: 60px 20px; color: #999; }
-          .empty-icon { font-size: 60px; margin-bottom: 15px; }
+          .empty-state { text-align: center; padding: 40px 20px; color: #999; }
+          .empty-icon { font-size: 48px; margin-bottom: 15px; }
         `}</style>
         
         <div className="class-selector-container">
           <div className="hero-section">
-            <div className="flex justify-center mb-4">
-              <Award size={48} />
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <Award size={36} className="sm:w-12 sm:h-12" />
             </div>
             <h2 className="hero-title">📊 Student Report Card Generator</h2>
             <p className="hero-subtitle">Select a class to generate report cards for first and second semester students</p>
@@ -1144,8 +1153,8 @@ const StudentReportCard = () => {
           {classes.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">📚</div>
-              <p className="text-lg font-semibold">No classes found</p>
-              <p className="text-sm mt-2">Please add classes first</p>
+              <p className="text-base sm:text-lg font-semibold">No classes found</p>
+              <p className="text-xs sm:text-sm mt-2">Please add classes first</p>
             </div>
           ) : (
             <div className="classes-grid">
@@ -1185,7 +1194,7 @@ const StudentReportCard = () => {
   }
 
   // ==========================================
-  // STUDENT DETAIL VIEW
+  // STUDENT DETAIL VIEW — responsive
   // ==========================================
   if (viewMode === 'student' && selectedStudent) {
     const overallAverage = calculateOverallAverage(selectedStudent._id);
@@ -1200,79 +1209,93 @@ const StudentReportCard = () => {
     const age = getStudentAge(selectedStudent._id);
     
     return (
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
         <style>{`
           .detail-header {
             background: linear-gradient(135deg, #0e7490, #0891b2);
             color: white;
-            padding: 40px;
+            padding: 20px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(8, 145, 178, 0.2);
           }
+          @media (min-width: 768px) { .detail-header { padding: 40px; margin-bottom: 30px; } }
           .detail-header-content {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 20px;
+            flex-direction: column;
+            gap: 16px;
           }
-          .student-header-info h3 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+          @media (min-width: 1024px) {
+            .detail-header-content { flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 20px; }
+          }
+          .student-header-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; word-break: break-word; }
+          @media (min-width: 768px) { .student-header-info h3 { font-size: 28px; margin-bottom: 10px; } }
           .detail-badge {
             display: inline-block;
             background: rgba(255,255,255,0.2);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
-            margin-right: 8px;
+            font-size: 11px;
+            margin-right: 6px;
+            margin-top: 4px;
           }
-          .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+          @media (min-width: 768px) { .detail-badge { padding: 6px 12px; font-size: 12px; margin-right: 8px; } }
+          .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; }
+          @media (min-width: 1024px) { .action-buttons { width: auto; } }
           .cert-btn {
             background: #22d3ee;
             color: #0f172a;
             border: none;
-            padding: 12px 24px;
+            padding: 9px 14px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 12px;
+            flex: 1 1 auto;
           }
+          @media (min-width: 768px) { .cert-btn { padding: 12px 24px; font-size: 14px; } }
           .cert-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34, 211, 238, 0.3); }
           .cert-btn-back { background: #6b7280; color: white; }
           .cert-btn-back:hover { background: #4b5563; }
           .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
           }
+          @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; } }
           .stat-card {
             background: white;
-            padding: 20px;
+            padding: 14px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             text-align: center;
             border-top: 4px solid #0891b2;
           }
-          .stat-card-value { font-size: 32px; font-weight: 700; color: #0e7490; margin: 10px 0; }
-          .stat-card-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+          @media (min-width: 768px) { .stat-card { padding: 20px; } }
+          .stat-card-value { font-size: 20px; font-weight: 700; color: #0e7490; margin: 8px 0; word-break: break-word; }
+          .stat-card-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+          @media (min-width: 768px) {
+            .stat-card-value { font-size: 32px; margin: 10px 0; }
+            .stat-card-label { font-size: 12px; }
+          }
         `}</style>
         
         <div className="detail-header">
           <div className="detail-header-content">
-            <div className="student-header-info flex items-center gap-4">
+            <div className="student-header-info flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4">
               <img
                 src={studentImage}
                 alt={selectedStudent.name}
-                className="w-40 h-40  object-cover border-2 border-white"
+                className="w-28 h-28 sm:w-40 sm:h-40 object-cover border-2 border-white"
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedStudent.name)}&background=4F46E5&color=fff&size=64&font-size=0.5&bold=true`;
                 }}
               />
-              <div>
+              <div className="min-w-0">
                 <h3>{selectedStudent.name}</h3>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-2 mt-1 justify-center sm:justify-start">
                   <span className="detail-badge">Roll No: {selectedStudent.rollNumber}</span>
                   <span className="detail-badge">Class: {selectedClass.grade}-{selectedClass.section}</span>
                   <span className="detail-badge">Gender: {sex}</span>
@@ -1305,9 +1328,9 @@ const StudentReportCard = () => {
               </button>
               <button 
                 onClick={() => { setSelectedStudent(null); setViewMode('all'); }} 
-                className="cert-btn cert-btn-back flex items-center gap-2"
+                className="cert-btn cert-btn-back flex items-center justify-center gap-2"
               >
-                <ArrowLeft size={18} /> Back
+                <ArrowLeft size={16} /> Back
               </button>
             </div>
           </div>
@@ -1334,17 +1357,17 @@ const StudentReportCard = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+          <table className="w-full min-w-[700px] text-xs sm:text-sm">
             <thead className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
               <tr>
-                <th className="p-3 text-left text-sm font-bold border border-cyan-600">Subject</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Test</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Midterm</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Notebook</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Final</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Total</th>
-                <th className="p-3 text-center text-sm font-bold border border-cyan-600">Grade</th>
+                <th className="p-2 sm:p-3 text-left font-bold border border-cyan-600">Subject</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Test</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Midterm</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Notebook</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Final</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Total</th>
+                <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600">Grade</th>
               </tr>
             </thead>
             <tbody>
@@ -1357,15 +1380,15 @@ const StudentReportCard = () => {
                 
                 return (
                   <tr key={idx} className="border-b hover:bg-cyan-50 transition even:bg-gray-50">
-                    <td className="p-3 text-sm font-medium border border-gray-200">{subjectName}</td>
-                    <td className="p-3 text-center text-sm border border-gray-200">{exams.test?.score || '-'}</td>
-                    <td className="p-3 text-center text-sm border border-gray-200">{exams.midterm?.score || '-'}</td>
-                    <td className="p-3 text-center text-sm font-medium text-blue-600 border border-gray-200">{exams.notebook?.score || exams.textbook?.score || exams.assignment?.score || '-'}</td>
-                    <td className="p-3 text-center text-sm border border-gray-200">{exams.final?.score || '-'}</td>
-                    <td className="p-3 text-center text-sm font-bold text-blue-600 border border-gray-200">{subjectTotal ? `${subjectTotal.total}/${subjectTotal.maxTotal}` : '-'}</td>
-                    <td className="p-3 text-center text-sm border border-gray-200">
+                    <td className="p-2 sm:p-3 font-medium border border-gray-200">{subjectName}</td>
+                    <td className="p-2 sm:p-3 text-center border border-gray-200">{exams.test?.score || '-'}</td>
+                    <td className="p-2 sm:p-3 text-center border border-gray-200">{exams.midterm?.score || '-'}</td>
+                    <td className="p-2 sm:p-3 text-center font-medium text-blue-600 border border-gray-200">{exams.notebook?.score || exams.textbook?.score || exams.assignment?.score || '-'}</td>
+                    <td className="p-2 sm:p-3 text-center border border-gray-200">{exams.final?.score || '-'}</td>
+                    <td className="p-2 sm:p-3 text-center font-bold text-blue-600 border border-gray-200">{subjectTotal ? `${subjectTotal.total}/${subjectTotal.maxTotal}` : '-'}</td>
+                    <td className="p-2 sm:p-3 text-center border border-gray-200">
                       {subjectGrade && (
-                        <span className="px-3 py-1 rounded-full text-xs font-bold" style={{background: subjectGrade.bg, color: subjectGrade.color}}>
+                        <span className="px-2 sm:px-3 py-1 rounded-full text-xs font-bold" style={{background: subjectGrade.bg, color: subjectGrade.color}}>
                           {subjectGrade.letter}
                         </span>
                       )}
@@ -1376,8 +1399,8 @@ const StudentReportCard = () => {
             </tbody>
             <tfoot className="bg-gray-100 border-t-2 border-gray-300">
               <tr>
-                <td colSpan="6" className="p-3 text-sm font-bold text-gray-700 border border-gray-200">Total Subjects</td>
-                <td className="p-3 text-center text-sm font-bold text-cyan-600 border border-gray-200">{allSubjectsList.length} Subjects</td>
+                <td colSpan="6" className="p-2 sm:p-3 font-bold text-gray-700 border border-gray-200">Total Subjects</td>
+                <td className="p-2 sm:p-3 text-center font-bold text-cyan-600 border border-gray-200">{allSubjectsList.length} Subjects</td>
               </tr>
             </tfoot>
           </table>
@@ -1387,7 +1410,7 @@ const StudentReportCard = () => {
   }
 
   // ==========================================
-  // MAIN DASHBOARD VIEW
+  // MAIN DASHBOARD VIEW — responsive
   // ==========================================
   const maxPossible = allSubjectsList.length * 100;
   const passedCount = sortedStudents.filter(s => s.overallAverage >= 50).length;
@@ -1396,28 +1419,38 @@ const StudentReportCard = () => {
     : 0;
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
-        .dashboard-header { margin-bottom: 30px; }
+        .dashboard-header { margin-bottom: 20px; }
+        @media (min-width: 768px) { .dashboard-header { margin-bottom: 30px; } }
         .header-top {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 20px;
-          margin-bottom: 20px;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        @media (min-width: 768px) {
+          .header-top {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+          }
         }
         .header-title {
           font-family: 'Playfair Display', serif;
-          font-size: 32px;
+          font-size: 22px;
           font-weight: 800;
           color: #1a202c;
         }
-        .header-subtitle { color: #666; margin-top: 5px; }
-        .header-controls { display: flex; gap: 10px; }
+        @media (min-width: 768px) { .header-title { font-size: 32px; } }
+        .header-subtitle { color: #666; margin-top: 5px; font-size: 13px; }
+        @media (min-width: 768px) { .header-subtitle { font-size: 14px; } }
+        .header-controls { display: flex; flex-wrap: wrap; gap: 8px; }
         .control-btn {
-          padding: 10px 20px;
+          padding: 8px 14px;
           border-radius: 8px;
           border: none;
           cursor: pointer;
@@ -1425,30 +1458,35 @@ const StudentReportCard = () => {
           transition: all 0.3s;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
+          font-size: 12px;
         }
+        @media (min-width: 768px) { .control-btn { padding: 10px 20px; font-size: 13px; gap: 8px; } }
         .period-selector {
           background: #f0f9ff;
-          padding: 20px;
+          padding: 14px;
           border-radius: 12px;
           border: 1px solid #bae6fd;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
+        @media (min-width: 768px) { .period-selector { padding: 20px; margin-bottom: 20px; } }
         .period-controls {
           display: flex;
-          gap: 15px;
+          gap: 10px;
           flex-wrap: wrap;
           align-items: center;
         }
         .period-btn {
-          padding: 10px 20px;
+          padding: 8px 14px;
           border-radius: 8px;
           border: 2px solid #bae6fd;
           background: white;
           cursor: pointer;
           font-weight: 600;
           transition: all 0.3s;
+          font-size: 12px;
         }
+        @media (min-width: 768px) { .period-btn { padding: 10px 20px; font-size: 13px; } }
         .period-btn.active {
           background: linear-gradient(135deg, #0e7490, #0891b2);
           color: white;
@@ -1463,10 +1501,10 @@ const StudentReportCard = () => {
       
       <div className="dashboard-header">
         <div className="header-top">
-          <div>
+          <div className="min-w-0">
             <h2 className="header-title">📊 Student Report Cards</h2>
             <p className="header-subtitle">Grade {selectedClass.grade} - Section {selectedClass.section} | Total Students: {sortedStudents.length}</p>
-            <p className="text-sm text-green-600 mt-1">✅ Passed: {passedCount} | ❌ Failed: {sortedStudents.length - passedCount}</p>
+            <p className="text-xs sm:text-sm text-green-600 mt-1">✅ Passed: {passedCount} | ❌ Failed: {sortedStudents.length - passedCount}</p>
           </div>
           <div className="header-controls">
             <button
@@ -1477,7 +1515,7 @@ const StudentReportCard = () => {
                 color: saveSpace ? 'white' : '#333'
               }}
             >
-              <Settings size={18} />
+              <Settings size={16} />
               {saveSpace ? 'Compact' : 'Full'}
             </button>
             <button 
@@ -1485,15 +1523,15 @@ const StudentReportCard = () => {
               className="control-btn"
               style={{ background: '#f3f4f6', color: '#0891b2' }}
             >
-              <ChevronLeft size={18} /> Classes
+              <ChevronLeft size={16} /> Classes
             </button>
           </div>
         </div>
         
         <div className="period-selector">
-          <div className="flex items-center gap-3 mb-4">
-            <Calendar size={20} style={{color: '#0891b2'}} />
-            <span className="font-semibold text-gray-700">Academic Period Selection:</span>
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Calendar size={18} style={{color: '#0891b2'}} className="sm:w-5 sm:h-5" />
+            <span className="font-semibold text-gray-700 text-sm sm:text-base">Academic Period Selection:</span>
           </div>
           <div className="period-controls">
             <button
@@ -1511,7 +1549,7 @@ const StudentReportCard = () => {
             <select
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg"
+              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm"
             >
               <option value="2023-2024">2023-2024</option>
               <option value="2024-2025">2024-2025</option>
@@ -1520,44 +1558,44 @@ const StudentReportCard = () => {
             <button
               onClick={generateAllQRCodes}
               disabled={generatingQR}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 flex items-center gap-2 text-xs sm:text-sm"
             >
-              <QrCode size={18} />
+              <QrCode size={16} />
               {generatingQR ? 'Generating...' : 'Generate QR Codes'}
             </button>
           </div>
         </div>
       </div>
       
-      {/* Stats Cards */}
+      {/* Stats Cards — responsive 1 → 2 → 3 → 6 cols */}
       {!loading && sortedStudents.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
-            <p className="text-sm text-green-700 font-semibold">Passed Students</p>
-            <p className="text-3xl font-bold text-green-700">{passedCount}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 sm:p-4 rounded-xl border border-green-200">
+            <p className="text-xs sm:text-sm text-green-700 font-semibold">Passed Students</p>
+            <p className="text-xl sm:text-3xl font-bold text-green-700">{passedCount}</p>
             <p className="text-xs text-green-600 mt-1">{((passedCount/sortedStudents.length)*100).toFixed(1)}%</p>
           </div>
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl border border-red-200">
-            <p className="text-sm text-red-700 font-semibold">Failed Students</p>
-            <p className="text-3xl font-bold text-red-700">{sortedStudents.length - passedCount}</p>
+          <div className="bg-gradient-to-br from-red-50 to-red-100 p-3 sm:p-4 rounded-xl border border-red-200">
+            <p className="text-xs sm:text-sm text-red-700 font-semibold">Failed Students</p>
+            <p className="text-xl sm:text-3xl font-bold text-red-700">{sortedStudents.length - passedCount}</p>
           </div>
-          <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 rounded-xl border border-cyan-200">
-            <p className="text-sm text-cyan-700 font-semibold">Class Average</p>
-            <p className="text-3xl font-bold text-cyan-700">{classAverage.toFixed(1)}%</p>
+          <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-3 sm:p-4 rounded-xl border border-cyan-200">
+            <p className="text-xs sm:text-sm text-cyan-700 font-semibold">Class Average</p>
+            <p className="text-xl sm:text-3xl font-bold text-cyan-700">{classAverage.toFixed(1)}%</p>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
-            <p className="text-sm text-purple-700 font-semibold">Total Marks</p>
-            <p className="text-2xl font-bold text-purple-700">{sortedStudents.reduce((sum, s) => sum + s.totalMarks, 0)}</p>
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 sm:p-4 rounded-xl border border-purple-200">
+            <p className="text-xs sm:text-sm text-purple-700 font-semibold">Total Marks</p>
+            <p className="text-lg sm:text-2xl font-bold text-purple-700">{sortedStudents.reduce((sum, s) => sum + s.totalMarks, 0)}</p>
             <p className="text-xs text-purple-600">/{sortedStudents.length * maxPossible}</p>
           </div>
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
-            <p className="text-sm text-orange-700 font-semibold">Current Period</p>
-            <p className="text-lg font-bold text-orange-700">{semester}</p>
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 sm:p-4 rounded-xl border border-orange-200">
+            <p className="text-xs sm:text-sm text-orange-700 font-semibold">Current Period</p>
+            <p className="text-sm sm:text-lg font-bold text-orange-700">{semester}</p>
             <p className="text-xs text-orange-600">{academicYear}</p>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
-            <p className="text-sm text-blue-700 font-semibold">Pass Rate</p>
-            <p className="text-3xl font-bold text-blue-700">{((passedCount/sortedStudents.length)*100).toFixed(1)}%</p>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 sm:p-4 rounded-xl border border-blue-200">
+            <p className="text-xs sm:text-sm text-blue-700 font-semibold">Pass Rate</p>
+            <p className="text-xl sm:text-3xl font-bold text-blue-700">{((passedCount/sortedStudents.length)*100).toFixed(1)}%</p>
             <p className="text-xs text-blue-600">{passedCount}/{sortedStudents.length} students</p>
           </div>
         </div>
@@ -1565,68 +1603,68 @@ const StudentReportCard = () => {
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Search Bar */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-3 sm:p-6 border-b border-gray-200">
           <div className="relative">
-            <Search className="absolute left-4 top-3 text-gray-400" size={20} />
+            <Search className="absolute left-3 sm:left-4 top-3 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search by student name or roll number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm sm:text-base"
             />
           </div>
-          <div className="flex flex-wrap gap-3 mt-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-3">
             <button 
               onClick={handleExportToExcel} 
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs sm:text-sm"
               disabled={loading}
             >
-              <FileSpreadsheet size={18} />
+              <FileSpreadsheet size={16} />
               <span>Export to Excel</span>
             </button>
           </div>
         </div>
         
         {loading ? (
-          <div className="text-center py-16">
+          <div className="text-center py-12 sm:py-16">
             <div className="inline-block">
-              <div className="w-12 h-12 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"></div>
-              <p className="mt-4 text-gray-600">Loading {semester} marks for {academicYear}...</p>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"></div>
+              <p className="mt-4 text-gray-600 text-sm sm:text-base px-4">Loading {semester} marks for {academicYear}...</p>
             </div>
           </div>
         ) : sortedStudents.length === 0 ? (
-          <div className="text-center py-16">
-            <BookOpen size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500 text-lg font-semibold">No students found in this class</p>
-            <p className="text-sm text-gray-400 mt-2">Please add students to the class first</p>
+          <div className="text-center py-12 sm:py-16">
+            <BookOpen size={40} className="mx-auto text-gray-400 mb-4 sm:w-12 sm:h-12" />
+            <p className="text-gray-500 text-base sm:text-lg font-semibold px-4">No students found in this class</p>
+            <p className="text-xs sm:text-sm text-gray-400 mt-2">Please add students to the class first</p>
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              <table className="w-full border-collapse min-w-[800px] text-xs sm:text-sm">
                 <thead className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
                   <tr>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Rank</th>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Photo</th>
-                    <th className="p-3 text-left text-sm font-bold border border-cyan-600 whitespace-nowrap min-w-[42px]">Roll No</th>
-                    <th className="p-3 text-left text-sm font-bold border border-cyan-600 whitespace-nowrap min-w-[42px]">Student Name</th>
-                    <th className="p-3 text-left text-sm font-bold border border-cyan-600">Gender</th>
-                    <th className="p-3 text-left text-sm font-bold border border-cyan-600">Age</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Rank</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Photo</th>
+                    <th className="p-2 sm:p-3 text-left font-bold border border-cyan-600 whitespace-nowrap">Roll No</th>
+                    <th className="p-2 sm:p-3 text-left font-bold border border-cyan-600 whitespace-nowrap">Student Name</th>
+                    <th className="p-2 sm:p-3 text-left font-bold border border-cyan-600 whitespace-nowrap">Gender</th>
+                    <th className="p-2 sm:p-3 text-left font-bold border border-cyan-600 whitespace-nowrap">Age</th>
                     {!saveSpace && allSubjectsList.map((subject, idx) => {
                       const subjectName = typeof subject === 'string' ? subject : subject.name;
                       return (
-                        <th key={idx} className="p-3 text-center text-sm font-bold border border-cyan-600">{subjectName}</th>
+                        <th key={idx} className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">{subjectName}</th>
                       );
                     })}
                     {saveSpace && (
-                      <th className="p-3 text-center text-sm font-bold border border-cyan-600">Subjects</th>
+                      <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Subjects</th>
                     )}
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600 whitespace-nowrap min-w-[42px]">Total Marks</th>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Avg %</th>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Grade</th>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Status</th>
-                    <th className="p-3 text-center text-sm font-bold border border-cyan-600">Actions</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Total Marks</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Avg %</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Grade</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Status</th>
+                    <th className="p-2 sm:p-3 text-center font-bold border border-cyan-600 whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -1643,44 +1681,44 @@ const StudentReportCard = () => {
                     
                     return (
                       <tr key={student._id} style={{background: bgColor}} className="hover:bg-cyan-50 transition">
-                        <td className="p-3 text-center border border-gray-200">
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
                           {student.rank === 1 ? (
-                            <div className='rounded-full bg-blue-300 text-blue-700 h-8 w-8 mt-2 text-center '>
+                            <div className='rounded-full bg-blue-300 text-blue-700 h-7 w-7 sm:h-8 sm:w-8 mx-auto text-center'>
                               <span className='text-bold justify-center flex'>1</span>
                             </div>
                           ) : student.rank === 2 ? (
-                           <div>2</div>
+                            <div>2</div>
                           ) : student.rank === 3 ? (
                             <div>3</div>
                           ) : (
-                            <span className="inline-block w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 font-bold text-center leading-8">
+                            <span className="inline-block w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-100 text-cyan-700 font-bold text-center leading-7 sm:leading-8">
                               {student.rank}
                             </span>
                           )}
                         </td>
-                        <td className="p-3 text-center border border-gray-200">
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
                           <img
                             src={studentImage}
                             alt={student.name}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-cyan-200 mx-auto"
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-cyan-200 mx-auto"
                             onError={(e) => {
                               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=4F46E5&color=fff&size=40&font-size=0.5&bold=true`;
                             }}
                           />
                         </td>
-                        <td className="p-3 font-mono font-semibold text-gray-900 border border-gray-200">{student.rollNumber}</td>
-                        <td className="p-3 font-medium text-gray-900 border border-gray-200 whitespace-nowrap min-w-[42px]">{student.name}</td>
-                        <td className="p-3 text-gray-600 border border-gray-200">{sex}</td>
-                        <td className="p-3 text-gray-600 border border-gray-200">{age}</td>
+                        <td className="p-2 sm:p-3 font-mono font-semibold text-gray-900 border border-gray-200 whitespace-nowrap">{student.rollNumber}</td>
+                        <td className="p-2 sm:p-3 font-medium text-gray-900 border border-gray-200 whitespace-nowrap">{student.name}</td>
+                        <td className="p-2 sm:p-3 text-gray-600 border border-gray-200">{sex}</td>
+                        <td className="p-2 sm:p-3 text-gray-600 border border-gray-200">{age}</td>
                         
                         {!saveSpace && allSubjectsList.map((subject, subIdx) => {
                           const subjectName = typeof subject === 'string' ? subject : subject.name;
                           const subjectTotal = getSubjectTotal(student._id, subjectName);
                           return (
-                            <td key={subIdx} className="p-3 text-center border border-gray-200 ">
+                            <td key={subIdx} className="p-2 sm:p-3 text-center border border-gray-200">
                               {subjectTotal ? (
                                 <div className="flex flex-col items-center">
-                                  <span className="font-bold text-cyan-700 text-sm">{subjectTotal.total}</span>
+                                  <span className="font-bold text-cyan-700">{subjectTotal.total}</span>
                                 </div>
                               ) : '-'}
                             </td>
@@ -1688,7 +1726,7 @@ const StudentReportCard = () => {
                         })}
                         
                         {saveSpace && (
-                          <td className="p-3 text-sm border border-gray-200">
+                          <td className="p-2 sm:p-3 border border-gray-200">
                             <div className="flex flex-col gap-1">
                               {allSubjectsList.slice(0, 2).map((subject, subIdx) => {
                                 const subjectName = typeof subject === 'string' ? subject : subject.name;
@@ -1707,31 +1745,31 @@ const StudentReportCard = () => {
                           </td>
                         )}
                         
-                        <td className="p-3 text-center font-bold text-gray-900 border border-gray-200">
+                        <td className="p-2 sm:p-3 text-center font-bold text-gray-900 border border-gray-200 whitespace-nowrap">
                           {totalMarks}/{maxPossible}
                         </td>
                         
-                        <td className="p-3 text-center border border-gray-200">
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
                           <div className="flex flex-col items-center">
-                            <span className="font-bold text-lg" style={{color: grade.color}}>
+                            <span className="font-bold text-base sm:text-lg" style={{color: grade.color}}>
                               {student.overallAverage.toFixed(1)}%
                             </span>
                           </div>
                         </td>
                         
-                        <td className="p-3 text-center border border-gray-200">
-                          <span className="px-3 py-1 rounded-full text-xs font-bold" style={{background: grade.bg, color: grade.color}}>
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
+                          <span className="px-2 sm:px-3 py-1 rounded-full text-xs font-bold" style={{background: grade.bg, color: grade.color}}>
                             {grade.letter}
                           </span>
                         </td>
                         
-                        <td className="p-3 text-center border border-gray-200">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap min-w-[42px] ${promoted ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
+                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${promoted ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {promotionText}
                           </span>
                         </td>
                         
-                        <td className="p-3 text-center border border-gray-200">
+                        <td className="p-2 sm:p-3 text-center border border-gray-200">
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => {
@@ -1741,7 +1779,7 @@ const StudentReportCard = () => {
                               className="text-gray-600 hover:text-gray-800 p-1 rounded transition"
                               title="View Details"
                             >
-                              <Eye size={18} />
+                              <Eye size={16} />
                             </button>
                           </div>
                         </td>
@@ -1751,8 +1789,8 @@ const StudentReportCard = () => {
                 </tbody>
                 <tfoot className="bg-gray-100 border-t-2 border-gray-300">
                   <tr>
-                    <td colSpan="9" className="p-3 text-sm font-bold text-gray-700 border border-gray-200">Total Students</td>
-                    <td colSpan="4" className="p-3 text-center text-sm font-bold text-cyan-600 border border-gray-200">
+                    <td colSpan="9" className="p-2 sm:p-3 font-bold text-gray-700 border border-gray-200 text-xs sm:text-sm">Total Students</td>
+                    <td colSpan="4" className="p-2 sm:p-3 text-center font-bold text-cyan-600 border border-gray-200 text-xs sm:text-sm">
                       {sortedStudents.length} Students | {allSubjectsList.length} Subjects
                     </td>
                   </tr>
@@ -1760,15 +1798,15 @@ const StudentReportCard = () => {
               </table>
             </div>
             
-            {/* Pagination */}
+            {/* Pagination — responsive */}
             {sortedStudents.length > 0 && (
-              <div className="border-t border-gray-200 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Rows per page:</span>
+              <div className="border-t border-gray-200 p-3 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-2 text-xs sm:text-sm">
+                  <span className="text-gray-600">Rows per page:</span>
                   <select
                     value={rowsPerPage}
                     onChange={handleRowsPerPageChange}
-                    className="px-3 py-1 border border-gray-300 rounded-lg"
+                    className="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -1783,17 +1821,17 @@ const StudentReportCard = () => {
                     disabled={currentPage === 1}
                     className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <ChevronsLeft size={18} />
+                    <ChevronsLeft size={16} />
                   </button>
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
                     className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <ChevronLeft size={18} />
+                    <ChevronLeft size={16} />
                   </button>
                   
-                  <span className="px-4 py-1 text-sm">
+                  <span className="px-2 sm:px-4 py-1 text-xs sm:text-sm">
                     Page {currentPage} of {totalPages}
                   </span>
                   
@@ -1802,18 +1840,18 @@ const StudentReportCard = () => {
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={16} />
                   </button>
                   <button
                     onClick={() => goToPage(totalPages)}
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <ChevronsRight size={18} />
+                    <ChevronsRight size={16} />
                   </button>
                 </div>
                 
-                <div className="text-sm text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600 text-center">
                   Showing {startIndex + 1} to {Math.min(startIndex + rowsPerPage, sortedStudents.length)} of {sortedStudents.length} students
                 </div>
               </div>
