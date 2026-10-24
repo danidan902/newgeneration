@@ -1242,7 +1242,7 @@ const ManageAdmins = ({ theme }) => {
 // ============================================
 // 🏠 THEME CONTEXT
 // ============================================
-const ThemeContext = createContext({ isDarkMode: true, toggleTheme: () => {} });
+const ThemeContext = createContext({ isDarkMode: false, toggleTheme: () => {} });
 
 // ============================================
 // 📄 LARGE FULL-SIZE IFRAME PAGE COMPONENT
@@ -1376,7 +1376,8 @@ const AdminDashboard = () => {
     archive: false
   });
   
-  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') !== 'light');
+  // ✅ DEFAULT THEME = WHITE (LIGHT). Only dark if the user explicitly saved 'dark'.
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1557,15 +1558,58 @@ const AdminDashboard = () => {
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       <div className="flex h-screen overflow-hidden" style={{ background: t.bg, fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
-        {/* ===== MOBILE TOP BAR: LOGO LEFT · TOGGLE · HAMBURGER RIGHT ===== */}
+        {/* ===== MOBILE TOP BAR: LOGO LEFT · TOGGLE · HAMBURGER RIGHT =====
+             ✅ REPLACED the "New Generation SCHOOL" text block with the PROFILE DROPDOWN,
+             and removed the old desktop profile block from the header (it now lives here).
+        */}
         <div className="mobile-topbar">
-          {/* School logo (LEFT) */}
-          <div className="mobile-logo-wrap">
-            <div className="mobile-logo-circle">🎓</div>
-            <div className="mobile-logo-text">
-              <span className="mobile-logo-title">New Generation</span>
-              <span className="mobile-logo-sub">SCHOOL</span>
-            </div>
+          {/* ✅ PROFILE DROPDOWN (replaces "New Generation" branding on the left) */}
+          <div className="mobile-profile-wrap">
+            <button
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className="mobile-profile-btn"
+              aria-label="Open profile menu"
+            >
+              <img
+                src={user?.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"}
+                alt="Admin profile"
+                className="mobile-profile-avatar"
+              />
+              <div className="mobile-profile-text">
+                <span className="mobile-profile-name">{user?.name || 'Administrator'}</span>
+                <span className="mobile-profile-role">{user?.role || 'Admin'}</span>
+              </div>
+              <ChevronDown className="w-4 h-4 mobile-profile-chevron" />
+            </button>
+
+            {showProfileDropdown && (
+              <>
+                <div className="fixed inset-0 z-[110]" onClick={() => setShowProfileDropdown(false)}></div>
+                <div className="absolute left-2 top-[58px] w-56 rounded-xl shadow-2xl border py-1 z-[120]"
+                  style={{ background: t.surface, borderColor: t.border }}>
+                  <div className="px-4 py-3 border-b" style={{ borderColor: t.border }}>
+                    <p className="text-sm font-bold truncate" style={{ color: t.text }}>{user?.name || 'Administrator'}</p>
+                    <p className="text-xs truncate" style={{ color: t.textMuted }}>{user?.email || 'admin@school.edu'}</p>
+                  </div>
+                  <button
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center gap-2.5"
+                    style={{ color: t.text }}
+                    onClick={() => { setShowProfileDropdown(false); navigate('/admin/settings'); }}
+                  >
+                    <Settings className="w-4 h-4 text-gray-500" />
+                    Account Settings
+                  </button>
+                  <button
+                    onClick={() => { setShowProfileDropdown(false); handleLogout(); }}
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center gap-2.5 border-t"
+                    style={{ color: '#D91B24', borderColor: t.border }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right side: toggle + hamburger */}
@@ -1794,45 +1838,8 @@ const AdminDashboard = () => {
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
 
-              <div className="relative">
-                <button 
-                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="flex items-center gap-2 focus:outline-none"
-                >
-                  <img
-                    src={user?.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"}
-                    alt="Admin profile"
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100"
-                  />
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </button>
-
-                {showProfileDropdown && (
-                  <>
-                    <div className="fixed inset-0 z-30" onClick={() => setShowProfileDropdown(false)}></div>
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-40"
-                      style={{ background: t.surface, borderColor: t.border }}>
-                      <div className="px-4 py-3 border-b" style={{ borderColor: t.border }}>
-                        <p className="text-sm font-bold" style={{ color: t.text }}>{user?.name}</p>
-                        <p className="text-xs" style={{ color: t.textMuted }}>{user?.email}</p>
-                      </div>
-                      <button className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center gap-2.5"
-                        style={{ color: t.text }}
-                        onClick={() => { setShowProfileDropdown(false); navigate('/admin/settings'); }}>
-                        <Settings className="w-4 h-4 text-gray-500" />
-                        Account Settings
-                      </button>
-                      <button 
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center gap-2.5 border-t border-gray-100"
-                        style={{ color: '#D91B24', borderColor: t.border }}>
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+              {/* ✅ PROFILE DROPDOWN REMOVED FROM DESKTOP HEADER (moved into mobile top bar).
+                   We keep the avatar as a quick visual, but the dropdown is now on the mobile bar. */}
             </div>
           </header>
 
@@ -1931,8 +1938,9 @@ const AdminDashboard = () => {
           a { text-decoration: none; }
 
           /* ============================================================
-             📱 MOBILE: LOGO LEFT · TOGGLE · HAMBURGER RIGHT
+             📱 MOBILE: PROFILE DROPDOWN LEFT · TOGGLE · HAMBURGER RIGHT
              SIDEBAR SLIDES IN FROM RIGHT
+             More responsive spacing for phones.
              ONLY affects screens ≤ 1024px. Desktop unchanged.
              ============================================================ */
           .mobile-topbar { display: none; }
@@ -1946,42 +1954,52 @@ const AdminDashboard = () => {
               justify-content: space-between;
               gap: 10px;
               position: fixed; top: 0; left: 0; right: 0; height: 60px;
-              padding: 0 14px;
+              padding: 0 12px;
               background: ${t.topbar};
               border-bottom: 1px solid ${t.border};
               box-shadow: 0 2px 12px rgba(0,0,0,0.08);
               z-index: 90;
             }
 
-            /* School logo — LEFT */
-            .mobile-logo-wrap {
-              display: flex; align-items: center; gap: 8px;
+            /* ✅ PROFILE DROPDOWN (replaces old school branding on left) */
+            .mobile-profile-wrap {
+              position: relative;
+              display: flex; align-items: center;
               min-width: 0; flex: 1;
             }
-            .mobile-logo-circle {
+            .mobile-profile-btn {
+              display: flex; align-items: center; gap: 8px;
+              background: transparent; border: none; padding: 4px 6px;
+              border-radius: 12px; cursor: pointer; min-width: 0;
+              transition: background .2s ease;
+            }
+            .mobile-profile-btn:active { background: ${t.bg}; }
+            .mobile-profile-avatar {
               width: 38px; height: 38px; border-radius: 50%;
-              background: linear-gradient(135deg, #D91B24, #1E3A8A);
-              display: flex; align-items: center; justify-content: center;
-              font-size: 18px; flex-shrink: 0;
-              box-shadow: 0 4px 14px rgba(217,27,36,0.35);
+              object-fit: cover; flex-shrink: 0;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+              border: 2px solid ${t.border};
             }
-            .mobile-logo-text {
-              display: flex; flex-direction: column; line-height: 1.05;
-              min-width: 0;
+            .mobile-profile-text {
+              display: flex; flex-direction: column; line-height: 1.1;
+              min-width: 0; text-align: left;
             }
-            .mobile-logo-title {
+            .mobile-profile-name {
               font-size: 13px; font-weight: 800; color: ${t.text};
-              letter-spacing: 0.2px; text-transform: uppercase;
               white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+              max-width: 130px;
             }
-            .mobile-logo-sub {
-              font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+            .mobile-profile-role {
+              font-size: 9px; font-weight: 700; letter-spacing: 1px;
               color: #D91B24; text-transform: uppercase;
+            }
+            .mobile-profile-chevron {
+              color: ${t.textMuted}; flex-shrink: 0;
             }
 
             /* Right side: toggle + hamburger */
             .mobile-topbar-right {
-              display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+              display: flex; align-items: center; gap: 8px; flex-shrink: 0;
             }
             .mobile-theme-toggle {
               width: 40px; height: 40px; border: none; border-radius: 12px;
@@ -2058,7 +2076,8 @@ const AdminDashboard = () => {
             .dashboard-content-wrap { padding-top: 60px !important; }
             .desktop-header { display: none !important; }
 
-            main.custom-scrollbar { padding: 12px !important; }
+            /* ✅ MORE PHONE-FRIENDLY SPACING */
+            main.custom-scrollbar { padding: 10px !important; }
 
             .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
               grid-template-columns: 1fr !important;
@@ -2067,38 +2086,78 @@ const AdminDashboard = () => {
             .grid.grid-cols-1.lg\\:grid-cols-12,
             .grid.grid-cols-1.xl\\:grid-cols-2 {
               grid-template-columns: 1fr !important;
-              gap: 14px !important;
+              gap: 12px !important;
             }
             .lg\\:col-span-6,
             .lg\\:col-span-3 {
               grid-column: span 1 / span 1 !important;
             }
-            .edu-card { padding: 14px !important; border-radius: 14px !important; }
+            .edu-card { padding: 12px !important; border-radius: 14px !important; }
 
             .grid.grid-cols-2.sm\\:grid-cols-3.md\\:grid-cols-6 {
               grid-template-columns: repeat(3, 1fr) !important;
               gap: 8px !important;
             }
 
-            h1 { font-size: 20px !important; }
-            h3 { font-size: 14px !important; }
+            h1 { font-size: 18px !important; }
+            h3 { font-size: 13px !important; }
 
-            .recharts-responsive-container { max-height: 240px !important; }
+            /* Charts — shorter on phones */
+            .recharts-responsive-container { max-height: 220px !important; }
             .grid.grid-cols-7 { gap: 2px !important; }
-            .grid.grid-cols-7 > div { padding: 6px 2px !important; font-size: 11px !important; }
+            .grid.grid-cols-7 > div { padding: 5px 2px !important; font-size: 10px !important; }
 
-            table { font-size: 11px !important; }
+            /* Tables — more compact + horizontal scroll */
             .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+            table { font-size: 11px !important; }
+            th, td { padding: 8px 10px !important; }
+
+            /* Stat cards: reduce padding + icon size on phones */
+            .stat-card, .bg-white.p-5.rounded-xl { padding: 12px !important; gap: 10px !important; }
+            .w-12.h-12 { width: 40px !important; height: 40px !important; }
+            .w-12.h-12 svg { width: 20px !important; height: 20px !important; }
+            .text-xl { font-size: 18px !important; }
+
+            /* Buttons — full width-ish, easier tap */
+            .px-6.py-3.rounded-xl { padding: 10px 16px !important; }
+
+            /* Quick Actions grid tighter */
+            .grid.grid-cols-2.sm\\:grid-cols-3.md\\:grid-cols-6 button {
+              padding: 10px 6px !important; font-size: 10px !important;
+            }
+
+            /* Reminders + Calendar cards tighter */
+            .bg-white.p-6.rounded-xl { padding: 12px !important; }
+
+            /* Sidebar inside the drawer — compact */
+            .admin-sidebar-mobile nav button,
+            .admin-sidebar-mobile nav a {
+              padding: 12px 16px !important; font-size: 13px !important;
+            }
+            .admin-sidebar-mobile .h-16 { height: 56px !important; }
+
+            /* Mobile profile dropdown width */
+            .mobile-profile-wrap .absolute { width: 230px !important; }
           }
 
-          @media (max-width: 380px) {
-            .mobile-logo-title { font-size: 11px; }
-            .mobile-logo-circle { width: 34px; height: 34px; font-size: 16px; }
+          @media (max-width: 480px) {
+            .mobile-profile-name { max-width: 100px; font-size: 12px; }
             .mobile-theme-toggle { width: 36px; height: 36px; }
             .hamburger-btn { width: 40px; height: 40px; padding: 10px; }
             .grid.grid-cols-2.sm\\:grid-cols-3.md\\:grid-cols-6 {
               grid-template-columns: repeat(2, 1fr) !important;
             }
+            .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 { gap: 8px !important; }
+            main.custom-scrollbar { padding: 8px !important; }
+            .text-2xl.font-bold { font-size: 16px !important; }
+          }
+
+          @media (max-width: 380px) {
+            .mobile-profile-name { max-width: 80px; font-size: 11px; }
+            .mobile-profile-avatar { width: 34px; height: 34px; }
+            .mobile-theme-toggle { width: 34px; height: 34px; }
+            .hamburger-btn { width: 38px; height: 38px; padding: 9px; }
+            .mobile-profile-wrap .absolute { width: 200px !important; }
           }
         `}</style>
       </div>
