@@ -46,7 +46,7 @@ const Avatar = ({ name, image, size = 40 }) => {
 };
 
 // ============================================
-// 📊 STUDENT PROFILE PAGE (Full Page)
+// 📊 STUDENT PROFILE PAGE (Full Page) — responsive
 // ============================================
 const StudentProfilePage = ({ student, reportData, onBack }) => {
   if (!student) return null;
@@ -86,7 +86,7 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
         .profile-container { animation: fadeIn 0.5s ease-out; }
@@ -94,29 +94,40 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
         .profile-header {
           background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
           color: white;
-          padding: 35px;
+          padding: 20px;
           border-radius: 15px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
+        }
+        @media (min-width: 768px) {
+          .profile-header { padding: 35px; margin-bottom: 30px; }
         }
         .profile-badge {
           display: inline-block;
           background: rgba(255,255,255,0.2);
-          padding: 4px 14px;
+          padding: 3px 10px;
           border-radius: 20px;
-          font-size: 12px;
-          margin-right: 6px;
+          font-size: 11px;
+          margin-right: 4px;
           margin-top: 4px;
+          word-break: break-word;
+          max-width: 100%;
+        }
+        @media (min-width: 768px) {
+          .profile-badge { padding: 4px 14px; font-size: 12px; }
         }
         .profile-stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 16px;
-          margin-bottom: 30px;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        @media (min-width: 640px) {
+          .profile-stats-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px; }
         }
         .profile-stat-card {
           background: white;
-          padding: 18px;
+          padding: 14px;
           border-radius: 12px;
           box-shadow: 0 4px 15px rgba(0,0,0,0.06);
           text-align: center;
@@ -124,12 +135,17 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
           border: 1px solid #e2e8f0;
           transition: all 0.3s;
         }
+        @media (min-width: 768px) { .profile-stat-card { padding: 18px; } }
         .profile-stat-card:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(8, 145, 178, 0.12);
         }
-        .profile-stat-value { font-size: 26px; font-weight: 700; color: #0e7490; margin: 6px 0; }
-        .profile-stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .profile-stat-value { font-size: 20px; font-weight: 700; color: #0e7490; margin: 6px 0; word-break: break-word; }
+        .profile-stat-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media (min-width: 768px) {
+          .profile-stat-value { font-size: 26px; }
+          .profile-stat-label { font-size: 11px; }
+        }
         .profile-info-table {
           width: 100%;
           border-collapse: collapse;
@@ -137,38 +153,41 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
           border-radius: 12px;
           overflow: hidden;
           border: 1px solid #e2e8f0;
+          font-size: 12px;
         }
+        @media (min-width: 768px) { .profile-info-table { font-size: 14px; } }
         .profile-info-table th {
           background: linear-gradient(135deg, #0e7490, #0891b2);
           color: white;
-          padding: 12px 16px;
+          padding: 8px 10px;
           text-align: left;
           font-weight: 600;
           border: 1px solid #0c6a82;
         }
+        @media (min-width: 768px) { .profile-info-table th { padding: 12px 16px; } }
         .profile-info-table td {
-          padding: 12px 16px;
+          padding: 8px 10px;
           border: 1px solid #e2e8f0;
+          word-break: break-word;
         }
-        .profile-info-table tr:nth-child(even) td {
-          background: #f8fafc;
-        }
-        .profile-info-table tr:hover td {
-          background: #f0f9ff;
-        }
+        @media (min-width: 768px) { .profile-info-table td { padding: 12px 16px; } }
+        .profile-info-table tr:nth-child(even) td { background: #f8fafc; }
+        .profile-info-table tr:hover td { background: #f0f9ff; }
         .profile-back-btn {
           background: white;
           color: #0e7490;
           border: 2px solid #0e7490;
-          padding: 10px 24px;
+          padding: 9px 16px;
           border-radius: 8px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
+          font-size: 13px;
         }
+        @media (min-width: 768px) { .profile-back-btn { padding: 10px 24px; font-size: 14px; } }
         .profile-back-btn:hover {
           background: #0e7490;
           color: white;
@@ -179,45 +198,46 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
           background: white;
           border: 1px solid #e2e8f0;
           border-radius: 12px;
-          padding: 16px;
+          padding: 12px;
           margin-bottom: 12px;
           transition: all 0.3s;
         }
+        @media (min-width: 768px) { .profile-subject-card { padding: 16px; } }
         .profile-subject-card:hover {
           box-shadow: 0 4px 15px rgba(8, 145, 178, 0.1);
           border-color: #0891b2;
         }
         .profile-grade-badge {
-          padding: 4px 12px;
+          padding: 3px 10px;
           border-radius: 20px;
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 700;
         }
+        @media (min-width: 768px) { .profile-grade-badge { padding: 4px 12px; font-size: 14px; } }
         .profile-section-title {
-          font-size: 20px;
+          font-size: 16px;
           font-weight: 700;
           color: #1e293b;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
-        .profile-section-title .icon {
-          color: #0891b2;
-        }
+        @media (min-width: 768px) { .profile-section-title { font-size: 20px; margin-bottom: 16px; gap: 10px; } }
+        .profile-section-title .icon { color: #0891b2; flex-shrink: 0; }
       `}</style>
 
       <div className="profile-container">
-        <button onClick={onBack} className="profile-back-btn mb-6">
-          <ArrowLeft size={18} /> Back to Reports
+        <button onClick={onBack} className="profile-back-btn mb-4 sm:mb-6">
+          <ArrowLeft size={16} /> Back to Reports
         </button>
 
         <div className="profile-header">
-          <div className="flex flex-wrap items-center gap-6">
-            <Avatar name={student.name} image={student.profileImage} size={120} />
-            <div>
-              <h2 className="text-3xl font-bold">{student.name}</h2>
-              <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+            <Avatar name={student.name} image={student.profileImage} size={90} />
+            <div className="min-w-0 w-full">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold break-words">{student.name}</h2>
+              <div className="flex flex-wrap gap-1 mt-2 justify-center sm:justify-start">
                 <span className="profile-badge">Roll No: {student.rollNumber}</span>
                 <span className="profile-badge">Email: {student.email}</span>
                 <span className="profile-badge">Class: {reportData?.classInfo}</span>
@@ -249,75 +269,79 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h3 className="profile-section-title">
-            <User className="icon" size={24} />
+            <User className="icon" size={20} />
             Personal Information
           </h3>
-          <table className="profile-info-table">
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {personalInfo.map((item, idx) => {
-                const IconComponent = item.icon;
-                return (
-                  <tr key={idx}>
-                    <td className="font-medium text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="text-cyan-600" size={16} />
-                        {item.label}
-                      </div>
-                    </td>
-                    <td>{item.value}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto rounded-xl">
+            <table className="profile-info-table min-w-[320px]">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {personalInfo.map((item, idx) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <tr key={idx}>
+                      <td className="font-medium text-gray-700">
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="text-cyan-600 flex-shrink-0" size={16} />
+                          {item.label}
+                        </div>
+                      </td>
+                      <td>{item.value}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h3 className="profile-section-title">
-            <GraduationCap className="icon" size={24} />
+            <GraduationCap className="icon" size={20} />
             Academic Information
           </h3>
-          <table className="profile-info-table">
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {academicInfo.map((item, idx) => {
-                const IconComponent = item.icon;
-                return (
-                  <tr key={idx}>
-                    <td className="font-medium text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="text-cyan-600" size={16} />
-                        {item.label}
-                      </div>
-                    </td>
-                    <td>{item.value}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto rounded-xl">
+            <table className="profile-info-table min-w-[320px]">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {academicInfo.map((item, idx) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <tr key={idx}>
+                      <td className="font-medium text-gray-700">
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="text-cyan-600 flex-shrink-0" size={16} />
+                          {item.label}
+                        </div>
+                      </td>
+                      <td>{item.value}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {student.subjectWiseMarks && Object.keys(student.subjectWiseMarks).length > 0 && (
           <div>
             <h3 className="profile-section-title">
-              <Award className="icon" size={24} />
+              <Award className="icon" size={20} />
               Subject-wise Marks Breakdown
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {Object.keys(student.subjectWiseMarks).map((subject, idx) => {
                 const marks = student.subjectWiseMarks[subject];
                 const percentage = ((marks.total / 100) * 100).toFixed(2);
@@ -332,52 +356,52 @@ const StudentProfilePage = ({ student, reportData, onBack }) => {
                 
                 return (
                   <div key={idx} className="profile-subject-card">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-bold text-gray-800">{subject}</h4>
+                    <div className="flex justify-between items-start mb-3 gap-2">
+                      <h4 className="font-bold text-gray-800 text-sm sm:text-base break-words">{subject}</h4>
                       <span 
-                        className="profile-grade-badge"
+                        className="profile-grade-badge flex-shrink-0"
                         style={{background: gradeColor + '20', color: gradeColor}}
                       >
                         {grade}
                       </span>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <p className="text-gray-500">Quiz</p>
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                      <div className="text-center p-1.5 sm:p-2 bg-gray-50 rounded">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Quiz</p>
                         <p className="font-bold text-gray-700">{marks.quiz || 0}/10</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <p className="text-gray-500">Test</p>
+                      <div className="text-center p-1.5 sm:p-2 bg-gray-50 rounded">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Test</p>
                         <p className="font-bold text-gray-700">{marks.test || 0}/10</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <p className="text-gray-500">Midterm</p>
+                      <div className="text-center p-1.5 sm:p-2 bg-gray-50 rounded">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Midterm</p>
                         <p className="font-bold text-gray-700">{marks.midterm || 0}/20</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <p className="text-gray-500">Textbook</p>
+                      <div className="text-center p-1.5 sm:p-2 bg-gray-50 rounded">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Textbook</p>
                         <p className="font-bold text-gray-700">{marks.textbook || 0}/20</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <p className="text-gray-500">Final</p>
+                      <div className="text-center p-1.5 sm:p-2 bg-gray-50 rounded">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Final</p>
                         <p className="font-bold text-gray-700">{marks.final || 0}/50</p>
                       </div>
-                      <div className="text-center p-2 bg-cyan-50 rounded border border-cyan-200">
-                        <p className="text-gray-500">Total</p>
+                      <div className="text-center p-1.5 sm:p-2 bg-cyan-50 rounded border border-cyan-200">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">Total</p>
                         <p className="font-bold text-cyan-700">{marks.total}/100</p>
                       </div>
                     </div>
                     <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
                         <div 
-                          className="h-2.5 rounded-full transition-all duration-1000"
+                          className="h-2 sm:h-2.5 rounded-full transition-all duration-1000"
                           style={{ 
                             width: `${percentage}%`,
                             background: `linear-gradient(90deg, #0e7490, ${gradeColor})`
                           }}
                         />
                       </div>
-                      <p className="text-right text-xs text-gray-500 mt-1">{percentage}%</p>
+                      <p className="text-right text-[10px] sm:text-xs text-gray-500 mt-1">{percentage}%</p>
                     </div>
                   </div>
                 );
@@ -994,7 +1018,7 @@ const SuperAdminReports = () => {
   // Render class selection screen
   if (!selectedClass) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
           .reports-container { animation: fadeIn 0.5s ease-out; }
@@ -1002,16 +1026,23 @@ const SuperAdminReports = () => {
           .hero-section {
             background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
             color: white;
-            padding: 40px;
+            padding: 20px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
           }
-          .hero-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
-          .hero-subtitle { font-size: 16px; opacity: 0.9; }
+          @media (min-width: 768px) {
+            .hero-section { padding: 40px; margin-bottom: 30px; }
+          }
+          .hero-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+          .hero-subtitle { font-size: 13px; opacity: 0.9; }
+          @media (min-width: 768px) {
+            .hero-title { font-size: 36px; margin-bottom: 10px; }
+            .hero-subtitle { font-size: 16px; }
+          }
           .class-card {
             background: white;
-            padding: 24px;
+            padding: 16px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -1020,6 +1051,7 @@ const SuperAdminReports = () => {
             position: relative;
             overflow: hidden;
           }
+          @media (min-width: 768px) { .class-card { padding: 24px; } }
           .class-card::before {
             content: '';
             position: absolute;
@@ -1034,55 +1066,67 @@ const SuperAdminReports = () => {
             box-shadow: 0 12px 30px rgba(8, 145, 178, 0.15);
             border-color: #0891b2;
           }
-          .class-icon { font-size: 40px; margin-bottom: 12px; }
-          .class-title { font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
-          .class-info { color: #666; font-size: 14px; }
+          .class-icon { font-size: 32px; margin-bottom: 10px; }
+          .class-title { font-size: 17px; font-weight: 700; color: #1a202c; margin-bottom: 6px; }
+          .class-info { color: #666; font-size: 13px; }
+          @media (min-width: 768px) {
+            .class-icon { font-size: 40px; margin-bottom: 12px; }
+            .class-title { font-size: 20px; margin-bottom: 8px; }
+            .class-info { font-size: 14px; }
+          }
           .class-stats {
             display: flex;
-            gap: 20px;
-            margin-top: 12px;
-            padding-top: 12px;
+            gap: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid #e5e7eb;
           }
+          @media (min-width: 768px) { .class-stats { gap: 20px; margin-top: 12px; padding-top: 12px; } }
           .class-stat-item { flex: 1; text-align: center; }
-          .class-stat-number { font-size: 18px; font-weight: 700; color: #0891b2; }
-          .class-stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+          .class-stat-number { font-size: 15px; font-weight: 700; color: #0891b2; }
+          .class-stat-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+          @media (min-width: 768px) {
+            .class-stat-number { font-size: 18px; }
+            .class-stat-label { font-size: 11px; }
+          }
           .class-view-btn {
             width: 100%;
             background: linear-gradient(135deg, #0e7490, #0891b2);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 9px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 12px;
+            margin-top: 10px;
             transition: all 0.3s;
+            font-size: 13px;
           }
+          @media (min-width: 768px) { .class-view-btn { padding: 10px; margin-top: 12px; font-size: 14px; } }
           .class-view-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3); }
         `}</style>
 
         <div className="reports-container">
           <div className="hero-section">
-            <div className="flex items-center gap-4 mb-2">
-              <BarChart3 size={40} />
-              <div>
+            <div className="flex items-center gap-3 sm:gap-4 mb-2">
+              <BarChart3 size={28} className="sm:w-10 sm:h-10 flex-shrink-0" />
+              <div className="min-w-0">
                 <h2 className="hero-title">📊 Reports & Analytics</h2>
                 <p className="hero-subtitle">View attendance and marklist reports for all classes</p>
               </div>
             </div>
           </div>
 
-          <div className="mb-8">
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <Award className="text-cyan-600" size={24} />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-3 mb-4">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
+                <Award className="text-cyan-600 flex-shrink-0" size={22} />
                 All Classes Summary
               </h3>
               <button
                 onClick={fetchAllClassesSummary}
                 disabled={isLoadingAll}
-                className="px-5 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 disabled:opacity-50 transition font-semibold flex items-center gap-2"
+                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 disabled:opacity-50 transition font-semibold flex items-center justify-center gap-2 text-sm"
               >
                 {isLoadingAll ? (
                   <>
@@ -1099,39 +1143,39 @@ const SuperAdminReports = () => {
             </div>
             
             {isLoadingAll && (
-              <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="text-center py-10 sm:py-12 bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 font-medium">Fetching data for all classes...</p>
+                <p className="mt-4 text-gray-600 font-medium text-sm sm:text-base">Fetching data for all classes...</p>
               </div>
             )}
             
             {allGradesSummary.length > 0 && !isLoadingAll && (
               <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full">
+                  <table className="min-w-[700px] w-full text-xs sm:text-sm">
                     <thead className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white">
                       <tr>
-                        <th className="py-3 px-4 text-left border border-cyan-700">Class</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Students</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Passed</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Failed</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Pass Rate</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Avg Attend</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Avg Score</th>
-                        <th className="py-3 px-4 text-center border border-cyan-700">Action</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-left border border-cyan-700 whitespace-nowrap">Class</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Students</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Passed</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Failed</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Pass Rate</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Avg Attend</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Avg Score</th>
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {allGradesSummary.map((summary, idx) => (
                         <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition`}>
-                          <td className="py-3 px-4 font-medium text-gray-700 border border-gray-200">{summary.classInfo}</td>
-                          <td className="py-3 px-4 text-center border border-gray-200">{summary.totalStudents}</td>
-                          <td className="py-3 px-4 text-center text-green-600 font-semibold border border-gray-200">{summary.passedStudents}</td>
-                          <td className="py-3 px-4 text-center text-red-600 font-semibold border border-gray-200">{summary.failedStudents}</td>
-                          <td className="py-3 px-4 text-center font-bold text-cyan-700 border border-gray-200">{summary.passRate}%</td>
-                          <td className="py-3 px-4 text-center border border-gray-200">{summary.averageAttendance}%</td>
-                          <td className="py-3 px-4 text-center border border-gray-200">{summary.averageScore}%</td>
-                          <td className="py-3 px-4 text-center border border-gray-200">
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-700 border border-gray-200 whitespace-nowrap">{summary.classInfo}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">{summary.totalStudents}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-green-600 font-semibold border border-gray-200">{summary.passedStudents}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-red-600 font-semibold border border-gray-200">{summary.failedStudents}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center font-bold text-cyan-700 border border-gray-200">{summary.passRate}%</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">{summary.averageAttendance}%</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">{summary.averageScore}%</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
                             <button
                               onClick={() => {
                                 const cls = classes.find(c => `${c.grade} - ${c.section}` === summary.classInfo);
@@ -1140,9 +1184,9 @@ const SuperAdminReports = () => {
                                   setTimeout(() => generateReport(), 100);
                                 }
                               }}
-                              className="px-3 py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-sm font-medium"
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-xs font-medium whitespace-nowrap"
                             >
-                              <Eye size={14} className="inline mr-1" /> View
+                              <Eye size={12} className="inline mr-1" /> View
                             </button>
                           </td>
                         </tr>
@@ -1154,11 +1198,11 @@ const SuperAdminReports = () => {
             )}
           </div>
 
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <BookOpen className="text-cyan-600" size={24} />
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <BookOpen className="text-cyan-600 flex-shrink-0" size={22} />
             Select a Class to View Detailed Report
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {classes.map((cls) => (
               <div key={cls._id} className="class-card">
                 <div className="class-icon">📖</div>
@@ -1195,32 +1239,32 @@ const SuperAdminReports = () => {
 
   // Render report view
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
       <style>{`
         .report-container { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
       <div className="report-container">
-        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-6 rounded-xl mb-6 shadow-lg">
-          <div className="flex flex-wrap justify-between items-center gap-4">
-            <div>
+        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-3 sm:gap-4">
+            <div className="min-w-0">
               <button
                 onClick={() => {
                   setSelectedClass(null);
                   setReportData(null);
                 }}
-                className="text-white/80 hover:text-white mb-2 flex items-center gap-1 transition"
+                className="text-white/80 hover:text-white mb-2 flex items-center gap-1 transition text-sm"
               >
-                <ChevronLeft size={20} /> Back to Classes
+                <ChevronLeft size={18} /> Back to Classes
               </button>
-              <h2 className="text-2xl font-bold">{reportData?.classInfo || `${selectedClass.grade} - ${selectedClass.section}`}</h2>
-              <p className="text-cyan-100 mt-1">Total Students: {selectedClass.students?.length || 0}</p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold break-words">{reportData?.classInfo || `${selectedClass.grade} - ${selectedClass.section}`}</h2>
+              <p className="text-cyan-100 mt-1 text-xs sm:text-sm">Total Students: {selectedClass.students?.length || 0}</p>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:flex-wrap">
               <button
                 onClick={() => setReportType('attendance')}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
                   reportType === 'attendance' 
                     ? 'bg-white text-cyan-700' 
                     : 'bg-cyan-700/50 text-white hover:bg-cyan-700'
@@ -1230,7 +1274,7 @@ const SuperAdminReports = () => {
               </button>
               <button
                 onClick={() => setReportType('marklist')}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
                   reportType === 'marklist' 
                     ? 'bg-white text-cyan-700' 
                     : 'bg-cyan-700/50 text-white hover:bg-cyan-700'
@@ -1242,12 +1286,12 @@ const SuperAdminReports = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-200">
-          <div className="flex flex-wrap gap-4 items-center">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-6 border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 sm:items-center">
             <button
               onClick={generateReport}
               disabled={isLoading}
-              className="px-5 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 disabled:opacity-50 transition font-semibold flex items-center gap-2"
+              className="w-full sm:w-auto px-4 sm:px-5 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 disabled:opacity-50 transition font-semibold flex items-center justify-center gap-2 text-sm"
             >
               {isLoading ? (
                 <>
@@ -1262,85 +1306,85 @@ const SuperAdminReports = () => {
               )}
             </button>
             {reportData && (
-              <>
+              <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => setShowCharts(!showCharts)}
-                  className="px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold text-sm"
                 >
                   {showCharts ? 'Hide Charts' : 'Show Charts'}
                 </button>
                 <button
                   onClick={handleExportToExcel}
-                  className="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center justify-center gap-2 text-sm"
                 >
                   <FileSpreadsheet size={18} />
                   Export Excel
                 </button>
                 <button
                   onClick={handlePrint}
-                  className="px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold flex items-center justify-center gap-2 text-sm"
                 >
                   <Printer size={18} />
                   Print
                 </button>
-              </>
+              </div>
             )}
           </div>
 
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Start Date</label>
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Start Date</label>
               <input
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">End Date</label>
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">End Date</label>
               <input
                 type="date"
                 value={dateRange.endDate}
                 onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-sm"
               />
             </div>
           </div>
         </div>
 
         {reportData && (
-          <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto border border-gray-200">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-              <div className="bg-cyan-50 rounded-xl p-4 text-center border border-cyan-200">
-                <p className="text-sm text-cyan-700 font-semibold">Total Students</p>
-                <p className="text-2xl font-bold text-cyan-700">{reportData.totalStudents}</p>
+          <div className="bg-white rounded-xl shadow-md p-3 sm:p-6 overflow-x-auto border border-gray-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
+              <div className="bg-cyan-50 rounded-xl p-3 sm:p-4 text-center border border-cyan-200">
+                <p className="text-xs sm:text-sm text-cyan-700 font-semibold">Total Students</p>
+                <p className="text-lg sm:text-2xl font-bold text-cyan-700">{reportData.totalStudents}</p>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 text-center border border-green-200">
-                <p className="text-sm text-green-700 font-semibold">Passed</p>
-                <p className="text-2xl font-bold text-green-600">{reportData.passedStudents}</p>
+              <div className="bg-green-50 rounded-xl p-3 sm:p-4 text-center border border-green-200">
+                <p className="text-xs sm:text-sm text-green-700 font-semibold">Passed</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-600">{reportData.passedStudents}</p>
               </div>
-              <div className="bg-red-50 rounded-xl p-4 text-center border border-red-200">
-                <p className="text-sm text-red-700 font-semibold">Failed</p>
-                <p className="text-2xl font-bold text-red-600">{reportData.failedStudents}</p>
+              <div className="bg-red-50 rounded-xl p-3 sm:p-4 text-center border border-red-200">
+                <p className="text-xs sm:text-sm text-red-700 font-semibold">Failed</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600">{reportData.failedStudents}</p>
               </div>
-              <div className="bg-purple-50 rounded-xl p-4 text-center border border-purple-200">
-                <p className="text-sm text-purple-700 font-semibold">Pass Rate</p>
-                <p className="text-2xl font-bold text-purple-700">{reportData.passRate}%</p>
+              <div className="bg-purple-50 rounded-xl p-3 sm:p-4 text-center border border-purple-200">
+                <p className="text-xs sm:text-sm text-purple-700 font-semibold">Pass Rate</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-700">{reportData.passRate}%</p>
               </div>
             </div>
 
             {showCharts && reportData.students && reportData.students.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-                  <BarChart3 className="text-cyan-600" size={24} />
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <BarChart3 className="text-cyan-600 flex-shrink-0" size={22} />
                   Visual Analytics
                 </h3>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Pass/Fail Distribution</h4>
-                    <ResponsiveContainer width="100%" height={280}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
+                  <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Pass/Fail Distribution</h4>
+                    <ResponsiveContainer width="100%" height={240}>
                       <PieChart>
                         <Pie
                           data={getPassFailData()}
@@ -1348,7 +1392,7 @@ const SuperAdminReports = () => {
                           cy="50%"
                           labelLine={false}
                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
+                          outerRadius={75}
                           fill="#8884d8"
                           dataKey="value"
                         >
@@ -1362,13 +1406,13 @@ const SuperAdminReports = () => {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Grade Distribution</h4>
-                    <ResponsiveContainer width="100%" height={280}>
+                  <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Grade Distribution</h4>
+                    <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={getGradeDistributionData()}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="grade" />
-                        <YAxis />
+                        <XAxis dataKey="grade" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="count" fill="#0891b2" name="Number of Students" />
@@ -1376,13 +1420,13 @@ const SuperAdminReports = () => {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Exam-wise Average Performance</h4>
-                    <ResponsiveContainer width="100%" height={280}>
+                  <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Exam-wise Average Performance</h4>
+                    <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={getExamWiseData()}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="exam" />
-                        <YAxis />
+                        <XAxis dataKey="exam" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="average" fill="#22d3ee" name="Class Average Score" />
@@ -1391,13 +1435,13 @@ const SuperAdminReports = () => {
                   </div>
 
                   {reportData.allSubjects && reportData.allSubjects.length > 0 && (
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                      <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Subject-wise Performance</h4>
-                      <ResponsiveContainer width="100%" height={280}>
+                    <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                      <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Subject-wise Performance</h4>
+                      <ResponsiveContainer width="100%" height={240}>
                         <BarChart data={getSubjectWisePerformanceData()}>
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="subject" />
-                          <YAxis />
+                          <XAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                          <YAxis tick={{ fontSize: 11 }} />
                           <Tooltip />
                           <Legend />
                           <Bar dataKey="average" fill="#f59e0b" name="Class Average (out of 100)" />
@@ -1406,13 +1450,13 @@ const SuperAdminReports = () => {
                     </div>
                   )}
 
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Overall Percentage Distribution</h4>
-                    <ResponsiveContainer width="100%" height={280}>
+                  <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Overall Percentage Distribution</h4>
+                    <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={getMarksDistributionData()}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="range" />
-                        <YAxis />
+                        <XAxis dataKey="range" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="count" fill="#10b981" name="Number of Students" />
@@ -1420,13 +1464,13 @@ const SuperAdminReports = () => {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <h4 className="text-lg font-semibold mb-3 text-center text-gray-700">Attendance Distribution</h4>
-                    <ResponsiveContainer width="100%" height={280}>
+                  <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3 text-center text-gray-700">Attendance Distribution</h4>
+                    <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={getAttendanceDistributionData()}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="range" />
-                        <YAxis />
+                        <XAxis dataKey="range" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="count" fill="#0e7490" name="Number of Students" />
@@ -1437,45 +1481,45 @@ const SuperAdminReports = () => {
               </div>
             )}
 
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 text-gray-800">
               {reportType === 'attendance' ? 'Attendance Details' : 'Student Summary'}
             </h3>
             
             <div className="overflow-x-auto">
               {reportType === 'attendance' ? (
-                <table className="min-w-full border rounded-lg overflow-hidden">
+                <table className="min-w-[720px] w-full border rounded-lg overflow-hidden text-xs sm:text-sm">
                   <thead className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white">
                     <tr>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Photo</th>
-                      <th className="py-3 px-4 text-left border border-cyan-700">Roll No</th>
-                      <th className="py-3 px-4 text-left border border-cyan-700" style={{ whiteSpace: 'nowrap' }}>Student Name</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Present</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Absent</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Late</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Total Days</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Percentage</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Action</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Photo</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-left border border-cyan-700 whitespace-nowrap">Roll No</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-left border border-cyan-700 whitespace-nowrap">Student Name</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Present</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Absent</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Late</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Total Days</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Percentage</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {reportData.students.map((student, idx) => (
                       <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition`}>
-                        <td className="py-3 px-4 text-center border border-gray-200">
-                          <Avatar name={student.name} image={student.profileImage} size={40} />
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
+                          <Avatar name={student.name} image={student.profileImage} size={32} />
                         </td>
-                        <td className="py-3 px-4 border border-gray-200">{student.rollNumber}</td>
-                        <td className="py-3 px-4 font-medium text-gray-700 border border-gray-200" style={{ whiteSpace: 'nowrap' }}>{student.name}</td>
-                        <td className="py-3 px-4 text-center text-green-600 font-semibold border border-gray-200">{student.attendance.presentDays}</td>
-                        <td className="py-3 px-4 text-center text-red-600 font-semibold border border-gray-200">{student.attendance.absentDays}</td>
-                        <td className="py-3 px-4 text-center text-yellow-600 font-semibold border border-gray-200">{student.attendance.lateDays}</td>
-                        <td className="py-3 px-4 text-center border border-gray-200">{student.attendance.totalDays}</td>
-                        <td className="py-3 px-4 text-center font-bold text-cyan-700 border border-gray-200">{student.attendance.percentage}%</td>
-                        <td className="py-3 px-4 text-center border border-gray-200">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 border border-gray-200 whitespace-nowrap">{student.rollNumber}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-700 border border-gray-200 whitespace-nowrap">{student.name}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-green-600 font-semibold border border-gray-200">{student.attendance.presentDays}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-red-600 font-semibold border border-gray-200">{student.attendance.absentDays}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-yellow-600 font-semibold border border-gray-200">{student.attendance.lateDays}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">{student.attendance.totalDays}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center font-bold text-cyan-700 border border-gray-200">{student.attendance.percentage}%</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
                           <button
                             onClick={() => handleViewProfile(student)}
-                            className="px-3 py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-sm font-medium"
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-xs font-medium whitespace-nowrap"
                           >
-                            <Eye size={14} className="inline mr-1" /> Profile
+                            <Eye size={12} className="inline mr-1" /> Profile
                           </button>
                         </td>
                       </tr>
@@ -1483,56 +1527,56 @@ const SuperAdminReports = () => {
                   </tbody>
                   <tfoot className="bg-cyan-50 font-semibold border-t-2 border-cyan-300">
                     <tr>
-                      <td colSpan="7" className="py-3 px-4 text-right text-cyan-700">Class Average:</td>
-                      <td className="py-3 px-4 text-center text-cyan-700">{reportData.averageAttendance}%</td>
+                      <td colSpan="7" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-cyan-700">Class Average:</td>
+                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-cyan-700">{reportData.averageAttendance}%</td>
                       <td></td>
                     </tr>
                   </tfoot>
                 </table>
               ) : (
-                <table className="min-w-full border rounded-lg overflow-hidden">
+                <table className="min-w-[760px] w-full border rounded-lg overflow-hidden text-xs sm:text-sm">
                   <thead className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white">
                     <tr>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Photo</th>
-                      <th className="py-3 px-4 text-left border border-cyan-700">Roll No</th>
-                      <th className="py-3 px-4 text-left border border-cyan-700" style={{ whiteSpace: 'nowrap' }}>Student Name</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Total Subjects</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Total Marks</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Percentage</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Result</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Grade</th>
-                      <th className="py-3 px-4 text-center border border-cyan-700">Action</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Photo</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-left border border-cyan-700 whitespace-nowrap">Roll No</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-left border border-cyan-700 whitespace-nowrap">Student Name</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Total Subjects</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Total Marks</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Percentage</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Result</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Grade</th>
+                      <th className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-cyan-700 whitespace-nowrap">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {reportData.students.map((student, idx) => (
                       <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-cyan-50 transition`}>
-                        <td className="py-3 px-4 text-center border border-gray-200">
-                          <Avatar name={student.name} image={student.profileImage} size={40} />
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
+                          <Avatar name={student.name} image={student.profileImage} size={32} />
                         </td>
-                        <td className="py-3 px-4 border border-gray-200">{student.rollNumber}</td>
-                        <td className="py-3 px-4 font-medium text-gray-700 border border-gray-200" style={{ whiteSpace: 'nowrap' }}>{student.name}</td>
-                        <td className="py-3 px-4 text-center border border-gray-200">{student.totalSubjects}</td>
-                        <td className="py-3 px-4 text-center font-bold text-cyan-700 border border-gray-200">{student.totalMarks}</td>
-                        <td className="py-3 px-4 text-center border border-gray-200">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 border border-gray-200 whitespace-nowrap">{student.rollNumber}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-700 border border-gray-200 whitespace-nowrap">{student.name}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">{student.totalSubjects}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center font-bold text-cyan-700 border border-gray-200">{student.totalMarks}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
                           <span className={`font-bold ${student.academicPercentage >= 50 ? 'text-green-600' : 'text-red-600'}`}>
                             {student.academicPercentage}%
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-center border border-gray-200">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
+                          <span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap ${
                             student.status === 'Passed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {student.status}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-center font-bold border border-gray-200">{student.grade}</td>
-                        <td className="py-3 px-4 text-center border border-gray-200">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center font-bold border border-gray-200">{student.grade}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center border border-gray-200">
                           <button
                             onClick={() => handleViewProfile(student)}
-                            className="px-3 py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-sm font-medium"
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-xs font-medium whitespace-nowrap"
                           >
-                            <Eye size={14} className="inline mr-1" /> Profile
+                            <Eye size={12} className="inline mr-1" /> Profile
                           </button>
                         </td>
                       </tr>
@@ -1540,8 +1584,8 @@ const SuperAdminReports = () => {
                   </tbody>
                   <tfoot className="bg-cyan-50 font-semibold border-t-2 border-cyan-300">
                     <tr>
-                      <td colSpan="5" className="py-3 px-4 text-right text-cyan-700">Class Average Percentage:</td>
-                      <td className="py-3 px-4 text-center text-cyan-700">{reportData.averageScore}%</td>
+                      <td colSpan="5" className="py-2 sm:py-3 px-2 sm:px-4 text-right text-cyan-700">Class Average Percentage:</td>
+                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-center text-cyan-700">{reportData.averageScore}%</td>
                       <td colSpan="3"></td>
                     </tr>
                   </tfoot>
@@ -1549,11 +1593,11 @@ const SuperAdminReports = () => {
               )}
             </div>
 
-            <div className="mt-6 p-4 bg-cyan-50 rounded-lg border border-cyan-200">
-              <p className="text-sm text-gray-600">Generated on: {new Date().toLocaleString()}</p>
-              <p className="text-sm text-gray-600">Period: {dateRange.startDate} to {dateRange.endDate}</p>
-              <p className="text-sm text-cyan-700 mt-2 flex items-center gap-1">
-                <AlertCircle size={16} />
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+              <p className="text-xs sm:text-sm text-gray-600">Generated on: {new Date().toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Period: {dateRange.startDate} to {dateRange.endDate}</p>
+              <p className="text-xs sm:text-sm text-cyan-700 mt-2 flex items-start gap-1">
+                <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
                 <strong>Note:</strong> Click "Profile" to see complete student profile with subject-wise marks breakdown.
               </p>
             </div>
@@ -1561,16 +1605,16 @@ const SuperAdminReports = () => {
         )}
 
         {!reportData && !isLoading && (
-          <div className="bg-white rounded-xl shadow-md p-12 text-center border border-gray-200">
-            <BarChart3 size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg font-semibold">Click "Generate Report" to view {reportType === 'attendance' ? 'attendance' : 'complete marklist'} data</p>
+          <div className="bg-white rounded-xl shadow-md p-8 sm:p-12 text-center border border-gray-200">
+            <BarChart3 size={40} className="mx-auto text-gray-400 mb-3 sm:mb-4" />
+            <p className="text-gray-600 text-sm sm:text-lg font-semibold px-2">Click "Generate Report" to view {reportType === 'attendance' ? 'attendance' : 'complete marklist'} data</p>
           </div>
         )}
 
         {isLoading && (
-          <div className="bg-white rounded-xl shadow-md p-12 text-center border border-gray-200">
+          <div className="bg-white rounded-xl shadow-md p-8 sm:p-12 text-center border border-gray-200">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 font-medium">Generating report...</p>
+            <p className="mt-4 text-gray-600 font-medium text-sm sm:text-base">Generating report...</p>
           </div>
         )}
       </div>
