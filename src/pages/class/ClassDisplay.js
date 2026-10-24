@@ -23,7 +23,7 @@ const Avatar = ({ name, image, size = 40 }) => {
       <img
         src={image}
         alt={name}
-        className="rounded-full object-cover border-2 border-cyan-200"
+        className="rounded-full object-cover border-2 border-cyan-200 flex-shrink-0"
         style={{ width: size, height: size }}
         onError={() => setImageError(true)}
       />
@@ -55,15 +55,15 @@ const Avatar = ({ name, image, size = 40 }) => {
 const Badge = ({ text, color = 'blue' }) => {
   const colorMap = {
     blue: 'bg-cyan-100 text-cyan-700',
-    green: 'bg-green-100 text-green-700',
-    yellow: 'bg-yellow-100 text-yellow-700',
-    red: 'bg-red-100 text-red-700',
-    purple: 'bg-purple-100 text-purple-700',
+    green: 'bg-cyan-100 text-cyan-700',
+    yellow: 'bg-gray-100 text-gray-700',
+    red: 'bg-gray-100 text-gray-700',
+    purple: 'bg-gray-100 text-gray-700',
     gray: 'bg-gray-100 text-gray-700',
   };
 
   return (
-    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${colorMap[color]}`}>
+    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${colorMap[color]}`}>
       {text}
     </span>
   );
@@ -89,7 +89,7 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
         .student-detail-container { animation: fadeIn 0.5s ease-out; }
@@ -97,16 +97,19 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
         .detail-header {
           background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
           color: white;
-          padding: 35px;
+          padding: 20px;
           border-radius: 15px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
+        }
+        @media (min-width: 768px) {
+          .detail-header { padding: 35px; margin-bottom: 30px; }
         }
         .detail-back-btn {
           background: white;
           color: #0e7490;
           border: 2px solid #0e7490;
-          padding: 10px 24px;
+          padding: 10px 20px;
           border-radius: 8px;
           font-weight: 600;
           cursor: pointer;
@@ -114,6 +117,7 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
           display: inline-flex;
           align-items: center;
           gap: 8px;
+          font-size: 14px;
         }
         .detail-back-btn:hover {
           background: #0e7490;
@@ -132,14 +136,19 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
         .detail-info-table th {
           background: linear-gradient(135deg, #0e7490, #0891b2);
           color: white;
-          padding: 12px 16px;
+          padding: 10px 12px;
           text-align: left;
           font-weight: 600;
           border: 1px solid #0c6a82;
+          font-size: 13px;
         }
         .detail-info-table td {
-          padding: 12px 16px;
+          padding: 10px 12px;
           border: 1px solid #e2e8f0;
+          font-size: 13px;
+        }
+        @media (min-width: 768px) {
+          .detail-info-table th, .detail-info-table td { padding: 12px 16px; font-size: 14px; }
         }
         .detail-info-table tr:nth-child(even) td {
           background: #f8fafc;
@@ -150,17 +159,17 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
       `}</style>
 
       <div className="student-detail-container">
-        <button onClick={onBack} className="detail-back-btn mb-6">
+        <button onClick={onBack} className="detail-back-btn mb-4 sm:mb-6">
           <ChevronLeft size={18} /> Back to Classes
         </button>
 
         <div className="detail-header">
-          <div className="flex flex-wrap items-center gap-6">
-            <Avatar name={student.name} image={student.profileImage} size={100} />
-            <div>
-              <h2 className="text-3xl font-bold">{student.name}</h2>
-              <p className="text-cyan-100 mt-1">Roll No: {student.rollNumber || 'N/A'}</p>
-              <div className="flex gap-2 mt-2">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+            <Avatar name={student.name} image={student.profileImage} size={90} />
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold break-words">{student.name}</h2>
+              <p className="text-cyan-100 mt-1 text-sm sm:text-base">Roll No: {student.rollNumber || 'N/A'}</p>
+              <div className="flex gap-2 mt-2 flex-wrap justify-center sm:justify-start">
                 <Badge text={isGraduated ? 'Graduated' : 'Active'} color={isGraduated ? 'purple' : 'green'} />
                 {student.programs && <Badge text={student.programs} color={student.programs === 'Social' ? 'yellow' : 'green'} />}
               </div>
@@ -168,44 +177,13 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
           </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <User className="text-cyan-600" size={24} />
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <User className="text-cyan-600 flex-shrink-0" size={22} />
             Personal Information
           </h3>
-          <table className="detail-info-table">
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {personalInfo.map((item, idx) => {
-                const IconComponent = item.icon;
-                return (
-                  <tr key={idx}>
-                    <td className="font-medium text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="text-cyan-600" size={16} />
-                        {item.label}
-                      </div>
-                    </td>
-                    <td>{item.value}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {student.phone && (
-          <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Phone className="text-cyan-600" size={24} />
-              Contact Information
-            </h3>
-            <table className="detail-info-table">
+          <div className="overflow-x-auto rounded-xl">
+            <table className="detail-info-table min-w-[320px]">
               <thead>
                 <tr>
                   <th>Field</th>
@@ -213,26 +191,61 @@ const StudentDetailView = ({ student, onBack, onEdit, onGraduate }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="font-medium text-gray-700">
-                    <div className="flex items-center gap-2">
-                      <Phone className="text-cyan-600" size={16} />
-                      Phone
-                    </div>
-                  </td>
-                  <td>{student.phone}</td>
-                </tr>
+                {personalInfo.map((item, idx) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <tr key={idx}>
+                      <td className="font-medium text-gray-700">
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="text-cyan-600 flex-shrink-0" size={16} />
+                          {item.label}
+                        </div>
+                      </td>
+                      <td className="break-words">{item.value}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+        </div>
+
+        {student.phone && (
+          <div className="mb-6 sm:mb-8">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+              <Phone className="text-cyan-600 flex-shrink-0" size={22} />
+              Contact Information
+            </h3>
+            <div className="overflow-x-auto rounded-xl">
+              <table className="detail-info-table min-w-[320px]">
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-medium text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <Phone className="text-cyan-600 flex-shrink-0" size={16} />
+                        Phone
+                      </div>
+                    </td>
+                    <td>{student.phone}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
 
-        <div className="flex gap-3 flex-wrap">
-          <button onClick={() => onEdit(student)} className="px-5 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-semibold flex items-center gap-2">
+        <div className="flex gap-2 sm:gap-3 flex-wrap">
+          <button onClick={() => onEdit(student)} className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-semibold flex items-center justify-center gap-2 text-sm">
             <Edit2 size={18} /> Edit Student
           </button>
           {!isGraduated && (
-            <button onClick={() => onGraduate(student)} className="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2">
+            <button onClick={() => onGraduate(student)} className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center justify-center gap-2 text-sm">
               <GraduationCap size={18} /> Mark as Graduated
             </button>
           )}
@@ -297,27 +310,33 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
   const sortedStudents = getSortedStudents();
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         .detail-container { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .detail-hero {
           background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
           color: white;
-          padding: 35px;
+          padding: 20px;
           border-radius: 15px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
+        }
+        @media (min-width: 768px) {
+          .detail-hero { padding: 35px; margin-bottom: 30px; }
         }
         .detail-stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 16px;
-          margin-bottom: 30px;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+        @media (min-width: 640px) {
+          .detail-stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 30px; }
         }
         .detail-stat-card {
           background: white;
-          padding: 18px;
+          padding: 14px;
           border-radius: 12px;
           box-shadow: 0 4px 15px rgba(0,0,0,0.06);
           text-align: center;
@@ -329,14 +348,18 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(8, 145, 178, 0.12);
         }
-        .detail-stat-value { font-size: 26px; font-weight: 700; color: #0e7490; margin: 6px 0; }
-        .detail-stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-stat-value { font-size: 20px; font-weight: 700; color: #0e7490; margin: 6px 0; word-break: break-word; }
+        .detail-stat-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media (min-width: 768px) {
+          .detail-stat-value { font-size: 26px; }
+          .detail-stat-label { font-size: 11px; }
+        }
         .detail-subject-card {
           background: white;
           border: 1px solid #e2e8f0;
           border-radius: 12px;
-          padding: 16px;
-          margin-bottom: 12px;
+          padding: 14px;
+          margin-bottom: 10px;
           transition: all 0.3s;
         }
         .detail-subject-card:hover {
@@ -347,7 +370,7 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
           background: white;
           color: #0e7490;
           border: 2px solid #0e7490;
-          padding: 10px 24px;
+          padding: 10px 20px;
           border-radius: 8px;
           font-weight: 600;
           cursor: pointer;
@@ -355,6 +378,7 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
           display: inline-flex;
           align-items: center;
           gap: 8px;
+          font-size: 14px;
         }
         .detail-back-btn:hover {
           background: #0e7490;
@@ -365,23 +389,23 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
       `}</style>
 
       <div className="detail-container">
-        <button onClick={onBack} className="detail-back-btn mb-6">
+        <button onClick={onBack} className="detail-back-btn mb-4 sm:mb-6">
           <ChevronLeft size={18} /> Back to Classes
         </button>
 
         <div className="detail-hero">
-          <div className="flex flex-wrap justify-between items-start gap-4">
-            <div>
-              <h2 className="text-3xl font-bold">Class Details</h2>
-              <p className="text-cyan-100 mt-1">Grade {classData.grade} - Section {classData.section}</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Class Details</h2>
+              <p className="text-cyan-100 mt-1 text-sm sm:text-base">Grade {classData.grade} - Section {classData.section}</p>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap w-full sm:w-auto">
               {!isGraduated && (
-                <button onClick={() => onEditClass(classData)} className="px-5 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-semibold flex items-center gap-2">
+                <button onClick={() => onEditClass(classData)} className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-semibold flex items-center justify-center gap-2 text-sm">
                   <Edit2 size={18} /> Edit Class
                 </button>
               )}
-              <button onClick={() => onDeleteClass(classData._id)} className="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center gap-2">
+              <button onClick={() => onDeleteClass(classData._id)} className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold flex items-center justify-center gap-2 text-sm">
                 <Trash2 size={18} /> Delete
               </button>
             </div>
@@ -395,7 +419,7 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
           </div>
           <div className="detail-stat-card" style={{borderTopColor: '#8b5cf6'}}>
             <div className="detail-stat-label">Class Teacher</div>
-            <div className="detail-stat-value" style={{color: '#8b5cf6', fontSize: '18px'}}>{classData.classTeacher?.name || 'Not assigned'}</div>
+            <div className="detail-stat-value" style={{color: '#8b5cf6', fontSize: '16px'}}>{classData.classTeacher?.name || 'Not assigned'}</div>
           </div>
           <div className="detail-stat-card" style={{borderTopColor: '#10b981'}}>
             <div className="detail-stat-label">Total Students</div>
@@ -404,23 +428,23 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
         </div>
 
         {/* Subjects Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <BookOpen className="text-cyan-600" size={24} />
+        <div className="mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <BookOpen className="text-cyan-600 flex-shrink-0" size={22} />
             Subjects
           </h3>
           {classData.subjects && classData.subjects.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {classData.subjects.map((subject, idx) => (
-                <div key={idx} className="detail-subject-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">{subject.name}</p>
-                    <p className="text-gray-600 text-sm">Teacher: <span className="font-semibold">{subject.teacher?.name || 'Not assigned'}</span></p>
+                <div key={idx} className="detail-subject-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-3">
+                  <div className="min-w-0">
+                    <p className="font-bold text-gray-800 text-base sm:text-lg break-words">{subject.name}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm">Teacher: <span className="font-semibold">{subject.teacher?.name || 'Not assigned'}</span></p>
                   </div>
                   {!isGraduated && (
                     <button
                       onClick={() => handleTeacherAssign(idx)}
-                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-semibold flex items-center gap-2 text-sm"
+                      className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-semibold flex items-center justify-center gap-2 text-xs sm:text-sm"
                     >
                       <UserCog size={16} /> Reassign
                     </button>
@@ -429,33 +453,33 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic">No subjects assigned</p>
+            <p className="text-gray-500 italic text-sm">No subjects assigned</p>
           )}
         </div>
 
         {/* Students Section */}
         <div>
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Users className="text-cyan-600" size={24} />
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+            <Users className="text-cyan-600 flex-shrink-0" size={22} />
             Enrolled Students ({sortedStudents.length})
           </h3>
           {sortedStudents.length > 0 ? (
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {sortedStudents.map((student) => (
-                <div key={student._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50 rounded-lg p-4 hover:bg-cyan-50 transition border border-gray-200">
-                  <div className="flex-1 flex items-center gap-3">
+                <div key={student._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-3 bg-gray-50 rounded-lg p-3 sm:p-4 hover:bg-cyan-50 transition border border-gray-200">
+                  <div className="flex-1 flex items-center gap-3 min-w-0">
                     <Avatar name={student.name} image={student.profileImage} size={35} />
-                    <div>
-                      <p className="font-semibold text-gray-800">{student.name}</p>
-                      <p className="text-sm text-gray-600">Roll: {student.rollNumber || '-'}</p>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{student.name}</p>
+                      <p className="text-xs text-gray-600">Roll: {student.rollNumber || '-'}</p>
                     </div>
                   </div>
                   {!isGraduated && (
-                    <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => onViewStudent(student)} className="px-3 py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-sm font-medium flex items-center gap-1">
+                    <div className="flex gap-2 flex-wrap w-full sm:w-auto">
+                      <button onClick={() => onViewStudent(student)} className="flex-1 sm:flex-initial px-3 py-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-xs font-medium flex items-center justify-center gap-1">
                         <Eye size={14} /> View
                       </button>
-                      <button onClick={() => onMarkGraduated(student)} className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium flex items-center gap-1">
+                      <button onClick={() => onMarkGraduated(student)} className="flex-1 sm:flex-initial px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-xs font-medium flex items-center justify-center gap-1">
                         <GraduationCap size={14} /> Graduate
                       </button>
                     </div>
@@ -464,22 +488,22 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic">No active students enrolled</p>
+            <p className="text-gray-500 italic text-sm">No active students enrolled</p>
           )}
         </div>
 
         {/* Teacher Re-assignment Modal */}
         {showTeacherAssignModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 modal-backdrop">
-            <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto modal-content">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">Reassign Teacher</h3>
-                <button onClick={() => { setShowTeacherAssignModal(false); setTeacherAssignData({ subjectIndex: null, teacherId: '' }); }} className="text-gray-500 hover:text-gray-700">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 modal-backdrop">
+            <div className="bg-white rounded-2xl p-4 sm:p-8 w-full max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto modal-content">
+              <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-800">Reassign Teacher</h3>
+                <button onClick={() => { setShowTeacherAssignModal(false); setTeacherAssignData({ subjectIndex: null, teacherId: '' }); }} className="text-gray-500 hover:text-gray-700 flex-shrink-0">
                   <X size={24} />
                 </button>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Select New Teacher <span className="text-red-500">*</span></label>
                 <select
                   value={teacherAssignData.teacherId}
@@ -493,11 +517,11 @@ const ClassDetailView = ({ classData, onBack, teachers, onTeacherReassign, onMar
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3">
-                <button onClick={() => { setShowTeacherAssignModal(false); setTeacherAssignData({ subjectIndex: null, teacherId: '' }); }} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+                <button onClick={() => { setShowTeacherAssignModal(false); setTeacherAssignData({ subjectIndex: null, teacherId: '' }); }} className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
                   Cancel
                 </button>
-                <button onClick={handleTeacherReassignSubmit} disabled={!teacherAssignData.teacherId} className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-50 font-semibold flex items-center gap-2">
+                <button onClick={handleTeacherReassignSubmit} disabled={!teacherAssignData.teacherId} className="w-full sm:w-auto px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-50 font-semibold flex items-center justify-center gap-2">
                   <UserCog size={18} /> Reassign
                 </button>
               </div>
@@ -662,23 +686,26 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         .assign-container { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .assign-header {
           background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
           color: white;
-          padding: 30px;
+          padding: 20px;
           border-radius: 15px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
+        }
+        @media (min-width: 768px) {
+          .assign-header { padding: 30px; margin-bottom: 30px; }
         }
         .assign-back-btn {
           background: white;
           color: #0e7490;
           border: 2px solid #0e7490;
-          padding: 10px 24px;
+          padding: 10px 20px;
           border-radius: 8px;
           font-weight: 600;
           cursor: pointer;
@@ -686,6 +713,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
           display: inline-flex;
           align-items: center;
           gap: 8px;
+          font-size: 14px;
         }
         .assign-back-btn:hover {
           background: #0e7490;
@@ -696,24 +724,24 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
       `}</style>
 
       <div className="assign-container">
-        <button onClick={onBack} className="assign-back-btn mb-6">
+        <button onClick={onBack} className="assign-back-btn mb-4 sm:mb-6">
           <ChevronLeft size={18} /> Back to Classes
         </button>
 
         <div className="assign-header">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold">Assign Students</h2>
-              <p className="text-cyan-100 mt-1">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Assign Students</h2>
+              <p className="text-cyan-100 mt-1 text-sm sm:text-base">
                 <span className="font-semibold">Grade {classData.grade}</span> - 
                 <span className="font-semibold ml-1">Section {classData.section}</span>
               </p>
-              <div className="flex flex-wrap gap-4 mt-2">
-                <p className="text-sm text-cyan-100">
+              <div className="flex flex-wrap gap-3 sm:gap-4 mt-2">
+                <p className="text-xs sm:text-sm text-cyan-100">
                   <Users size={14} className="inline mr-1" /> 
                   Currently enrolled: <span className="font-semibold">{classData.students?.filter(s => s.academicStatus !== 'graduated' && s.grade !== 'Graduated').length || 0}</span> students
                 </p>
-                <p className="text-sm text-cyan-100">
+                <p className="text-xs sm:text-sm text-cyan-100">
                   <Users size={14} className="inline mr-1" /> 
                   Available: <span className="font-semibold">{filteredStudents.length}</span> students
                 </p>
@@ -722,7 +750,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
             <button
               onClick={handleAssignStudents}
               disabled={selectedStudents.length === 0 || loading}
-              className="px-6 py-3 bg-white text-cyan-700 rounded-lg hover:bg-cyan-50 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center gap-2 shadow-lg"
+              className="w-full md:w-auto px-5 sm:px-6 py-3 bg-white text-cyan-700 rounded-lg hover:bg-cyan-50 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 shadow-lg text-sm"
             >
               {loading ? (
                 <>
@@ -737,10 +765,10 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
           </div>
         </div>
 
-        {/* Search and Filter */}
-        <div className="bg-white border-2 border-cyan-200 rounded-xl p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="relative">
+        {/* Search and Filter — responsive grid */}
+        <div className="bg-white border-2 border-cyan-200 rounded-xl p-3 sm:p-4 mb-5 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+            <div className="relative sm:col-span-2 md:col-span-1">
               <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500" />
               <input
                 type="text"
@@ -750,7 +778,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none transition"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none transition"
               />
             </div>
             <select
@@ -759,7 +787,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                 setFilterProgram(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none bg-white transition"
+              className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none bg-white transition"
             >
               <option value="">All Programs</option>
               <option value="Social Science">Social Science</option>
@@ -771,7 +799,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                 setFilterGrade(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none bg-white transition"
+              className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:border-cyan-500 focus:outline-none bg-white transition"
             >
               <option value="">All Grades</option>
               <option value="Grade 9">Grade 9</option>
@@ -780,7 +808,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
               <option value="Grade 12">Grade 12</option>
             </select>
           </div>
-          <div className="mt-3 text-sm text-cyan-700">
+          <div className="mt-3 text-xs sm:text-sm text-cyan-700">
             Found <span className="font-semibold">{filteredStudents.length}</span> available students
             {filterProgram && ` • Program: ${filterProgram}`}
             {filterGrade && ` • Grade: ${filterGrade}`}
@@ -790,10 +818,10 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
 
         {/* Student Table */}
         {filteredStudents.length === 0 ? (
-          <div className="text-center py-12 bg-cyan-50 rounded-xl border-2 border-cyan-200">
-            <Users size={48} className="mx-auto text-cyan-400 mb-4" />
-            <p className="text-cyan-800 text-lg font-semibold">No available students found</p>
-            <p className="text-cyan-600 text-sm mt-2">
+          <div className="text-center py-10 sm:py-12 bg-cyan-50 rounded-xl border-2 border-cyan-200">
+            <Users size={40} className="mx-auto text-cyan-400 mb-3 sm:mb-4" />
+            <p className="text-cyan-800 text-base sm:text-lg font-semibold">No available students found</p>
+            <p className="text-cyan-600 text-xs sm:text-sm mt-2 px-4">
               {filterProgram || filterGrade ? (
                 <>No students match the selected filters</>
               ) : (
@@ -805,10 +833,10 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
           <>
             <div className="border-2 border-cyan-200 rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
+                <table className="w-full border-collapse min-w-[700px]">
                   <thead className="bg-gradient-to-r from-cyan-600 to-cyan-700">
                     <tr>
-                      <th className="px-4 py-3 text-center w-12">
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-center w-12">
                         <input
                           type="checkbox"
                           checked={currentStudents.length > 0 && currentStudents.every(s => selectedStudents.includes(s._id))}
@@ -824,12 +852,12 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                           className="w-4 h-4 text-cyan-600 rounded border-gray-300"
                         />
                       </th>
-                      <th className="px-4 py-3 text-left text-white font-semibold">Roll No</th>
-                      <th className="px-4 py-3 text-left text-white font-semibold">Student</th>
-                      <th className="px-4 py-3 text-left text-white font-semibold">Grade</th>
-                      <th className="px-4 py-3 text-left text-white font-semibold">Section</th>
-                      <th className="px-4 py-3 text-left text-white font-semibold">Program</th>
-                      <th className="px-4 py-3 text-center text-white font-semibold">Status</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white font-semibold text-xs sm:text-sm">Roll No</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white font-semibold text-xs sm:text-sm">Student</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white font-semibold text-xs sm:text-sm">Grade</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white font-semibold text-xs sm:text-sm">Section</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-white font-semibold text-xs sm:text-sm">Program</th>
+                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-white font-semibold text-xs sm:text-sm">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -840,7 +868,7 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                           key={student._id} 
                           className={`${index % 2 === 0 ? 'bg-white' : 'bg-cyan-50'} hover:bg-cyan-100 transition`}
                         >
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
                             <input
                               type="checkbox"
                               checked={isSelected}
@@ -848,41 +876,35 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
                               className="w-4 h-4 text-cyan-600 rounded border-gray-300 focus:ring-cyan-500"
                             />
                           </td>
-                          <td className="px-4 py-3 font-medium text-gray-700">
+                          <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium text-gray-700 text-xs sm:text-sm whitespace-nowrap">
                             {student.rollNumber || '-'}
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <Avatar name={student.name} image={student.profileImage} size={35} />
-                              <div>
-                                <p className="font-semibold text-gray-800">{student.name}</p>
-                                <p className="text-xs text-gray-500">{student.email || 'No email'}</p>
+                          <td className="px-2 sm:px-4 py-2 sm:py-3">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                              <Avatar name={student.name} image={student.profileImage} size={32} />
+                              <div className="min-w-0">
+                                <p className="font-semibold text-gray-800 text-xs sm:text-sm truncate">{student.name}</p>
+                                <p className="text-[10px] sm:text-xs text-gray-500 truncate">{student.email || 'No email'}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-cyan-100 text-cyan-700 rounded text-sm font-semibold">
+                          <td className="px-2 sm:px-4 py-2 sm:py-3">
+                            <span className="px-2 py-1 bg-cyan-100 text-cyan-700 rounded text-xs sm:text-sm font-semibold whitespace-nowrap">
                               {student.grade || '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold">
+                          <td className="px-2 sm:px-4 py-2 sm:py-3">
+                            <span className="px-2 py-1 bg-cyan-100 text-cyan-700 rounded text-xs sm:text-sm font-semibold whitespace-nowrap">
                               {student.section || student.classSection || student.class || '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded text-sm font-semibold ${
-                              (student.programs || student.program || '').toLowerCase() === 'social' 
-                                ? 'bg-yellow-100 text-yellow-700' 
-                                : (student.programs || student.program || '').toLowerCase() === 'natural'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}>
+                          <td className="px-2 sm:px-4 py-2 sm:py-3">
+                            <span className="px-2 py-1 rounded text-xs sm:text-sm font-semibold whitespace-nowrap bg-gray-100 text-gray-700">
                               {student.programs || student.program || '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                          <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
+                            <span className="px-2 sm:px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap">
                               ✅ Available
                             </span>
                           </td>
@@ -895,28 +917,28 @@ const AssignStudentsView = ({ classData, students, classes, onBack, onStudentsAs
             </div>
 
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-3 mt-6">
+              <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-5 sm:mt-6">
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 border-2 border-cyan-300 text-cyan-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 transition font-semibold"
+                  className="px-3 sm:px-4 py-2 border-2 border-cyan-300 text-cyan-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 transition font-semibold text-sm"
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 font-semibold text-cyan-700">
+                <span className="px-3 sm:px-4 py-2 font-semibold text-cyan-700 text-sm">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 border-2 border-cyan-300 text-cyan-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 transition font-semibold"
+                  className="px-3 sm:px-4 py-2 border-2 border-cyan-300 text-cyan-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 transition font-semibold text-sm"
                 >
                   Next
                 </button>
               </div>
             )}
 
-            <div className="mt-4 text-center text-sm text-cyan-700">
+            <div className="mt-4 text-center text-xs sm:text-sm text-cyan-700">
               <span className="font-semibold">{selectedStudents.length}</span> student(s) selected for assignment
             </div>
           </>
@@ -1637,7 +1659,7 @@ const ClassList = ({ onEditClass }) => {
   // ============================================
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -1647,21 +1669,31 @@ const ClassList = ({ onEditClass }) => {
         .manage-hero {
           background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%);
           color: white;
-          padding: 35px;
+          padding: 20px;
           border-radius: 15px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           box-shadow: 0 10px 40px rgba(8, 145, 178, 0.3);
         }
-        .manage-hero-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
-        .manage-hero-subtitle { font-size: 16px; opacity: 0.9; }
+        @media (min-width: 768px) {
+          .manage-hero { padding: 35px; margin-bottom: 30px; }
+        }
+        .manage-hero-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+        .manage-hero-subtitle { font-size: 13px; opacity: 0.9; }
+        @media (min-width: 768px) {
+          .manage-hero-title { font-size: 36px; margin-bottom: 10px; }
+          .manage-hero-subtitle { font-size: 16px; }
+        }
         
         .manage-filter-box {
           background: white;
           border: 2px solid #e2e8f0;
           border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 24px;
+          padding: 14px;
+          margin-bottom: 20px;
           transition: all 0.3s;
+        }
+        @media (min-width: 768px) {
+          .manage-filter-box { padding: 20px; margin-bottom: 24px; }
         }
         .manage-filter-box:focus-within {
           border-color: #0891b2;
@@ -1669,16 +1701,19 @@ const ClassList = ({ onEditClass }) => {
         }
         
         .manage-tab-btn {
-          padding: 10px 20px;
+          padding: 8px 14px;
           border-radius: 8px 8px 0 0;
           font-weight: 600;
-          font-size: 14px;
+          font-size: 12px;
           transition: all 0.3s;
           border: none;
           cursor: pointer;
           background: transparent;
           color: #6b7280;
           border-bottom: 3px solid transparent;
+        }
+        @media (min-width: 768px) {
+          .manage-tab-btn { padding: 10px 20px; font-size: 14px; }
         }
         .manage-tab-btn:hover {
           color: #1f2937;
@@ -1698,11 +1733,14 @@ const ClassList = ({ onEditClass }) => {
           display: inline-block;
           padding: 1px 8px;
           border-radius: 12px;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 700;
           margin-left: 6px;
           background: #e2e8f0;
           color: #475569;
+        }
+        @media (min-width: 768px) {
+          .tab-badge { font-size: 11px; }
         }
         
         /* Class Card Styles */
@@ -1710,12 +1748,15 @@ const ClassList = ({ onEditClass }) => {
           background: white;
           border: 2px solid #e2e8f0;
           border-radius: 16px;
-          padding: 24px;
+          padding: 14px;
           transition: all 0.3s ease;
           box-shadow: 0 4px 15px rgba(0,0,0,0.06);
           position: relative;
           overflow: hidden;
-          margin-bottom: 20px;
+          margin-bottom: 14px;
+        }
+        @media (min-width: 768px) {
+          .class-card { padding: 24px; margin-bottom: 20px; }
         }
         .class-card::before {
           content: '';
@@ -1733,69 +1774,89 @@ const ClassList = ({ onEditClass }) => {
         }
         
         .class-card-graduated {
-          border-color: #d8b4fe;
+          border-color: #cbd5e1;
         }
         .class-card-graduated::before {
-          background: linear-gradient(90deg, #7c3aed, #a78bfa);
+          background: linear-gradient(90deg, #64748b, #94a3b8);
         }
         .class-card-graduated:hover {
-          border-color: #7c3aed;
-          box-shadow: 0 12px 30px rgba(124, 58, 237, 0.15);
+          border-color: #64748b;
+          box-shadow: 0 12px 30px rgba(100, 116, 139, 0.15);
         }
         
         .class-icon-box {
-          width: 56px;
-          height: 56px;
+          width: 44px;
+          height: 44px;
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 28px;
+          font-size: 20px;
+          font-weight: 700;
           background: linear-gradient(135deg, #0e7490, #0891b2);
           color: white;
           flex-shrink: 0;
         }
+        @media (min-width: 768px) {
+          .class-icon-box { width: 56px; height: 56px; font-size: 28px; }
+        }
         .class-icon-box-graduated {
-          background: linear-gradient(135deg, #7c3aed, #a78bfa);
+          background: linear-gradient(135deg, #64748b, #94a3b8);
         }
         
         .class-stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 12px;
-          margin: 16px 0;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+          margin: 12px 0;
+        }
+        @media (min-width: 640px) {
+          .class-stats-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 16px 0; }
         }
         .class-stat-item {
           background: #f8fafc;
-          padding: 12px 16px;
+          padding: 10px 12px;
           border-radius: 10px;
           text-align: center;
           border: 1px solid #e2e8f0;
         }
+        @media (min-width: 768px) {
+          .class-stat-item { padding: 12px 16px; }
+        }
         .class-stat-number {
-          font-size: 22px;
+          font-size: 18px;
           font-weight: 700;
           color: #0e7490;
         }
+        @media (min-width: 768px) {
+          .class-stat-number { font-size: 22px; }
+        }
         .class-stat-label {
-          font-size: 10px;
+          font-size: 9px;
           color: #94a3b8;
           text-transform: uppercase;
           letter-spacing: 0.5px;
           font-weight: 600;
         }
+        @media (min-width: 768px) {
+          .class-stat-label { font-size: 10px; }
+        }
         
         .class-action-btn {
-          padding: 8px 16px;
+          padding: 6px 10px;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 13px;
+          font-size: 11px;
           transition: all 0.3s;
           border: none;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 4px;
+          justify-content: center;
+        }
+        @media (min-width: 768px) {
+          .class-action-btn { padding: 8px 16px; font-size: 13px; gap: 6px; }
         }
         .class-action-btn:hover {
           transform: translateY(-2px);
@@ -1810,35 +1871,35 @@ const ClassList = ({ onEditClass }) => {
         }
         
         .btn-success-class {
-          background: linear-gradient(135deg, #059669, #10b981);
+          background: #0891b2;
           color: white;
         }
         .btn-success-class:hover {
-          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+          box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
         }
         
         .btn-warning-class {
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: #0e7490;
           color: white;
         }
         .btn-warning-class:hover {
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
         }
         
         .btn-danger-class {
-          background: linear-gradient(135deg, #dc2626, #ef4444);
+          background: #475569;
           color: white;
         }
         .btn-danger-class:hover {
-          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+          box-shadow: 0 6px 20px rgba(71, 85, 105, 0.3);
         }
         
         .btn-purple-class {
-          background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+          background: #0e7490;
           color: white;
         }
         .btn-purple-class:hover {
-          box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+          box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
         }
         
         .btn-gray-class {
@@ -1853,13 +1914,19 @@ const ClassList = ({ onEditClass }) => {
           background: white;
           color: #0e7490;
           border: 2px solid white;
-          padding: 12px 28px;
+          padding: 10px 20px;
           border-radius: 12px;
           font-weight: 700;
           transition: all 0.3s;
           display: inline-flex;
           align-items: center;
           gap: 8px;
+          font-size: 13px;
+          width: 100%;
+          justify-content: center;
+        }
+        @media (min-width: 640px) {
+          .btn-add-class { padding: 12px 28px; font-size: 14px; width: auto; }
         }
         .btn-add-class:hover {
           background: rgba(255,255,255,0.15);
@@ -1879,16 +1946,23 @@ const ClassList = ({ onEditClass }) => {
           color: white;
         }
         .student-table-header th {
-          padding: 10px 14px;
+          padding: 8px 10px;
           text-align: left;
           font-weight: 600;
-          font-size: 12px;
+          font-size: 11px;
           border: 1px solid #0c6a82;
+          white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+          .student-table-header th { padding: 10px 14px; font-size: 12px; }
         }
         .student-table-row td {
-          padding: 8px 14px;
+          padding: 6px 10px;
           border: 1px solid #e2e8f0;
-          font-size: 13px;
+          font-size: 12px;
+        }
+        @media (min-width: 768px) {
+          .student-table-row td { padding: 8px 14px; font-size: 13px; }
         }
         .student-table-row:nth-child(even) td {
           background: #f8fafc;
@@ -1915,10 +1989,10 @@ const ClassList = ({ onEditClass }) => {
           font-size: 11px;
           font-weight: 600;
         }
-        .badge-social { background: #fef3c7; color: #d97706; }
-        .badge-natural { background: #d1fae5; color: #059669; }
-        .badge-graduated { background: #ede9fe; color: #7c3aed; }
-        .badge-active { background: #dbeafe; color: #2563eb; }
+        .badge-social { background: #e2e8f0; color: #475569; }
+        .badge-natural { background: #cffafe; color: #0e7490; }
+        .badge-graduated { background: #e2e8f0; color: #475569; }
+        .badge-active { background: #cffafe; color: #0e7490; }
         
         .search-input-wrapper {
           position: relative;
@@ -1929,7 +2003,10 @@ const ClassList = ({ onEditClass }) => {
           border: 2px solid #e2e8f0;
           border-radius: 10px;
           transition: all 0.3s;
-          font-size: 14px;
+          font-size: 13px;
+        }
+        @media (min-width: 768px) {
+          .search-input-wrapper input { font-size: 14px; }
         }
         .search-input-wrapper input:focus {
           border-color: #0891b2;
@@ -1948,8 +2025,8 @@ const ClassList = ({ onEditClass }) => {
       <div className="manage-container">
         {/* ========== HERO SECTION ========== */}
         <div className="manage-hero">
-          <div className="flex flex-wrap justify-between items-center gap-4">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-3 sm:gap-4">
+            <div className="min-w-0">
               <h2 className="manage-hero-title">📚 Manage Classes</h2>
               <p className="manage-hero-subtitle">View and manage all classes and student enrollments</p>
             </div>
@@ -1957,13 +2034,13 @@ const ClassList = ({ onEditClass }) => {
               onClick={() => onEditClass(null)}
               className="btn-add-class"
             >
-              <Plus size={20} /> Add New Class
+              <Plus size={18} /> Add New Class
             </button>
           </div>
         </div>
 
         {/* ========== TABS ========== */}
-        <div className="flex gap-1 mb-6 border-b border-gray-200">
+        <div className="flex gap-1 mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
           <button
             onClick={() => {
               setActiveTab('active');
@@ -1973,7 +2050,7 @@ const ClassList = ({ onEditClass }) => {
             }}
             className={`manage-tab-btn ${activeTab === 'active' ? 'manage-tab-btn-active' : ''}`}
           >
-            <BookOpen size={18} className="inline mr-2" />
+            <BookOpen size={16} className="inline mr-1.5" />
             Active Classes
             <span className="tab-badge">{classes.length}</span>
           </button>
@@ -1985,7 +2062,7 @@ const ClassList = ({ onEditClass }) => {
             }}
             className={`manage-tab-btn ${activeTab === 'graduated' ? 'manage-tab-btn-active' : ''}`}
           >
-            <Archive size={18} className="inline mr-2" />
+            <Archive size={16} className="inline mr-1.5" />
             Graduated Classes
             <span className="tab-badge">{graduatedClasses.length}</span>
           </button>
@@ -1996,10 +2073,10 @@ const ClassList = ({ onEditClass }) => {
         {/* ========================================================= */}
         {activeTab === 'active' && (
           <>
-            {/* Filter Box */}
+            {/* Filter Box — responsive grade/program/section/sort */}
             <div className="manage-filter-box">
-              <div className="flex flex-col md:flex-row gap-3">
-                <div className="flex-1 search-input-wrapper">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 sm:gap-3">
+                <div className="search-input-wrapper sm:col-span-2 lg:col-span-2">
                   <Search size={18} className="search-icon" />
                   <input
                     type="text"
@@ -2017,7 +2094,7 @@ const ClassList = ({ onEditClass }) => {
                     setFilterGrade(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
+                  className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
                 >
                   <option value="">All Grades</option>
                   <option value="9">Grade 9</option>
@@ -2031,7 +2108,7 @@ const ClassList = ({ onEditClass }) => {
                     setFilterProgram(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
+                  className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
                 >
                   <option value="">All Programs</option>
                   <option value="Social">Social Science</option>
@@ -2045,12 +2122,12 @@ const ClassList = ({ onEditClass }) => {
                     setFilterSection(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none w-32"
+                  className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none"
                 />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
+                  className="w-full px-3 sm:px-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-cyan-500 focus:outline-none bg-white transition"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -2059,25 +2136,25 @@ const ClassList = ({ onEditClass }) => {
                 {(searchTerm || filterGrade || filterProgram || filterSection) && (
                   <button
                     onClick={clearFilters}
-                    className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition"
+                    className="w-full sm:col-span-2 lg:col-span-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition text-sm"
                   >
                     Clear Filters
                   </button>
                 )}
               </div>
-              <div className="mt-3 text-sm text-gray-500">
+              <div className="mt-3 text-xs sm:text-sm text-gray-500">
                 Found {filteredActiveClasses.length} class{filteredActiveClasses.length !== 1 ? 'es' : ''}
               </div>
             </div>
 
             {/* Class Cards */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {filteredActiveClasses.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-lg p-12 text-center border border-gray-200">
-                  <BookOpen size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 text-lg">No active classes found.</p>
+                <div className="bg-white rounded-xl shadow-lg p-8 sm:p-12 text-center border border-gray-200">
+                  <BookOpen size={40} className="mx-auto text-gray-400 mb-3 sm:mb-4" />
+                  <p className="text-gray-600 text-base sm:text-lg">No active classes found.</p>
                   {(searchTerm || filterGrade || filterProgram || filterSection) && (
-                    <button onClick={clearFilters} className="mt-4 text-cyan-600 hover:text-cyan-700 font-semibold">
+                    <button onClick={clearFilters} className="mt-4 text-cyan-600 hover:text-cyan-700 font-semibold text-sm">
                       Clear filters to see all classes
                     </button>
                   )}
@@ -2089,14 +2166,14 @@ const ClassList = ({ onEditClass }) => {
                     return (
                       <div key={cls._id} className="class-card">
                         {/* Header */}
-                        <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
-                          <div className="flex items-start gap-4 flex-1">
+                        <div className="flex flex-col lg:flex-row justify-between items-start gap-3 sm:gap-4">
+                          <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full min-w-0">
                             <div className="class-icon-box">
                               {cls.grade}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex flex-wrap items-center gap-3 mb-2">
-                                <h3 className="text-xl font-bold text-gray-800">
+                              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
                                   Grade {cls.grade} - Section {cls.section}
                                 </h3>
                                 <span className={`badge-program ${
@@ -2106,41 +2183,41 @@ const ClassList = ({ onEditClass }) => {
                                   {cls.program || 'N/A'}
                                 </span>
                                 {canGraduate && (
-                                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                  <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-gray-100 text-gray-700 whitespace-nowrap">
                                     Eligible for Graduation
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs sm:text-sm text-gray-600">
                                 Teacher: <span className="font-semibold text-cyan-700">{cls.classTeacher?.name || 'Not assigned'}</span>
                               </p>
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
-                          <div className="flex gap-2 flex-wrap w-full lg:w-auto">
+                          {/* Action Buttons — wrap + full-width on mobile */}
+                          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full lg:w-auto">
                             <button onClick={() => openClassDetail(cls)} className="class-action-btn btn-primary-class">
-                              <Eye size={16} /> Details
+                              <Eye size={14} /> Details
                             </button>
                             <button onClick={() => openAssignStudents(cls)} className="class-action-btn btn-success-class">
-                              <Users size={16} /> Assign
+                              <Users size={14} /> Assign
                             </button>
                             <button onClick={() => onEditClass(cls)} className="class-action-btn btn-warning-class">
-                              <Edit2 size={16} /> Edit
+                              <Edit2 size={14} /> Edit
                             </button>
                             {canGraduate && (
                               <button onClick={() => handleMarkClassAsGraduated(cls)} className="class-action-btn btn-purple-class">
-                                <GraduationCap size={16} /> Graduate
+                                <GraduationCap size={14} /> Graduate
                               </button>
                             )}
                             {cls.students && cls.students.filter(s => s.academicStatus !== 'graduated' && s.grade !== 'Graduated').length > 0 && (
                               <button onClick={() => toggleDropdown(cls._id)} className="class-action-btn btn-gray-class">
-                                {expandedClass === cls._id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                {expandedClass === cls._id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                                 {expandedClass === cls._id ? 'Hide' : 'Show'} Students
                               </button>
                             )}
                             <button onClick={() => handleDelete(cls._id)} className="class-action-btn btn-danger-class">
-                              <Trash2 size={16} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
@@ -2159,12 +2236,12 @@ const ClassList = ({ onEditClass }) => {
 
                         {/* Expanded Student List */}
                         {expandedClass === cls._id && cls.students && cls.students.filter(s => s.academicStatus !== 'graduated' && s.grade !== 'Graduated').length > 0 && (
-                          <div className="mt-4 pt-4 border-t-2 border-gray-200">
-                            <div className="flex justify-between items-center mb-3">
-                              <h4 className="font-bold text-gray-800">Enrolled Students</h4>
+                          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t-2 border-gray-200">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                              <h4 className="font-bold text-gray-800 text-sm sm:text-base">Enrolled Students</h4>
                               <button 
                                 onClick={() => handleRemoveMultipleStudents(cls._id, cls.students.filter(s => s.academicStatus !== 'graduated' && s.grade !== 'Graduated').map(s => s._id))} 
-                                className="class-action-btn btn-danger-class text-sm"
+                                className="class-action-btn btn-danger-class"
                               >
                                 <Trash2 size={14} /> Remove All
                               </button>
@@ -2172,7 +2249,7 @@ const ClassList = ({ onEditClass }) => {
 
                             <div className="student-table-container">
                               <div className="overflow-x-auto">
-                                <table className="w-full border-collapse">
+                                <table className="w-full border-collapse min-w-[700px]">
                                   <thead className="student-table-header">
                                     <tr>
                                       <th className="text-center">Roll</th>
@@ -2190,12 +2267,12 @@ const ClassList = ({ onEditClass }) => {
                                       const fullStudentData = students.find(s => s._id === student._id) || student;
                                       return (
                                         <tr key={student._id} className="student-table-row">
-                                          <td className="text-center font-medium text-gray-700">{fullStudentData.rollNumber || '-'}</td>
+                                          <td className="text-center font-medium text-gray-700 whitespace-nowrap">{fullStudentData.rollNumber || '-'}</td>
                                           <td className="text-center">
-                                            <Avatar name={fullStudentData.name} image={fullStudentData.profileImage} size={32} />
+                                            <Avatar name={fullStudentData.name} image={fullStudentData.profileImage} size={30} />
                                           </td>
                                           <td className="font-medium text-gray-900">{fullStudentData.name}</td>
-                                          <td className="text-center text-gray-700">{fullStudentData.grade || '-'}</td>
+                                          <td className="text-center text-gray-700 whitespace-nowrap">{fullStudentData.grade || '-'}</td>
                                           <td className="text-center text-gray-700">{fullStudentData.section || '-'}</td>
                                           <td className="text-center text-gray-700">{fullStudentData.programs || '-'}</td>
                                           <td className="text-center">
@@ -2226,19 +2303,19 @@ const ClassList = ({ onEditClass }) => {
                             </div>
 
                             {getTotalStudentPages(cls._id) > 1 && (
-                              <div className="flex justify-center mt-4 gap-2">
+                              <div className="flex flex-wrap justify-center mt-3 sm:mt-4 gap-2">
                                 <button 
                                   onClick={() => { const newPage = Math.max(1, (studentPage[cls._id] || 1) - 1); setStudentPage(prev => ({ ...prev, [cls._id]: newPage })); }} 
                                   disabled={(studentPage[cls._id] || 1) === 1} 
-                                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+                                  className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-xs sm:text-sm"
                                 >
                                   Previous
                                 </button>
-                                <span className="px-4 py-2 font-semibold text-gray-700">Page {(studentPage[cls._id] || 1)} of {getTotalStudentPages(cls._id)}</span>
+                                <span className="px-3 sm:px-4 py-2 font-semibold text-gray-700 text-xs sm:text-sm">Page {(studentPage[cls._id] || 1)} of {getTotalStudentPages(cls._id)}</span>
                                 <button 
                                   onClick={() => { const newPage = Math.min(getTotalStudentPages(cls._id), (studentPage[cls._id] || 1) + 1); setStudentPage(prev => ({ ...prev, [cls._id]: newPage })); }} 
                                   disabled={(studentPage[cls._id] || 1) === getTotalStudentPages(cls._id)} 
-                                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+                                  className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-xs sm:text-sm"
                                 >
                                   Next
                                 </button>
@@ -2252,12 +2329,12 @@ const ClassList = ({ onEditClass }) => {
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="flex justify-center gap-3 mt-8">
-                      <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
+                      <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Previous
                       </button>
-                      <span className="px-6 py-3 font-bold text-gray-700">Page {currentPage} of {totalPages}</span>
-                      <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                      <span className="px-4 sm:px-6 py-2 sm:py-3 font-bold text-gray-700 text-sm">Page {currentPage} of {totalPages}</span>
+                      <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Next
                       </button>
                     </div>
@@ -2272,58 +2349,58 @@ const ClassList = ({ onEditClass }) => {
         {/* ========== GRADUATED CLASSES TAB ========== */}
         {/* ========================================================= */}
         {activeTab === 'graduated' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Archive size={24} /> Graduated Classes
+              <div className="bg-gradient-to-r from-cyan-700 to-cyan-600 px-4 sm:px-6 py-3 sm:py-4">
+                <h2 className="text-base sm:text-xl font-bold text-white flex items-center gap-2">
+                  <Archive size={20} className="flex-shrink-0" /> Graduated Classes
                 </h2>
-                <p className="text-purple-100 text-sm mt-1">Classes that have completed their academic program</p>
+                <p className="text-cyan-100 text-xs sm:text-sm mt-1">Classes that have completed their academic program</p>
               </div>
 
               {graduatedClasses.length === 0 ? (
-                <div className="text-center py-12">
-                  <Archive size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-lg">No graduated classes found.</p>
+                <div className="text-center py-10 sm:py-12">
+                  <Archive size={40} className="mx-auto text-gray-400 mb-3 sm:mb-4" />
+                  <p className="text-gray-500 text-base sm:text-lg">No graduated classes found.</p>
                 </div>
               ) : (
                 <>
                   {currentGraduatedClasses.map((cls) => (
-                    <div key={cls._id} className="class-card class-card-graduated m-4">
-                      <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
-                        <div className="flex items-start gap-4 flex-1">
+                    <div key={cls._id} className="class-card class-card-graduated m-3 sm:m-4">
+                      <div className="flex flex-col lg:flex-row justify-between items-start gap-3 sm:gap-4">
+                        <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full min-w-0">
                           <div className="class-icon-box class-icon-box-graduated">
                             {cls.grade}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-3 mb-2">
-                              <h3 className="text-xl font-bold text-gray-800">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
                                 Grade {cls.grade} - Section {cls.section}
                               </h3>
                               <span className="badge-program badge-graduated">Graduated</span>
                             </div>
-                            <p className="text-sm text-gray-600">
-                              Teacher: <span className="font-semibold text-purple-700">{cls.classTeacher?.name || 'Not assigned'}</span>
+                            <p className="text-xs sm:text-sm text-gray-600">
+                              Teacher: <span className="font-semibold text-cyan-700">{cls.classTeacher?.name || 'Not assigned'}</span>
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
                               Graduated on: {new Date(cls.updatedAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex gap-2 flex-wrap w-full lg:w-auto">
+                        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full lg:w-auto">
                           <button onClick={() => openClassDetail(cls)} className="class-action-btn btn-primary-class">
-                            <Eye size={16} /> Details
+                            <Eye size={14} /> Details
                           </button>
                           <button onClick={() => handleRestoreGraduatedClass(cls)} className="class-action-btn btn-success-class">
-                            <RefreshCw size={16} /> Restore
+                            <RefreshCw size={14} /> Restore
                           </button>
                           <button onClick={() => handleDelete(cls._id)} className="class-action-btn btn-danger-class">
-                            <Trash2 size={16} />
+                            <Trash2 size={14} />
                           </button>
                           {cls.students && cls.students.length > 0 && (
                             <button onClick={() => toggleGraduatedDropdown(cls._id)} className="class-action-btn btn-gray-class">
-                              {expandedGraduatedClass === cls._id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              {expandedGraduatedClass === cls._id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                               {expandedGraduatedClass === cls._id ? 'Hide' : 'Show'} Students
                             </button>
                           )}
@@ -2332,22 +2409,22 @@ const ClassList = ({ onEditClass }) => {
 
                       <div className="class-stats-grid">
                         <div className="class-stat-item">
-                          <div className="class-stat-number" style={{color: '#7c3aed'}}>{cls.students?.length || 0}</div>
+                          <div className="class-stat-number" style={{color: '#0e7490'}}>{cls.students?.length || 0}</div>
                           <div className="class-stat-label">Graduated Students</div>
                         </div>
                         <div className="class-stat-item">
-                          <div className="class-stat-number" style={{color: '#7c3aed'}}>{cls.subjects?.length || 0}</div>
+                          <div className="class-stat-number" style={{color: '#0e7490'}}>{cls.subjects?.length || 0}</div>
                           <div className="class-stat-label">Subjects</div>
                         </div>
                       </div>
 
                       {expandedGraduatedClass === cls._id && cls.students && cls.students.length > 0 && (
-                        <div className="mt-4 pt-4 border-t-2 border-purple-200">
-                          <h4 className="font-bold text-gray-800 mb-3">Graduated Students</h4>
+                        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t-2 border-gray-200">
+                          <h4 className="font-bold text-gray-800 mb-3 text-sm sm:text-base">Graduated Students</h4>
                           <div className="student-table-container">
                             <div className="overflow-x-auto">
-                              <table className="w-full border-collapse">
-                                <thead className="student-table-header" style={{background: 'linear-gradient(135deg, #7c3aed, #a78bfa)'}}>
+                              <table className="w-full border-collapse min-w-[600px]">
+                                <thead className="student-table-header" style={{background: 'linear-gradient(135deg, #0e7490, #0891b2)'}}>
                                   <tr>
                                     <th className="text-center">Roll</th>
                                     <th className="text-center">Photo</th>
@@ -2361,12 +2438,12 @@ const ClassList = ({ onEditClass }) => {
                                 <tbody>
                                   {getGraduatedClassStudents(cls._id).map((student) => (
                                     <tr key={student._id} className="student-table-row">
-                                      <td className="text-center font-medium text-gray-700">{student.rollNumber || '-'}</td>
+                                      <td className="text-center font-medium text-gray-700 whitespace-nowrap">{student.rollNumber || '-'}</td>
                                       <td className="text-center">
-                                        <Avatar name={student.name} image={student.profileImage} size={32} />
+                                        <Avatar name={student.name} image={student.profileImage} size={30} />
                                       </td>
                                       <td className="font-medium text-gray-900">{student.name}</td>
-                                      <td className="text-center text-gray-700">{student.grade || '-'}</td>
+                                      <td className="text-center text-gray-700 whitespace-nowrap">{student.grade || '-'}</td>
                                       <td className="text-center text-gray-700">{student.section || student.classSection || student.class || '-'}</td>
                                       <td className="text-center text-gray-700">{student.programs || '-'}</td>
                                       <td className="text-center">
@@ -2387,19 +2464,19 @@ const ClassList = ({ onEditClass }) => {
                           </div>
 
                           {getTotalGraduatedClassStudentPages(cls._id) > 1 && (
-                            <div className="flex justify-center mt-4 gap-2">
+                            <div className="flex flex-wrap justify-center mt-3 sm:mt-4 gap-2">
                               <button 
                                 onClick={() => { const newPage = Math.max(1, (graduatedStudentPage[cls._id] || 1) - 1); setGraduatedStudentPage(prev => ({ ...prev, [cls._id]: newPage })); }} 
                                 disabled={(graduatedStudentPage[cls._id] || 1) === 1} 
-                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+                                className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-xs sm:text-sm"
                               >
                                 Previous
                               </button>
-                              <span className="px-4 py-2 font-semibold text-gray-700">Page {(graduatedStudentPage[cls._id] || 1)} of {getTotalGraduatedClassStudentPages(cls._id)}</span>
+                              <span className="px-3 sm:px-4 py-2 font-semibold text-gray-700 text-xs sm:text-sm">Page {(graduatedStudentPage[cls._id] || 1)} of {getTotalGraduatedClassStudentPages(cls._id)}</span>
                               <button 
                                 onClick={() => { const newPage = Math.min(getTotalGraduatedClassStudentPages(cls._id), (graduatedStudentPage[cls._id] || 1) + 1); setGraduatedStudentPage(prev => ({ ...prev, [cls._id]: newPage })); }} 
                                 disabled={(graduatedStudentPage[cls._id] || 1) === getTotalGraduatedClassStudentPages(cls._id)} 
-                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition"
+                                className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-xs sm:text-sm"
                               >
                                 Next
                               </button>
@@ -2411,12 +2488,12 @@ const ClassList = ({ onEditClass }) => {
                   ))}
 
                   {totalGClassPages > 1 && (
-                    <div className="flex justify-center gap-3 mt-8 pb-6">
-                      <button onClick={() => setGraduatedClassPage(graduatedClassPage - 1)} disabled={graduatedClassPage === 1} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8 pb-6">
+                      <button onClick={() => setGraduatedClassPage(graduatedClassPage - 1)} disabled={graduatedClassPage === 1} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Previous
                       </button>
-                      <span className="px-6 py-3 font-bold text-gray-700">Page {graduatedClassPage} of {totalGClassPages}</span>
-                      <button onClick={() => setGraduatedClassPage(graduatedClassPage + 1)} disabled={graduatedClassPage === totalGClassPages} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                      <span className="px-4 sm:px-6 py-2 sm:py-3 font-bold text-gray-700 text-sm">Page {graduatedClassPage} of {totalGClassPages}</span>
+                      <button onClick={() => setGraduatedClassPage(graduatedClassPage + 1)} disabled={graduatedClassPage === totalGClassPages} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Next
                       </button>
                     </div>
@@ -2427,24 +2504,24 @@ const ClassList = ({ onEditClass }) => {
 
             {/* All Graduated Students Section */}
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <GraduationCap size={24} /> All Graduated Students
+              <div className="bg-gradient-to-r from-cyan-700 to-cyan-600 px-4 sm:px-6 py-3 sm:py-4">
+                <h2 className="text-base sm:text-xl font-bold text-white flex items-center gap-2">
+                  <GraduationCap size={20} className="flex-shrink-0" /> All Graduated Students
                 </h2>
-                <p className="text-purple-100 text-sm mt-1">All students who have completed their academic program</p>
+                <p className="text-cyan-100 text-xs sm:text-sm mt-1">All students who have completed their academic program</p>
               </div>
 
               {graduatedStudents.length === 0 ? (
-                <div className="text-center py-12">
-                  <GraduationCap size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-lg">No graduated students found.</p>
+                <div className="text-center py-10 sm:py-12">
+                  <GraduationCap size={40} className="mx-auto text-gray-400 mb-3 sm:mb-4" />
+                  <p className="text-gray-500 text-base sm:text-lg">No graduated students found.</p>
                 </div>
               ) : (
                 <>
                   <div className="student-table-container" style={{border: 'none', borderRadius: 0}}>
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead className="student-table-header" style={{background: 'linear-gradient(135deg, #7c3aed, #a78bfa)'}}>
+                      <table className="w-full border-collapse min-w-[600px]">
+                        <thead className="student-table-header" style={{background: 'linear-gradient(135deg, #0e7490, #0891b2)'}}>
                           <tr>
                             <th className="text-center">Roll</th>
                             <th className="text-center">Photo</th>
@@ -2458,12 +2535,12 @@ const ClassList = ({ onEditClass }) => {
                         <tbody>
                           {currentGraduatedStudents.map((student) => (
                             <tr key={student._id} className="student-table-row">
-                              <td className="text-center font-medium text-gray-700">{student.rollNumber || '-'}</td>
+                              <td className="text-center font-medium text-gray-700 whitespace-nowrap">{student.rollNumber || '-'}</td>
                               <td className="text-center">
-                                <Avatar name={student.name} image={student.profileImage} size={32} />
+                                <Avatar name={student.name} image={student.profileImage} size={30} />
                               </td>
                               <td className="font-medium text-gray-900">{student.name}</td>
-                              <td className="text-center text-gray-700">{student.grade || 'Graduated'}</td>
+                              <td className="text-center text-gray-700 whitespace-nowrap">{student.grade || 'Graduated'}</td>
                               <td className="text-center text-gray-700">{student.section || student.classSection || student.class || '-'}</td>
                               <td className="text-center text-gray-700">{student.programs || '-'}</td>
                               <td className="text-center">
@@ -2484,12 +2561,12 @@ const ClassList = ({ onEditClass }) => {
                   </div>
 
                   {totalGStudentPages > 1 && (
-                    <div className="flex justify-center gap-3 py-6 border-t-2 border-gray-200">
-                      <button onClick={() => setGraduatedStudentListPage(graduatedStudentListPage - 1)} disabled={graduatedStudentListPage === 1} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 py-4 sm:py-6 border-t-2 border-gray-200">
+                      <button onClick={() => setGraduatedStudentListPage(graduatedStudentListPage - 1)} disabled={graduatedStudentListPage === 1} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Previous
                       </button>
-                      <span className="px-6 py-3 font-bold text-gray-700">Page {graduatedStudentListPage} of {totalGStudentPages}</span>
-                      <button onClick={() => setGraduatedStudentListPage(graduatedStudentListPage + 1)} disabled={graduatedStudentListPage === totalGStudentPages} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition">
+                      <span className="px-4 sm:px-6 py-2 sm:py-3 font-bold text-gray-700 text-sm">Page {graduatedStudentListPage} of {totalGStudentPages}</span>
+                      <button onClick={() => setGraduatedStudentListPage(graduatedStudentListPage + 1)} disabled={graduatedStudentListPage === totalGStudentPages} className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 font-semibold hover:bg-gray-300 transition text-sm">
                         Next
                       </button>
                     </div>
@@ -2505,16 +2582,16 @@ const ClassList = ({ onEditClass }) => {
       {/* ========== EDIT STUDENT MODAL ========== */}
       {/* ========================================================= */}
       {showEditStudentForm && editingStudent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 modal-backdrop">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">Edit Student</h3>
-              <button onClick={() => setShowEditStudentForm(false)} className="text-gray-500 hover:text-gray-700">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 modal-backdrop">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto modal-content">
+            <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">Edit Student</h3>
+              <button onClick={() => setShowEditStudentForm(false)} className="text-gray-500 hover:text-gray-700 flex-shrink-0">
                 <X size={24} />
               </button>
             </div>
             <form onSubmit={handleUpdateStudent}>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Student Name *</label>
                   <input
@@ -2535,7 +2612,7 @@ const ClassList = ({ onEditClass }) => {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Roll Number</label>
                     <input
@@ -2559,7 +2636,7 @@ const ClassList = ({ onEditClass }) => {
                     </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Grade</label>
                     <select
@@ -2598,11 +2675,11 @@ const ClassList = ({ onEditClass }) => {
                   </select>
                 </div>
               </div>
-              <div className="mt-6 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowEditStudentForm(false)} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
+              <div className="mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+                <button type="button" onClick={() => setShowEditStudentForm(false)} className="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
                   Cancel
                 </button>
-                <button type="submit" disabled={loading} className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-50 font-semibold">
+                <button type="submit" disabled={loading} className="w-full sm:w-auto px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-50 font-semibold">
                   Update Student
                 </button>
               </div>
