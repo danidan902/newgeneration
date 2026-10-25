@@ -1,4 +1,9 @@
-import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
+// StudentDashboard.jsx — Full Rewrite
+// - Light mode (white) by default
+// - Cloudinary image support with sanitization + fallback
+// - Fully responsive via useWindowWidth hook
+
+import React, { useState, useEffect, createContext, useContext, useRef, useCallback } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
@@ -6,8 +11,7 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  ComposedChart,
-  Label
+  ComposedChart, Label
 } from 'recharts';
 import StudentIDCard from './StudentIDdownload';
 import StudentCertificate from './StudentCertficate';
@@ -16,7 +20,38 @@ import StudentPayment from './StudentPayment';
 import { Menu, X } from 'lucide-react';
 
 // ─────────────────────────────────────────────
-// ICONS - Using Lucide-style icons
+// IMAGE HELPERS
+// ─────────────────────────────────────────────
+const sanitizeImage = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim().replace(/^["']|["']$/g, '');
+  if (!u) return '';
+  u = u.replace(/^http:\/\//i, 'https://');
+  if (u.includes('res.cloudinary.com') && u.includes('/upload/')) {
+    if (!/\/upload\/[^/]*(f_auto|q_auto)/.test(u)) {
+      u = u.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+  }
+  return u;
+};
+
+// ─────────────────────────────────────────────
+// RESPONSIVE HOOK
+// ─────────────────────────────────────────────
+const useWindowWidth = () => {
+  const [width, setWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return width;
+};
+
+// ─────────────────────────────────────────────
+// ICONS (Lucide-style)
 // ─────────────────────────────────────────────
 const Icons = {
   dashboard: (
@@ -104,33 +139,23 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
     </svg>
   ),
-  expand: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7" />
-    </svg>
-  ),
-  collapse: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7" />
-    </svg>
-  ),
 };
 
 // ─────────────────────────────────────────────
 // THEME CONTEXT
 // ─────────────────────────────────────────────
-const ThemeContext = createContext({ isDark: true, toggle: () => {} });
+const ThemeContext = createContext({ isDark: false, toggle: () => {} });
 
 const tokens = (dark) => ({
-  bg: dark ? '#0F1724' : '#D5E5EE',
+  bg: dark ? '#0F1724' : '#FFFFFF',
   sidebar: dark ? '#1A2D3D' : '#244955',
   card: dark ? '#1E2D3D' : '#FFFFFF',
   cardBg: dark ? '#1A2D3D' : '#FFFFFF',
-  text: dark ? '#EEF2FF' : '#1A2D3D',
-  textSub: dark ? '#94A3CF' : '#4A5A6A',
-  textMuted: dark ? '#4A5580' : '#8A9AA8',
-  border: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-  hover: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+  text: dark ? '#EEF2FF' : '#1E293B',
+  textSub: dark ? '#94A3CF' : '#475569',
+  textMuted: dark ? '#4A5580' : '#94A3B8',
+  border: dark ? 'rgba(255,255,255,0.08)' : '#E2E8F0',
+  hover: dark ? 'rgba(255,255,255,0.05)' : '#F1F5F9',
   active: '#D5E5EE',
   activeText: '#244955',
   primary: '#244955',
@@ -158,8 +183,8 @@ const GlobalStyles = () => {
     style.textContent = `
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; }
-      ::-webkit-scrollbar { width: 4px; height: 4px; }
+      html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; background: #FFFFFF; color: #1E293B; overflow-x: hidden; }
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: rgba(36,73,85,0.4); border-radius: 4px; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -188,14 +213,12 @@ const GlobalStyles = () => {
       .table-row { transition: background .15s ease; }
       .table-row:hover { background: rgba(36,73,85,0.04); }
       .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
-      
-      /* Sidebar curve effect */
-      .sidebar-curve-top { position: absolute; top: -16px; right: 0; width: 16px; height: 16px; background: #D5E5EE; }
+      .sidebar-curve-top { position: absolute; top: -16px; right: 0; width: 16px; height: 16px; background: #FFFFFF; }
       .sidebar-curve-top::before { content: ''; position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: #244955; border-bottom-left-radius: 16px; }
-      .sidebar-curve-bottom { position: absolute; bottom: -16px; right: 0; width: 16px; height: 16px; background: #D5E5EE; }
+      .sidebar-curve-bottom { position: absolute; bottom: -16px; right: 0; width: 16px; height: 16px; background: #FFFFFF; }
       .sidebar-curve-bottom::before { content: ''; position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: #244955; border-top-left-radius: 16px; }
-      
-      /* Mobile Responsive */
+      .table-container table { min-width: 600px; }
+      .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
       @media (max-width: 768px) {
         .sidebar-desktop { display: none; }
         .sidebar-mobile { display: flex; }
@@ -207,11 +230,11 @@ const GlobalStyles = () => {
         .welcome-banner { padding: 20px !important; flex-direction: column !important; text-align: center; }
         .student-info-grid { grid-template-columns: 1fr !important; }
         .quick-actions-grid { grid-template-columns: 1fr 1fr !important; }
-        .table-container { font-size: 11px; }
         .table-container th, .table-container td { padding: 8px 10px !important; }
         .student-details-card { flex-direction: column !important; align-items: center !important; text-align: center; }
+        button, .btn-primary, .nav-link { min-height: 40px; }
+        input, select, textarea { font-size: 16px !important; }
       }
-      
       @media (max-width: 480px) {
         .metrics-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
         .quick-actions-grid { grid-template-columns: 1fr !important; }
@@ -224,6 +247,7 @@ const GlobalStyles = () => {
         .welcome-banner h2 { font-size: 18px !important; }
         .action-buttons { flex-direction: column; width: 100%; }
         .action-buttons button { width: 100%; }
+        .modal-box { width: calc(100vw - 24px) !important; max-height: 88vh !important; padding: 16px !important; }
       }
     `;
     document.head.appendChild(style);
@@ -239,44 +263,41 @@ const Spinner = ({ color = '#244955' }) => (
   <div style={{ width: 36, height: 36, border: `3px solid ${color}20`, borderTop: `3px solid ${color}`, borderRadius: '50%' }} className="anim-spin" />
 );
 
-// Passport Size Image Component
 const PassportPhoto = ({ src, name, size = 80 }) => {
   const [imgError, setImgError] = useState(false);
-  const initials = name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '??';
-  const imageSrc = src && typeof src === 'string' && src.length > 0 ? src : null;
-  
+
+  useEffect(() => { setImgError(false); }, [src]);
+
+  const initials = name
+    ? name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : '??';
+
+  const imageSrc = sanitizeImage(src);
+
   if (imageSrc && !imgError) {
     return (
-      <img 
-        src={imageSrc} 
-        alt={name || 'Student'} 
-        style={{ 
-          width: size, 
-          height: size, 
-          borderRadius: 12, 
-          objectFit: 'cover',
-          border: '3px solid #fff',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+      <img
+        src={imageSrc}
+        alt={name || 'Student'}
+        style={{
+          width: size, height: size, borderRadius: 12, objectFit: 'cover',
+          border: '3px solid #fff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
         }}
-        onError={() => setImgError(true)} 
+        crossOrigin="anonymous"
+        referrerPolicy="no-referrer"
+        onError={() => setImgError(true)}
+        loading="lazy"
       />
     );
   }
-  
+
   return (
-    <div style={{ 
-      width: size, 
-      height: size, 
-      borderRadius: 12, 
+    <div style={{
+      width: size, height: size, borderRadius: 12,
       background: 'linear-gradient(135deg, #244955, #3A6B7A)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff',
-      fontWeight: 700,
-      fontSize: size * 0.4,
-      border: '3px solid #fff',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: '#fff', fontWeight: 700, fontSize: size * 0.4,
+      border: '3px solid #fff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
     }}>
       {initials}
     </div>
@@ -285,40 +306,38 @@ const PassportPhoto = ({ src, name, size = 80 }) => {
 
 const CircleAvatar = ({ src, name, size = 40 }) => {
   const [imgError, setImgError] = useState(false);
-  const initials = name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '??';
-  const imageSrc = src && typeof src === 'string' && src.length > 0 ? src : null;
-  
+
+  useEffect(() => { setImgError(false); }, [src]);
+
+  const initials = name
+    ? name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : '??';
+
+  const imageSrc = sanitizeImage(src);
+
   if (imageSrc && !imgError) {
     return (
-      <img 
-        src={imageSrc} 
-        alt={name || 'User'} 
-        style={{ 
-          width: size, 
-          height: size, 
-          borderRadius: '50%', 
-          objectFit: 'cover',
-          border: '2px solid rgba(255,255,255,0.3)',
-          flexShrink: 0 
+      <img
+        src={imageSrc}
+        alt={name || 'User'}
+        style={{
+          width: size, height: size, borderRadius: '50%', objectFit: 'cover',
+          border: '2px solid rgba(255,255,255,0.3)', flexShrink: 0,
         }}
-        onError={() => setImgError(true)} 
+        crossOrigin="anonymous"
+        referrerPolicy="no-referrer"
+        onError={() => setImgError(true)}
+        loading="lazy"
       />
     );
   }
-  
+
   return (
-    <div style={{ 
-      width: size, 
-      height: size, 
-      borderRadius: '50%',
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
       background: 'linear-gradient(135deg, #244955, #3A6B7A)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff',
-      fontWeight: 700,
-      fontSize: size * 0.4,
-      flexShrink: 0 
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: '#fff', fontWeight: 700, fontSize: size * 0.4, flexShrink: 0,
     }}>
       {initials}
     </div>
@@ -346,17 +365,20 @@ const StatusPill = ({ status }) => {
 const MetricCard = ({ label, value, sub, icon, delay = 0 }) => {
   const { isDark } = useContext(ThemeContext);
   const t = tokens(isDark);
-  const isMobile = window.innerWidth <= 480;
-  
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
+
   return (
-    <div className={`card-hover anim-fadeup stagger-${delay} metric-card`} style={{ 
-      background: t.card, 
-      border: `1px solid ${t.border}`, 
-      borderRadius: isMobile ? 12 : 16, 
-      padding: isMobile ? '16px 18px' : '20px 24px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
+    <div
+      className={`card-hover anim-fadeup stagger-${delay} metric-card`}
+      style={{
+        background: t.card,
+        border: `1px solid ${t.border}`,
+        borderRadius: isMobile ? 12 : 16,
+        padding: isMobile ? '16px 18px' : '20px 24px',
+        position: 'relative', overflow: 'hidden',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 4 : 8 }}>
         <span style={{ fontSize: isMobile ? 10 : 12, fontWeight: 500, color: t.textMuted, letterSpacing: '.04em', textTransform: 'uppercase' }}>{label}</span>
         <span style={{ color: t.textMuted, opacity: 0.6 }}>{icon}</span>
@@ -370,16 +392,20 @@ const MetricCard = ({ label, value, sub, icon, delay = 0 }) => {
 const GlassCard = ({ children, style, className = '' }) => {
   const { isDark } = useContext(ThemeContext);
   const t = tokens(isDark);
-  const isMobile = window.innerWidth <= 480;
-  
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
+
   return (
-    <div className={`${className}`} style={{ 
-      background: t.card, 
-      border: `1px solid ${t.border}`, 
-      borderRadius: isMobile ? 12 : 16, 
-      padding: isMobile ? 16 : 24,
-      ...style 
-    }}>
+    <div
+      className={className}
+      style={{
+        background: t.card,
+        border: `1px solid ${t.border}`,
+        borderRadius: isMobile ? 12 : 16,
+        padding: isMobile ? 16 : 24,
+        ...style,
+      }}
+    >
       {children}
     </div>
   );
@@ -391,7 +417,11 @@ const ChartTooltip = ({ active, payload, label, isDark }) => {
   return (
     <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 8, padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
       <p style={{ fontSize: 11, color: t.textMuted, marginBottom: 4, fontWeight: 600 }}>{label}</p>
-      {payload.map((p, i) => <p key={i} style={{ fontSize: 12, color: p.color, fontWeight: 600 }}>{p.name}: {typeof p.value === 'number' ? p.value.toFixed(1) : p.value}</p>)}
+      {payload.map((p, i) => (
+        <p key={i} style={{ fontSize: 12, color: p.color, fontWeight: 600 }}>
+          {p.name}: {typeof p.value === 'number' ? p.value.toFixed(1) : p.value}
+        </p>
+      ))}
     </div>
   );
 };
@@ -402,8 +432,8 @@ const ChartTooltip = ({ active, payload, label, isDark }) => {
 const navItems = [
   { path: '/student', label: 'Dashboard', icon: Icons.dashboard },
   { path: '/student/marks', label: 'My Marks', icon: Icons.marks },
-  { path: 'https://tuludimtuschool.com/studentstudy-dashboard', label: 'Digital Library', icon: Icons.moon},
-  { path: 'https://www.tuludimtuschool.com/studentgetstudy-material', label: 'Teacher Upload', icon: Icons.certificate},
+  { path: 'https://tuludimtuschool.com/studentstudy-dashboard', label: 'Digital Library', icon: Icons.moon },
+  { path: 'https://www.tuludimtuschool.com/studentgetstudy-material', label: 'Teacher Upload', icon: Icons.certificate },
   { path: '/student/attendance', label: 'Attendance', icon: Icons.attendance },
   { path: '/student/reports', label: 'Reports', icon: Icons.reports },
   { path: '/student/news', label: 'News Feed', icon: Icons.news },
@@ -419,8 +449,10 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
   const t = tokens(isDark);
   const location = useLocation();
   const navigate = useNavigate();
+  const width = useWindowWidth();
+  const isMobile = width <= 768;
+
   const isActive = (p) => p === '/student' ? location.pathname === '/student' : location.pathname.startsWith(p);
-  const isMobile = window.innerWidth <= 768;
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -429,47 +461,44 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
     navigate('/login');
   };
 
-  // Mobile sidebar
   if (isMobile) {
     return (
       <>
         {open && (
-          <div onClick={onClose} style={{ 
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', 
-            zIndex: 40, backdropFilter: 'blur(4px)' 
-          }} className="anim-fadein" />
+          <div
+            onClick={onClose}
+            style={{
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+              zIndex: 40, backdropFilter: 'blur(4px)',
+            }}
+            className="anim-fadein"
+          />
         )}
-        <aside style={{ 
-          position: 'fixed', top: 0, left: 0, bottom: 0, 
-          width: 280, background: t.sidebar,
-          display: 'flex', flexDirection: 'column', zIndex: 50,
+        <aside style={{
+          position: 'fixed', top: 0, left: 0, bottom: 0, width: 280,
+          background: t.sidebar, display: 'flex', flexDirection: 'column',
+          zIndex: 50,
           transform: open ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform .3s cubic-bezier(.22,1,.36,1)',
-          overflowY: 'auto', overflowX: 'hidden',
-          color: '#fff'
+          overflowY: 'auto', overflowX: 'hidden', color: '#fff',
         }}>
-          {/* Close button */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px' }}>
-            <button onClick={onClose} style={{ 
-              background: 'rgba(255,255,255,0.1)', 
-              border: 'none', 
-              borderRadius: '50%', 
-              width: 36, 
-              height: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              cursor: 'pointer'
-            }}>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'rgba(255,255,255,0.1)', border: 'none',
+                borderRadius: '50%', width: 36, height: 36,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer',
+              }}
+            >
               {Icons.close}
             </button>
           </div>
 
-          {/* User Profile with Passport Photo */}
           <div style={{ padding: '0 20px 20px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-              <PassportPhoto src={studentDetails?.profileImage} name={user?.name || studentDetails?.name} size={64} />
+              <PassportPhoto src={studentDetails?.profileImage || user?.profileImage} name={user?.name || studentDetails?.name} size={64} />
             </div>
             <h3 style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2 }}>
               {user?.name || 'Student'}
@@ -479,29 +508,27 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
             </p>
           </div>
 
-          {/* Navigation */}
           <nav style={{ flex: 1, padding: '16px 12px' }}>
             {navItems.map((item) => {
               const active = isActive(item.path);
+              const isExternal = item.path.startsWith('http');
               return (
-                <Link 
-                  key={item.path} 
-                  to={item.path} 
-                  onClick={() => { onClose(); }} 
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={onClose}
                   className="nav-link"
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 12, 
-                    padding: '10px 14px', 
-                    borderRadius: 8, 
-                    marginBottom: 2, 
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 14px', borderRadius: 8, marginBottom: 2,
                     textDecoration: 'none',
                     background: active ? '#D5E5EE' : 'transparent',
                     color: active ? '#244955' : 'rgba(255,255,255,0.7)',
-                    fontWeight: active ? 600 : 400,
-                    fontSize: 13,
-                  }}>
+                    fontWeight: active ? 600 : 400, fontSize: 13,
+                  }}
+                >
                   <span style={{ opacity: active ? 1 : 0.7 }}>{item.icon}</span>
                   {item.label}
                 </Link>
@@ -509,33 +536,31 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
             })}
           </nav>
 
-          {/* Bottom actions */}
           <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <button 
+            <button
               onClick={toggle}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '8px 14px', 
-                borderRadius: 8, background: 'rgba(255,255,255,0.05)', 
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                padding: '8px 14px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                color: 'rgba(255,255,255,0.7)', fontSize: 13, 
-                fontWeight: 500, cursor: 'pointer',
-                marginBottom: 4 
+                color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 500,
+                cursor: 'pointer', marginBottom: 4,
               }}
-              className="btn-primary">
+              className="btn-primary"
+            >
               {isDark ? Icons.sun : Icons.moon} {isDark ? 'Light Mode' : 'Dark Mode'}
             </button>
-            <button 
+            <button
               onClick={handleLogout}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '8px 14px',
-                borderRadius: 8, background: 'transparent', 
-                border: 'none',
-                color: '#F7526A', fontSize: 13, 
-                fontWeight: 500, cursor: 'pointer' 
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                padding: '8px 14px', borderRadius: 8, background: 'transparent',
+                border: 'none', color: '#F7526A', fontSize: 13, fontWeight: 500,
+                cursor: 'pointer',
               }}
-              className="btn-primary">
+              className="btn-primary"
+            >
               {Icons.logout} Logout
             </button>
           </div>
@@ -544,71 +569,55 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
     );
   }
 
-  // Desktop sidebar
   return (
-    <aside style={{ 
-      position: 'fixed', top: 0, left: 0, bottom: 0, 
-      width: collapsed ? 72 : 240, 
-      background: t.sidebar,
+    <aside style={{
+      position: 'fixed', top: 0, left: 0, bottom: 0,
+      width: collapsed ? 72 : 240, background: t.sidebar,
       display: 'flex', flexDirection: 'column', zIndex: 50,
-      transition: 'width .3s cubic-bezier(.22,1,.36,1)', 
-      overflowY: 'auto', overflowX: 'hidden',
-      color: '#fff'
+      transition: 'width .3s cubic-bezier(.22,1,.36,1)',
+      overflowY: 'auto', overflowX: 'hidden', color: '#fff',
     }}>
-      {/* Collapse Toggle Button */}
-      <div style={{ 
+      <div style={{
         padding: collapsed ? '16px 12px' : '20px 20px 16px',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
-        display: 'flex',
-        justifyContent: collapsed ? 'center' : 'space-between',
-        alignItems: 'center'
+        display: 'flex', justifyContent: collapsed ? 'center' : 'space-between',
+        alignItems: 'center',
       }}>
         {!collapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ 
-              width: 36, height: 36, borderRadius: 8, 
+            <div style={{
+              width: 36, height: 36, borderRadius: 8,
               background: 'rgba(255,255,255,0.1)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 700, fontSize: 16, color: '#fff'
+              fontWeight: 700, fontSize: 16, color: '#fff',
             }}>E</div>
             <span style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>EduManage</span>
           </div>
         )}
-        <button 
+        <button
           onClick={onToggleCollapse}
           className="btn-primary"
-          style={{ 
-            background: 'rgba(255, 253, 253, 0.6)',
-            border: 'none',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#0a0505',
-            cursor: 'pointer',
-            transition: 'transform .3s'
+          style={{
+            background: 'rgba(255,253,253,0.6)', border: 'none',
+            borderRadius: '50%', width: 32, height: 32,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#0a0505', cursor: 'pointer', transition: 'transform .3s',
           }}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <div>
-            {collapsed ? <Menu size={20} /> : <X size={20} />}
-          </div>
+          <div>{collapsed ? <Menu size={20} /> : <X size={20} />}</div>
         </button>
       </div>
 
-      {/* User Profile with Passport Photo */}
-      <div style={{ 
-        padding: collapsed ? '12px 8px' : '16px 20px 20px', 
-        textAlign: 'center', 
-        borderBottom: '1px solid rgba(255,255,255,0.08)' 
+      <div style={{
+        padding: collapsed ? '12px 8px' : '16px 20px 20px',
+        textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
         <div style={{ marginBottom: collapsed ? 8 : 12, display: 'flex', justifyContent: 'center' }}>
-          <PassportPhoto 
-            src={studentDetails?.profileImage} 
-            name={user?.name || studentDetails?.name} 
-            size={collapsed ? 36 : 64} 
+          <PassportPhoto
+            src={studentDetails?.profileImage || user?.profileImage}
+            name={user?.name || studentDetails?.name}
+            size={collapsed ? 36 : 64}
           />
         </div>
         {!collapsed && (
@@ -628,73 +637,62 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
         )}
       </div>
 
-      {/* Navigation */}
       <nav style={{ flex: 1, padding: collapsed ? '8px 4px' : '16px 12px' }}>
         {navItems.map((item) => {
           const active = isActive(item.path);
+          const isExternal = item.path.startsWith('http');
           return (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className="nav-link" 
+            <Link
+              key={item.path}
+              to={item.path}
+              className="nav-link"
               title={collapsed ? item.label : ''}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? 0 : 12, 
+              target={isExternal ? '_blank' : undefined}
+              rel={isExternal ? 'noopener noreferrer' : undefined}
+              style={{
+                display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 12,
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                padding: collapsed ? '10px' : '10px 14px', 
-                borderRadius: 8, 
-                marginBottom: 2, 
-                textDecoration: 'none',
+                padding: collapsed ? '10px' : '10px 14px', borderRadius: 8,
+                marginBottom: 2, textDecoration: 'none',
                 background: active ? '#D5E5EE' : 'transparent',
                 color: active ? '#244955' : 'rgba(255,255,255,0.7)',
-                fontWeight: active ? 600 : 400,
-                fontSize: 13,
-                position: 'relative'
-              }}>
+                fontWeight: active ? 600 : 400, fontSize: 13, position: 'relative',
+              }}
+            >
               <span style={{ opacity: active ? 1 : 0.7 }}>{item.icon}</span>
               {!collapsed && item.label}
-              {active && !collapsed && (
-                <>
-                  <div className="sidebar-curve-top" />
-                  <div className="sidebar-curve-bottom" />
-                </>
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom actions */}
       <div style={{ padding: collapsed ? '8px' : '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <button 
+        <button
           onClick={toggle}
-          style={{ 
+          style={{
             display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 10,
             justifyContent: collapsed ? 'center' : 'flex-start',
-            width: '100%', padding: collapsed ? '8px' : '8px 14px', 
-            borderRadius: 8, background: 'rgba(255,255,255,0.05)', 
+            width: '100%', padding: collapsed ? '8px' : '8px 14px',
+            borderRadius: 8, background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.7)', fontSize: 13, 
-            fontWeight: 500, cursor: 'pointer',
-            marginBottom: 4 
+            color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 500,
+            cursor: 'pointer', marginBottom: 4,
           }}
-          className="btn-primary">
+          className="btn-primary"
+        >
           {isDark ? Icons.sun : Icons.moon} {!collapsed && (isDark ? 'Light Mode' : 'Dark Mode')}
         </button>
         {!collapsed && (
-          <button 
+          <button
             onClick={handleLogout}
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: 10,
-              width: '100%', padding: '8px 14px',
-              borderRadius: 8, background: 'transparent', 
-              border: 'none',
-              color: '#F7526A', fontSize: 13, 
-              fontWeight: 500, cursor: 'pointer' 
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+              padding: '8px 14px', borderRadius: 8, background: 'transparent',
+              border: 'none', color: '#F7526A', fontSize: 13, fontWeight: 500,
+              cursor: 'pointer',
             }}
-            className="btn-primary">
+            className="btn-primary"
+          >
             {Icons.logout} Logout
           </button>
         )}
@@ -706,19 +704,20 @@ const Sidebar = ({ user, studentDetails, open, onClose, collapsed, onToggleColla
 // ─────────────────────────────────────────────
 // HEADER
 // ─────────────────────────────────────────────
-const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
+const Header = ({ user, studentDetails, onMobileMenuClick }) => {
   const { isDark } = useContext(ThemeContext);
   const t = tokens(isDark);
   const [showDrop, setShowDrop] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const isMobile = window.innerWidth <= 768;
-  
+  const width = useWindowWidth();
+  const isMobile = width <= 768;
+
   const pageName = navItems.find(n => {
     if (n.path === '/student') return location.pathname === '/student';
     return location.pathname.startsWith(n.path);
   })?.label || 'Dashboard';
-  
+
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const handleLogout = () => {
@@ -728,26 +727,25 @@ const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
   };
 
   return (
-    <header style={{ 
-      position: 'sticky', top: 0, zIndex: 30, 
-      background: isDark ? 'rgba(15,23,36,0.9)' : 'rgba(213,229,238,0.85)',
+    <header style={{
+      position: 'sticky', top: 0, zIndex: 30,
+      background: isDark ? 'rgba(15,23,36,0.9)' : 'rgba(255,255,255,0.9)',
       backdropFilter: 'blur(20px)',
-      borderBottom: `1px solid ${t.border}`, 
-      padding: '0 16px', height: 60,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between' 
+      borderBottom: `1px solid ${t.border}`, padding: '0 16px', height: 60,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* Mobile Menu Button - Only show on mobile */}
         {isMobile && (
-          <button 
-            onClick={onMobileMenuClick} 
+          <button
+            onClick={onMobileMenuClick}
             className="btn-primary"
-            style={{ 
-              width: 36, height: 36, borderRadius: 8, 
-              background: 'transparent', border: `1px solid ${t.border}`,
-              color: t.text, display: 'flex', alignItems: 'center', 
-              justifyContent: 'center', cursor: 'pointer' 
-            }}>
+            style={{
+              width: 36, height: 36, borderRadius: 8, background: 'transparent',
+              border: `1px solid ${t.border}`, color: t.text,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
             {Icons.menu}
           </button>
         )}
@@ -758,23 +756,18 @@ const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
           {!isMobile && <p style={{ fontSize: 12, color: t.textMuted }}>{today}</p>}
         </div>
       </div>
-      
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {/* Search - Hide on mobile */}
         {!isMobile && (
           <div className="header-search" style={{ position: 'relative' }}>
             <input
               type="text"
               placeholder="Search..."
               style={{
-                padding: '6px 14px 6px 36px',
-                borderRadius: 20,
+                padding: '6px 14px 6px 36px', borderRadius: 20,
                 border: `1px solid ${t.border}`,
-                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
-                fontSize: 12,
-                outline: 'none',
-                width: 160,
-                color: t.text
+                background: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
+                fontSize: 12, outline: 'none', width: 160, color: t.text,
               }}
             />
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>
@@ -783,28 +776,36 @@ const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
           </div>
         )}
 
-        <button className="btn-primary" style={{ 
-          width: 36, height: 36, borderRadius: '50%', 
-          background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
-          border: `1px solid ${t.border}`,
-          color: t.textSub, display: 'flex', alignItems: 'center', 
-          justifyContent: 'center', cursor: 'pointer', position: 'relative' 
-        }}>
+        <button
+          className="btn-primary"
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
+            border: `1px solid ${t.border}`, color: t.textSub,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', position: 'relative',
+          }}
+        >
           {Icons.bell}
           <span style={{ position: 'absolute', top: 8, right: 8, width: 6, height: 6, background: '#F7526A', borderRadius: '50%' }} />
         </button>
 
         <div style={{ position: 'relative' }}>
-          <button 
-            onClick={() => setShowDrop(!showDrop)} 
+          <button
+            onClick={() => setShowDrop(!showDrop)}
             className="btn-primary"
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: 6, 
-              background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
-              border: `1px solid ${t.border}`, borderRadius: 8, 
-              padding: '3px 8px 3px 3px', cursor: 'pointer' 
-            }}>
-            <CircleAvatar src={studentDetails?.profileImage || user?.profileImage} name={user?.name} size={28} />
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
+              border: `1px solid ${t.border}`, borderRadius: 8,
+              padding: '3px 8px 3px 3px', cursor: 'pointer',
+            }}
+          >
+            <CircleAvatar
+              src={studentDetails?.profileImage || user?.profileImage}
+              name={user?.name}
+              size={28}
+            />
             <span className="header-user-name" style={{ fontSize: 13, fontWeight: 600, color: t.text }}>
               {user?.name?.split(' ')[0] || 'User'}
             </span>
@@ -813,26 +814,29 @@ const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
           {showDrop && (
             <>
               <div onClick={() => setShowDrop(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-              <div className="anim-fadeup" style={{ 
-                position: 'absolute', top: 'calc(100% + 8px)', right: 0, 
-                width: 200, borderRadius: 12, zIndex: 50, 
-                background: t.card, border: `1px solid ${t.border}`, 
-                boxShadow: '0 8px 32px rgba(0,0,0,0.15)', overflow: 'hidden' 
-              }}>
+              <div
+                className="anim-fadeup"
+                style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  width: 200, borderRadius: 12, zIndex: 50, background: t.card,
+                  border: `1px solid ${t.border}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                  overflow: 'hidden',
+                }}
+              >
                 <div style={{ padding: '12px 16px', borderBottom: `1px solid ${t.border}` }}>
                   <p style={{ fontWeight: 600, fontSize: 13, color: t.text }}>{user?.name}</p>
                   <p style={{ fontSize: 11, color: t.textMuted }}>{user?.studentId}</p>
                 </div>
                 <div style={{ padding: '4px' }}>
-                  <Link to="/student/profile" onClick={() => setShowDrop(false)} 
+                  <Link to="/student/profile" onClick={() => setShowDrop(false)}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 6, textDecoration: 'none', color: t.textSub, fontSize: 13 }}>
                     My Profile
                   </Link>
-                  <Link to="/student/password" onClick={() => setShowDrop(false)} 
+                  <Link to="/student/password" onClick={() => setShowDrop(false)}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 6, textDecoration: 'none', color: t.textSub, fontSize: 13 }}>
                     Security
                   </Link>
-                  <button onClick={handleLogout} 
+                  <button onClick={handleLogout}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 12px', borderRadius: 6, background: 'none', border: 'none', color: '#F7526A', fontSize: 13, cursor: 'pointer' }}>
                     Logout
                   </button>
@@ -847,7 +851,7 @@ const Header = ({ user, studentDetails, onMobileMenuClick, collapsed }) => {
 };
 
 // ─────────────────────────────────────────────
-// STUDENT HOME (with Charts and Graphs)
+// STUDENT HOME
 // ─────────────────────────────────────────────
 const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks = [], studentDetails = null }) => {
   const { isDark } = useContext(ThemeContext);
@@ -858,16 +862,17 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
   const [attendanceStats, setAttendanceStats] = useState({ present: 0, absent: 0, total: 0 });
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
-  useEffect(() => { 
+  useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser(userData);
-    fetchData(); 
+    fetchData();
   }, []);
 
   const hour = new Date().getHours();
-  let message = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const message = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const fetchData = async () => {
     try {
@@ -876,11 +881,16 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
       if (!studentId) { setLoading(false); return; }
 
       let marks = [];
-      try { const marksRes = await api.get(`/marks/student/${studentId}`); marks = marksRes.data || []; } catch (err) {}
+      try {
+        const marksRes = await api.get(`/marks/student/${studentId}`);
+        marks = marksRes.data || [];
+      } catch (err) { /* silent */ }
 
       const subjectsMap = new Map();
       marks.forEach(mark => {
-        if (!subjectsMap.has(mark.subject)) subjectsMap.set(mark.subject, { subject: mark.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0, total: 0 });
+        if (!subjectsMap.has(mark.subject)) {
+          subjectsMap.set(mark.subject, { subject: mark.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0, total: 0 });
+        }
         const s = subjectsMap.get(mark.subject);
         if (mark.examType === 'quiz') s.firstTest = mark.score;
         else if (mark.examType === 'midterm') s.midExam = mark.score;
@@ -888,6 +898,7 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
         else if (mark.examType === 'final') s.finalExam = mark.score;
         s.total = s.firstTest + s.midExam + s.notebook + s.finalExam;
       });
+
       const subjectsData = Array.from(subjectsMap.values());
       setSubjectWiseMarks(subjectsData);
 
@@ -895,16 +906,36 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
       if (subjectsData.length > 0) {
         overallAvg = subjectsData.reduce((sum, s) => sum + s.total, 0) / subjectsData.length;
         result = overallAvg >= 50 ? 'Pass' : 'Fail';
-        if (overallAvg >= 90) grade = 'A+'; else if (overallAvg >= 80) grade = 'A'; else if (overallAvg >= 70) grade = 'B'; else if (overallAvg >= 60) grade = 'C'; else if (overallAvg >= 50) grade = 'D'; else grade = 'F';
+        if (overallAvg >= 90) grade = 'A+';
+        else if (overallAvg >= 80) grade = 'A';
+        else if (overallAvg >= 70) grade = 'B';
+        else if (overallAvg >= 60) grade = 'C';
+        else if (overallAvg >= 50) grade = 'D';
+        else grade = 'F';
       }
-      setMarksSummary({ total: subjectsData.reduce((sum, s) => sum + s.total, 0), percentage: overallAvg.toFixed(2), result, grade });
+      setMarksSummary({
+        total: subjectsData.reduce((sum, s) => sum + s.total, 0),
+        percentage: overallAvg.toFixed(2), result, grade,
+      });
 
-      if (attendanceSummary) setAttendanceStats(attendanceSummary);
-      else {
-        try { const attRes = await api.get(`/attendance/student/${studentId}`); const attendance = attRes.data || []; setAttendanceStats({ present: attendance.filter(a => a.status === 'present').length, absent: attendance.length - attendance.filter(a => a.status === 'present').length, total: attendance.length }); } catch (err) {}
+      if (attendanceSummary) {
+        setAttendanceStats(attendanceSummary);
+      } else {
+        try {
+          const attRes = await api.get(`/attendance/student/${studentId}`);
+          const attendance = attRes.data || [];
+          setAttendanceStats({
+            present: attendance.filter(a => a.status === 'present').length,
+            absent: attendance.length - attendance.filter(a => a.status === 'present').length,
+            total: attendance.length,
+          });
+        } catch (err) { /* silent */ }
       }
-    } catch (error) { toast.error('Failed to load dashboard'); }
-    finally { setLoading(false); }
+    } catch (error) {
+      toast.error('Failed to load dashboard');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const DetailRow = ({ label, value }) => (
@@ -914,43 +945,57 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
     </div>
   );
 
-  const attendancePercentage = attendanceStats.total > 0 ? Math.round((attendanceStats.present / attendanceStats.total) * 100) : 0;
+  const attendancePercentage = attendanceStats.total > 0
+    ? Math.round((attendanceStats.present / attendanceStats.total) * 100) : 0;
+
   const chartData = subjectWiseMarks.map(s => ({ name: s.subject.slice(0, 4), total: s.total }));
   const CustomTooltip = (props) => <ChartTooltip {...props} isDark={isDark} />;
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}><Spinner /></div>;
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div>
-      {/* Welcome Banner */}
-      <div className="anim-fadeup welcome-banner" style={{ 
-        background: 'linear-gradient(135deg, #244955, #3A6B7A)', 
-        borderRadius: isMobile ? 12 : 16, 
-        padding: isMobile ? '16px 20px' : '24px 32px', 
-        marginBottom: isMobile ? 16 : 24 
-      }}>
+      <div
+        className="anim-fadeup welcome-banner"
+        style={{
+          background: 'linear-gradient(135deg, #244955, #3A6B7A)',
+          borderRadius: isMobile ? 12 : 16,
+          padding: isMobile ? '16px 20px' : '24px 32px',
+          marginBottom: isMobile ? 16 : 24,
+        }}
+      >
         <h2 className="student-name" style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
           {message}, {user?.name}!
         </h2>
-        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.7)' }}>Your academic overview at a glance</p>
+        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.7)' }}>
+          Your academic overview at a glance
+        </p>
       </div>
 
-      {/* Student Information Card with Passport Photo */}
       {studentDetails && (
         <GlassCard className="anim-fadeup stagger-1" style={{ padding: isMobile ? 16 : 24, marginBottom: isMobile ? 16 : 24 }}>
-          <div className="student-details-card" style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: isMobile ? 'center' : 'start', 
-            marginBottom: 16, 
-            flexWrap: 'wrap', 
-            gap: isMobile ? 10 : 12 
-          }}>
+          <div
+            className="student-details-card"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: isMobile ? 'center' : 'flex-start',
+              marginBottom: 16,
+              flexWrap: 'wrap',
+              gap: isMobile ? 10 : 12,
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
-              <PassportPhoto 
-                src={studentDetails?.profileImage || user?.profileImage} 
-                name={user?.name || studentDetails?.name} 
-                size={isMobile ? 60 : 80} 
+              <PassportPhoto
+                src={studentDetails?.profileImage || user?.profileImage}
+                name={user?.name || studentDetails?.name}
+                size={isMobile ? 60 : 80}
               />
               <div>
                 <h3 style={{ fontWeight: 700, fontSize: isMobile ? 16 : 18, color: t.text }}>
@@ -970,25 +1015,23 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
               onClick={() => setShowDetails(true)}
               style={{
                 padding: isMobile ? '4px 14px' : '6px 16px',
-                background: '#244955',
-                border: 'none',
-                borderRadius: 6,
-                color: '#fff',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontSize: isMobile ? 11 : 12,
-                whiteSpace: 'nowrap'
+                background: '#244955', border: 'none', borderRadius: 6,
+                color: '#fff', fontWeight: 500, cursor: 'pointer',
+                fontSize: isMobile ? 11 : 12, whiteSpace: 'nowrap',
               }}
             >
               View Details →
             </button>
           </div>
-          
-          <div className="student-info-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(140px, 1fr))', 
-            gap: isMobile ? 8 : 12 
-          }}>
+
+          <div
+            className="student-info-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: isMobile ? 8 : 12,
+            }}
+          >
             {studentDetails.sex && studentDetails.sex !== 'Not specified' && (
               <div>
                 <p style={{ fontSize: isMobile ? 9 : 10, color: t.textMuted, textTransform: 'uppercase' }}>Gender</p>
@@ -1017,35 +1060,34 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
         </GlassCard>
       )}
 
-      {/* Modal for Full Details with Passport Photo */}
       {showDetails && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(4px)',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }} onClick={() => setShowDetails(false)}>
-          <div onClick={e => e.stopPropagation()} style={{
-            background: isDark ? '#1E2D3D' : '#fff',
-            borderRadius: 16,
-            maxWidth: 440,
-            width: '100%',
-            maxHeight: '80vh',
-            overflow: 'auto',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-            padding: isMobile ? 20 : 24
-          }}>
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(4px)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px',
+          }}
+          onClick={() => setShowDetails(false)}
+        >
+          <div
+            className="modal-box"
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: isDark ? '#1E2D3D' : '#fff',
+              borderRadius: 16, maxWidth: 440, width: '100%', maxHeight: '80vh',
+              overflow: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+              padding: isMobile ? 20 : 24,
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: t.text, margin: 0 }}>Full Details</h3>
-              <button onClick={() => setShowDetails(false)} style={{
-                background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: t.textMuted
-              }}>✕</button>
+              <button
+                onClick={() => setShowDetails(false)}
+                style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: t.textMuted }}
+              >✕</button>
             </div>
-            
+
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
               <PassportPhoto
                 src={studentDetails?.profileImage || user?.profileImage}
@@ -1053,7 +1095,7 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
                 size={isMobile ? 80 : 100}
               />
             </div>
-            
+
             <div style={{ border: `1px solid ${t.border}`, borderRadius: 8, padding: '12px 16px' }}>
               <DetailRow label="Full Name" value={studentDetails?.name} />
               <DetailRow label="Roll Number" value={studentDetails?.rollNumber} />
@@ -1070,34 +1112,38 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
         </div>
       )}
 
-      {/* Metrics */}
-      <div className="metrics-grid" style={{ 
-        display: 'grid', 
-        gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
-        gap: isMobile ? 10 : 16, 
-        marginBottom: isMobile ? 16 : 24 
-      }}>
+      <div
+        className="metrics-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: isMobile ? 10 : 16,
+          marginBottom: isMobile ? 16 : 24,
+        }}
+      >
         <MetricCard label="Average" value={`${marksSummary?.percentage || 0}%`} sub={`Grade ${marksSummary?.grade || 'N/A'}`} icon={Icons.dashboard} delay={1} />
         <MetricCard label="Attendance" value={`${attendancePercentage}%`} sub={`${attendanceStats.present} / ${attendanceStats.total} days`} icon={Icons.attendance} delay={2} />
         <MetricCard label="Subjects" value={subjectWiseMarks.length} sub="Active courses" icon={Icons.marks} delay={3} />
         <MetricCard label="Status" value={marksSummary?.result || 'N/A'} sub="Academic standing" icon={Icons.reports} delay={4} />
       </div>
 
-      {/* Linked Parents */}
       {linkedParents.length > 0 && (
         <GlassCard className="anim-fadeup stagger-2" style={{ padding: isMobile ? 16 : 24, marginBottom: isMobile ? 16 : 24 }}>
           <h4 style={{ fontWeight: 700, fontSize: isMobile ? 14 : 15, color: t.text, marginBottom: isMobile ? 12 : 16 }}>Linked Parents</h4>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: isMobile ? 10 : 12 
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: isMobile ? 10 : 12,
           }}>
             {linkedParents.map((parent, idx) => (
-              <div key={parent._id || idx} style={{ 
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(36,73,85,0.04)', 
-                borderRadius: 12, padding: isMobile ? 12 : 16, 
-                border: `1px solid ${t.border}` 
-              }}>
+              <div
+                key={parent._id || idx}
+                style={{
+                  background: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
+                  borderRadius: 12, padding: isMobile ? 12 : 16,
+                  border: `1px solid ${t.border}`,
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <CircleAvatar src={parent.profileImage} name={parent.name} size={isMobile ? 36 : 40} />
                   <div>
@@ -1111,15 +1157,17 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
         </GlassCard>
       )}
 
-      {/* Charts Section - All graphs preserved */}
       {subjectWiseMarks.length > 0 ? (
         <>
-          <div className="charts-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-            gap: isMobile ? 12 : 16, 
-            marginBottom: isMobile ? 16 : 20 
-          }}>
+          <div
+            className="charts-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              gap: isMobile ? 12 : 16,
+              marginBottom: isMobile ? 16 : 20,
+            }}
+          >
             <GlassCard className="anim-fadeup stagger-3" style={{ padding: isMobile ? 14 : 20 }}>
               <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
                 Subject Performance
@@ -1131,34 +1179,37 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
                   <YAxis domain={[0, 100]} tick={{ fill: t.textMuted, fontSize: isMobile ? 9 : 10 }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="total" name="Total" radius={[6, 6, 0, 0]}>
-                    {chartData.map((_, i) => (<Cell key={i} fill={_.total >= 80 ? '#22D5A6' : _.total >= 60 ? '#7C5CFC' : '#F7526A'} />))}
+                    {chartData.map((_, i) => (
+                      <Cell key={i} fill={_.total >= 80 ? '#22D5A6' : _.total >= 60 ? '#7C5CFC' : '#F7526A'} />
+                    ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </GlassCard>
-            
+
             <GlassCard className="anim-fadeup stagger-4" style={{ padding: isMobile ? 14 : 20 }}>
               <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
                 Grade Distribution
               </h4>
               <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
                 <PieChart>
-                  <Pie 
+                  <Pie
                     data={[
                       { name: 'A+', value: subjectWiseMarks.filter(s => s.total >= 90).length },
                       { name: 'A', value: subjectWiseMarks.filter(s => s.total >= 80 && s.total < 90).length },
                       { name: 'B', value: subjectWiseMarks.filter(s => s.total >= 70 && s.total < 80).length },
                       { name: 'C', value: subjectWiseMarks.filter(s => s.total >= 60 && s.total < 70).length },
                       { name: 'F', value: subjectWiseMarks.filter(s => s.total < 60).length },
-                    ].filter(d => d.value > 0)} 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius={isMobile ? 30 : 50} 
-                    outerRadius={isMobile ? 60 : 80} 
-                    paddingAngle={3} 
+                    ].filter(d => d.value > 0)}
+                    cx="50%" cy="50%"
+                    innerRadius={isMobile ? 30 : 50}
+                    outerRadius={isMobile ? 60 : 80}
+                    paddingAngle={3}
                     dataKey="value"
                   >
-                    {subjectWiseMarks.map((_, i) => (<Cell key={i} fill={['#22D5A6', '#06E5C8', '#7C5CFC', '#F5A623', '#F7526A'][i % 5]} />))}
+                    {subjectWiseMarks.map((_, i) => (
+                      <Cell key={i} fill={['#22D5A6', '#06E5C8', '#7C5CFC', '#F5A623', '#F7526A'][i % 5]} />
+                    ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
                 </PieChart>
@@ -1166,34 +1217,35 @@ const StudentHome = ({ linkedParents = [], attendanceSummary = null, latestMarks
             </GlassCard>
           </div>
 
-          {/* Quick Actions */}
           <GlassCard className="anim-fadeup stagger-5" style={{ padding: isMobile ? 14 : 20 }}>
             <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
               Quick Actions
             </h4>
-            <div className="quick-actions-grid" style={{ 
-              display: 'grid', 
-              gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(120px, 1fr))', 
-              gap: isMobile ? 8 : 10 
-            }}>
+            <div
+              className="quick-actions-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: isMobile ? 8 : 10,
+              }}
+            >
               {[
-                { to: '/student/marks', label: 'View Marks' }, 
-                { to: '/student/attendance', label: 'Attendance' }, 
-                { to: '/student/reports', label: 'Reports' }, 
-                { to: '/student/profile', label: 'Edit Profile' }
+                { to: '/student/marks', label: 'View Marks' },
+                { to: '/student/attendance', label: 'Attendance' },
+                { to: '/student/reports', label: 'Reports' },
+                { to: '/student/profile', label: 'Edit Profile' },
               ].map(({ to, label }) => (
-                <Link key={to} to={to} className="btn-primary" style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  padding: isMobile ? '8px 12px' : '10px 16px', 
-                  borderRadius: 8, 
-                  background: '#244955', 
-                  color: '#fff', 
-                  fontWeight: 500, 
-                  fontSize: isMobile ? 11 : 12, 
-                  textDecoration: 'none' 
-                }}>
+                <Link
+                  key={to}
+                  to={to}
+                  className="btn-primary"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: isMobile ? '8px 12px' : '10px 16px', borderRadius: 8,
+                    background: '#244955', color: '#fff', fontWeight: 500,
+                    fontSize: isMobile ? 11 : 12, textDecoration: 'none',
+                  }}
+                >
                   {label}
                 </Link>
               ))}
@@ -1219,7 +1271,8 @@ const ViewMarks = () => {
   const t = tokens(isDark);
   const [marksData, setMarksData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
   useEffect(() => { fetchMarks(); }, []);
 
@@ -1232,7 +1285,9 @@ const ViewMarks = () => {
       const marks = res.data || [];
       const subjectsMap = new Map();
       marks.forEach(mark => {
-        if (!subjectsMap.has(mark.subject)) subjectsMap.set(mark.subject, { subject: mark.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0 });
+        if (!subjectsMap.has(mark.subject)) {
+          subjectsMap.set(mark.subject, { subject: mark.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0 });
+        }
         const s = subjectsMap.get(mark.subject);
         if (mark.examType === 'quiz') s.firstTest = mark.score;
         else if (mark.examType === 'midterm') s.midExam = mark.score;
@@ -1242,35 +1297,45 @@ const ViewMarks = () => {
       setMarksData(Array.from(subjectsMap.values()).map(s => {
         const total = s.firstTest + s.midExam + s.notebook + s.finalExam;
         let result = total >= 50 ? 'Pass' : 'Fail', grade = 'F';
-        if (total >= 90) grade = 'A+'; else if (total >= 80) grade = 'A'; else if (total >= 70) grade = 'B'; else if (total >= 60) grade = 'C'; else if (total >= 50) grade = 'D';
+        if (total >= 90) grade = 'A+';
+        else if (total >= 80) grade = 'A';
+        else if (total >= 70) grade = 'B';
+        else if (total >= 60) grade = 'C';
+        else if (total >= 50) grade = 'D';
         return { ...s, total, result, grade };
       }));
-    } catch (err) { toast.error('Failed to load marks'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      toast.error('Failed to load marks');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  }
 
-  const avg = marksData.length > 0 ? (marksData.reduce((s, m) => s + m.total, 0) / marksData.length).toFixed(1) : 0;
+  const avg = marksData.length > 0
+    ? (marksData.reduce((s, m) => s + m.total, 0) / marksData.length).toFixed(1)
+    : 0;
+
   const cols = ['Subject', 'First Test', 'Mid Exam', 'Notebook', 'Final', 'Total', 'Grade', 'Result'];
 
   return (
     <div className="anim-fadeup">
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: isMobile ? 14 : 20, 
-        flexWrap: 'wrap', 
-        gap: isMobile ? 8 : 12 
-      }}>
+      <div
+        style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          marginBottom: isMobile ? 14 : 20, flexWrap: 'wrap', gap: isMobile ? 8 : 12,
+        }}
+      >
         <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text }}>Academic Marks</h2>
         <div style={{ textAlign: 'right' }}>
           <p style={{ fontSize: isMobile ? 10 : 11, color: t.textMuted }}>Average</p>
           <p style={{ fontSize: isMobile ? 24 : 28, fontWeight: 700, color: '#244955' }}>{avg}%</p>
         </div>
       </div>
-      
+
       {marksData.length === 0 ? (
         <GlassCard style={{ padding: isMobile ? 32 : 48, textAlign: 'center' }}>
           <p style={{ fontSize: isMobile ? 32 : 48 }}>📊</p>
@@ -1282,7 +1347,11 @@ const ViewMarks = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: isMobile ? 10 : 13 }}>
               <thead>
                 <tr style={{ background: '#244955' }}>
-                  {cols.map(c => <th key={c} style={{ padding: isMobile ? '8px 10px' : '12px 16px', textAlign: 'left', color: '#fff', fontSize: isMobile ? 9 : 11, fontWeight: 600 }}>{c}</th>)}
+                  {cols.map(c => (
+                    <th key={c} style={{ padding: isMobile ? '8px 10px' : '12px 16px', textAlign: 'left', color: '#fff', fontSize: isMobile ? 9 : 11, fontWeight: 600 }}>
+                      {c}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -1295,20 +1364,16 @@ const ViewMarks = () => {
                     <td style={{ padding: isMobile ? '8px 10px' : '12px 16px', color: t.textSub, fontSize: isMobile ? 10 : 13 }}>{m.finalExam}</td>
                     <td style={{ padding: isMobile ? '8px 10px' : '12px 16px', fontWeight: 700, color: '#244955', fontSize: isMobile ? 10 : 13 }}>{m.total}</td>
                     <td style={{ padding: isMobile ? '8px 10px' : '12px 16px' }}>
-                      <span style={{ 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        width: isMobile ? 26 : 32, 
-                        height: isMobile ? 26 : 32, 
-                        borderRadius: 6, 
-                        background: 'rgba(36,73,85,0.1)', 
-                        color: '#244955', 
-                        fontWeight: 700,
-                        fontSize: isMobile ? 10 : 13
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: isMobile ? 26 : 32, height: isMobile ? 26 : 32,
+                        borderRadius: 6, background: 'rgba(36,73,85,0.1)',
+                        color: '#244955', fontWeight: 700, fontSize: isMobile ? 10 : 13,
                       }}>{m.grade}</span>
                     </td>
-                    <td style={{ padding: isMobile ? '8px 10px' : '12px 16px' }}><StatusPill status={m.result} /></td>
+                    <td style={{ padding: isMobile ? '8px 10px' : '12px 16px' }}>
+                      <StatusPill status={m.result} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1328,7 +1393,8 @@ const ViewAttendance = () => {
   const t = tokens(isDark);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
   useEffect(() => { fetchAttendance(); }, []);
 
@@ -1339,29 +1405,44 @@ const ViewAttendance = () => {
       if (!studentId) { setLoading(false); return; }
       const res = await api.get(`/attendance/student/${studentId}`);
       setRecords(res.data || []);
-    } catch (err) { toast.error('Failed to load attendance'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      toast.error('Failed to load attendance');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  }
 
-  const stats = { present: records.filter(r => r.status === 'present').length, absent: records.filter(r => r.status === 'absent').length, late: records.filter(r => r.status === 'late').length, total: records.length };
+  const stats = {
+    present: records.filter(r => r.status === 'present').length,
+    absent: records.filter(r => r.status === 'absent').length,
+    late: records.filter(r => r.status === 'late').length,
+    total: records.length,
+  };
   const pct = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
 
   return (
     <div className="anim-fadeup">
-      <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text, marginBottom: isMobile ? 14 : 20 }}>Attendance Record</h2>
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : 'repeat(auto-fit, minmax(140px, 1fr))', 
-        gap: isMobile ? 8 : 16, 
-        marginBottom: isMobile ? 14 : 24 
-      }}>
+      <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text, marginBottom: isMobile ? 14 : 20 }}>
+        Attendance Record
+      </h2>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: isMobile ? 8 : 16,
+          marginBottom: isMobile ? 14 : 24,
+        }}
+      >
         <MetricCard label="Present" value={stats.present} sub="Days attended" icon={Icons.dashboard} delay={1} />
         <MetricCard label="Absent" value={stats.absent} sub="Days missed" icon={Icons.attendance} delay={2} />
         <MetricCard label="Rate" value={`${pct}%`} sub="Attendance rate" icon={Icons.reports} delay={3} />
       </div>
-      
+
       {records.length === 0 ? (
         <GlassCard style={{ padding: isMobile ? 32 : 48, textAlign: 'center' }}>
           <p style={{ fontSize: isMobile ? 32 : 48 }}>📅</p>
@@ -1373,7 +1454,11 @@ const ViewAttendance = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: isMobile ? 10 : 13 }}>
               <thead>
                 <tr style={{ background: '#244955' }}>
-                  {['Date', 'Subject', 'Status'].map(h => <th key={h} style={{ padding: isMobile ? '8px 10px' : '12px 20px', textAlign: 'left', color: '#fff', fontSize: isMobile ? 9 : 11, fontWeight: 600 }}>{h}</th>)}
+                  {['Date', 'Subject', 'Status'].map(h => (
+                    <th key={h} style={{ padding: isMobile ? '8px 10px' : '12px 20px', textAlign: 'left', color: '#fff', fontSize: isMobile ? 9 : 11, fontWeight: 600 }}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -1396,7 +1481,7 @@ const ViewAttendance = () => {
 };
 
 // ─────────────────────────────────────────────
-// REPORTS (with all graphs)
+// REPORTS
 // ─────────────────────────────────────────────
 const StudentReports = () => {
   const { isDark } = useContext(ThemeContext);
@@ -1404,7 +1489,8 @@ const StudentReports = () => {
   const [marksData, setMarksData] = useState([]);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
   useEffect(() => { fetchData(); }, []);
 
@@ -1419,7 +1505,9 @@ const StudentReports = () => {
         const marks = marksRes.data || [];
         const map = new Map();
         marks.forEach(m => {
-          if (!map.has(m.subject)) map.set(m.subject, { subject: m.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0, total: 0 });
+          if (!map.has(m.subject)) {
+            map.set(m.subject, { subject: m.subject, firstTest: 0, midExam: 0, notebook: 0, finalExam: 0, total: 0 });
+          }
           const s = map.get(m.subject);
           if (m.examType === 'quiz') s.firstTest = m.score;
           else if (m.examType === 'midterm') s.midExam = m.score;
@@ -1428,15 +1516,17 @@ const StudentReports = () => {
           s.total = s.firstTest + s.midExam + s.notebook + s.finalExam;
         });
         setMarksData(Array.from(map.values()));
-      } catch (err) { console.error('Marks error:', err); }
+      } catch (err) { /* silent */ }
 
       try {
         const attRes = await api.get(`/attendance/student/${studentId}`);
         setAttendanceRecords(attRes.data || []);
-      } catch (err) { console.error('Attendance error:', err); }
-
-    } catch (error) { console.error('Error:', error); toast.error('Failed to load reports'); }
-    finally { setLoading(false); }
+      } catch (err) { /* silent */ }
+    } catch (error) {
+      toast.error('Failed to load reports');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const CustomTooltip = (props) => <ChartTooltip {...props} isDark={isDark} />;
@@ -1444,7 +1534,7 @@ const StudentReports = () => {
   const getMonthlyPerformance = () => {
     const monthlyData = {};
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
+
     attendanceRecords.forEach(record => {
       const date = new Date(record.date);
       const month = months[date.getMonth()];
@@ -1454,23 +1544,31 @@ const StudentReports = () => {
       monthlyData[month].count++;
     });
 
-    const avgMark = marksData.length > 0 ? marksData.reduce((s, m) => s + m.total, 0) / marksData.length : 0;
+    const avgMark = marksData.length > 0
+      ? marksData.reduce((s, m) => s + m.total, 0) / marksData.length
+      : 0;
 
     return months.slice(0, 6).map(month => ({
       month,
       marks: avgMark,
-      attendance: monthlyData[month]?.count > 0 ? Math.round(monthlyData[month].attendance / monthlyData[month].count) : 0
+      attendance: monthlyData[month]?.count > 0
+        ? Math.round(monthlyData[month].attendance / monthlyData[month].count)
+        : 0,
     }));
   };
 
   const trendData = getMonthlyPerformance();
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  }
 
   return (
     <div className="anim-fadeup">
       <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text, marginBottom: 2 }}>Academic Reports</h2>
-      <p style={{ fontSize: isMobile ? 12 : 13, color: t.textMuted, marginBottom: isMobile ? 16 : 24 }}>Comprehensive performance analytics</p>
+      <p style={{ fontSize: isMobile ? 12 : 13, color: t.textMuted, marginBottom: isMobile ? 16 : 24 }}>
+        Comprehensive performance analytics
+      </p>
 
       {marksData.length === 0 ? (
         <GlassCard style={{ padding: isMobile ? 32 : 48, textAlign: 'center' }}>
@@ -1479,7 +1577,6 @@ const StudentReports = () => {
         </GlassCard>
       ) : (
         <>
-          {/* Performance Trend Graph */}
           <GlassCard style={{ padding: isMobile ? 14 : 20, marginBottom: isMobile ? 12 : 16 }}>
             <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
               📈 Performance Trend
@@ -1503,7 +1600,6 @@ const StudentReports = () => {
             </ResponsiveContainer>
           </GlassCard>
 
-          {/* Subject Breakdown Graph */}
           <GlassCard style={{ padding: isMobile ? 14 : 20, marginBottom: isMobile ? 12 : 16 }}>
             <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
               📊 Subject Breakdown
@@ -1523,7 +1619,6 @@ const StudentReports = () => {
             </ResponsiveContainer>
           </GlassCard>
 
-          {/* Proficiency Radar Graph */}
           <GlassCard style={{ padding: isMobile ? 14 : 20 }}>
             <h4 style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: t.text, marginBottom: isMobile ? 10 : 16 }}>
               🎯 Proficiency Radar
@@ -1552,21 +1647,29 @@ const NewsFeedPage = () => {
   const t = tokens(isDark);
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
   useEffect(() => { fetchNews(); }, []);
 
   const fetchNews = async () => {
-    try { const res = await api.get('/news'); setNews(Array.isArray(res.data) ? res.data : res.data?.news || res.data?.data || []); } catch (err) {}
+    try {
+      const res = await api.get('/news');
+      setNews(Array.isArray(res.data) ? res.data : res.data?.news || res.data?.data || []);
+    } catch (err) { /* silent */ }
     finally { setLoading(false); }
   };
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', height: '60vh', alignItems: 'center' }}><Spinner /></div>;
+  }
 
   return (
     <div className="anim-fadeup">
-      <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text, marginBottom: isMobile ? 14 : 20 }}>News Feed</h2>
-      
+      <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text, marginBottom: isMobile ? 14 : 20 }}>
+        News Feed
+      </h2>
+
       {news.length === 0 ? (
         <GlassCard style={{ padding: isMobile ? 32 : 48, textAlign: 'center' }}>
           <p style={{ fontSize: isMobile ? 32 : 48 }}>📰</p>
@@ -1574,33 +1677,21 @@ const NewsFeedPage = () => {
         </GlassCard>
       ) : (
         news.map((n, i) => (
-          <GlassCard key={n._id || i} className="card-hover" style={{ 
-            padding: isMobile ? '12px 16px' : '16px 20px', 
-            marginBottom: isMobile ? 10 : 12 
-          }}>
-            <span style={{ 
-              fontSize: isMobile ? 9 : 10, 
-              fontWeight: 700, 
-              color: '#06E5C8', 
-              background: 'rgba(6,229,200,0.1)', 
-              padding: '2px 8px', 
-              borderRadius: 99 
+          <GlassCard
+            key={n._id || i}
+            className="card-hover"
+            style={{ padding: isMobile ? '12px 16px' : '16px 20px', marginBottom: isMobile ? 10 : 12 }}
+          >
+            <span style={{
+              fontSize: isMobile ? 9 : 10, fontWeight: 700, color: '#06E5C8',
+              background: 'rgba(6,229,200,0.1)', padding: '2px 8px', borderRadius: 99,
             }}>
               {n.tag || 'NEWS'}
             </span>
-            <p style={{ 
-              fontWeight: 600, 
-              fontSize: isMobile ? 13 : 14, 
-              color: t.text, 
-              marginTop: isMobile ? 4 : 6 
-            }}>
+            <p style={{ fontWeight: 600, fontSize: isMobile ? 13 : 14, color: t.text, marginTop: isMobile ? 4 : 6 }}>
               {n.title}
             </p>
-            <p style={{ 
-              fontSize: isMobile ? 11 : 12, 
-              color: t.textMuted, 
-              marginTop: isMobile ? 2 : 4 
-            }}>
+            <p style={{ fontSize: isMobile ? 11 : 12, color: t.textMuted, marginTop: isMobile ? 2 : 4 }}>
               {n.content || n.description}
             </p>
           </GlassCard>
@@ -1611,23 +1702,30 @@ const NewsFeedPage = () => {
 };
 
 // ─────────────────────────────────────────────
-// EDIT PROFILE (with Passport Photo upload)
+// EDIT PROFILE
 // ─────────────────────────────────────────────
 const EditProfile = () => {
   const { isDark } = useContext(ThemeContext);
   const t = tokens(isDark);
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{"name":"","email":""}'));
-  const [form, setForm] = useState({ name: user.name || '', email: user.email || '', phone: user.phone || '', address: user.address || '', parentName: user.parentName || '', parentPhone: user.parentPhone || '' });
+  const [form, setForm] = useState({
+    name: user.name || '', email: user.email || '', phone: user.phone || '',
+    address: user.address || '', parentName: user.parentName || '', parentPhone: user.parentPhone || '',
+  });
   const [profileImage, setProfileImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(user.profileImage || null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
-  const isMobile = window.innerWidth <= 480;
+  const width = useWindowWidth();
+  const isMobile = width <= 480;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) { setProfileImage(file); setPreviewUrl(URL.createObjectURL(file)); }
+    if (file) {
+      setProfileImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleSave = async () => {
@@ -1637,85 +1735,69 @@ const EditProfile = () => {
       const formData = new FormData();
       Object.keys(form).forEach(key => { if (form[key]) formData.append(key, form[key]); });
       if (profileImage) formData.append('profileImage', profileImage);
-      const res = await api.put(`/users/${userId}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await api.put(`/users/${userId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       const updated = { ...user, ...form, profileImage: res.data.profileImage || previewUrl };
       localStorage.setItem('user', JSON.stringify(updated));
       setUser(updated);
       toast.success('Profile updated!');
       setEditing(false);
-    } catch (err) { toast.error('Failed to update profile'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      toast.error('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="anim-fadeup">
       <GlassCard style={{ padding: isMobile ? 16 : 28 }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: isMobile ? 16 : 24, 
-          flexWrap: 'wrap', 
-          gap: isMobile ? 8 : 12 
-        }}>
+        <div
+          style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: isMobile ? 16 : 24, flexWrap: 'wrap', gap: isMobile ? 8 : 12,
+          }}
+        >
           <h2 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: t.text }}>My Profile</h2>
           {!editing ? (
-            <button onClick={() => setEditing(true)} className="btn-primary" style={{ 
-              padding: isMobile ? '6px 16px' : '8px 20px', 
-              borderRadius: 6, 
-              background: '#244955', 
-              color: '#fff', 
-              fontSize: isMobile ? 12 : 13 
-            }}>
+            <button
+              onClick={() => setEditing(true)}
+              className="btn-primary"
+              style={{ padding: isMobile ? '6px 16px' : '8px 20px', borderRadius: 6, background: '#244955', color: '#fff', fontSize: isMobile ? 12 : 13 }}
+            >
               Edit Profile
             </button>
           ) : (
             <div style={{ display: 'flex', gap: isMobile ? 6 : 8 }}>
-              <button onClick={() => setEditing(false)} className="btn-primary" style={{ 
-                padding: isMobile ? '6px 12px' : '8px 16px', 
-                borderRadius: 6, 
-                background: 'transparent', 
-                border: `1px solid ${t.border}`, 
-                color: t.textSub, 
-                fontSize: isMobile ? 12 : 13 
-              }}>
+              <button
+                onClick={() => setEditing(false)}
+                className="btn-primary"
+                style={{ padding: isMobile ? '6px 12px' : '8px 16px', borderRadius: 6, background: 'transparent', border: `1px solid ${t.border}`, color: t.textSub, fontSize: isMobile ? 12 : 13 }}
+              >
                 Cancel
               </button>
-              <button onClick={handleSave} disabled={loading} className="btn-primary" style={{ 
-                padding: isMobile ? '6px 12px' : '8px 16px', 
-                borderRadius: 6, 
-                background: '#244955', 
-                color: '#fff', 
-                fontSize: isMobile ? 12 : 13 
-              }}>
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="btn-primary"
+                style={{ padding: isMobile ? '6px 12px' : '8px 16px', borderRadius: 6, background: '#244955', color: '#fff', fontSize: isMobile ? 12 : 13 }}
+              >
                 {loading ? 'Saving...' : 'Save'}
               </button>
             </div>
           )}
         </div>
 
-        {/* Passport Photo Upload */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: isMobile ? 14 : 24, 
-          marginBottom: isMobile ? 16 : 24, 
-          flexWrap: 'wrap' 
-        }}>
-          <PassportPhoto 
-            src={previewUrl || user.profileImage} 
-            name={user.name} 
-            size={isMobile ? 64 : 80} 
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 14 : 24, marginBottom: isMobile ? 16 : 24, flexWrap: 'wrap' }}>
+          <PassportPhoto src={previewUrl || user.profileImage} name={user.name} size={isMobile ? 64 : 80} />
           {editing && (
             <div>
-              <button onClick={() => fileInputRef.current?.click()} className="btn-primary" style={{ 
-                padding: isMobile ? '4px 12px' : '6px 16px', 
-                borderRadius: 6, 
-                background: '#244955', 
-                color: '#fff', 
-                fontSize: isMobile ? 11 : 12 
-              }}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="btn-primary"
+                style={{ padding: isMobile ? '4px 12px' : '6px 16px', borderRadius: 6, background: '#244955', color: '#fff', fontSize: isMobile ? 11 : 12 }}
+              >
                 Upload Photo
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
@@ -1723,45 +1805,35 @@ const EditProfile = () => {
           )}
         </div>
 
-        <div className="profile-grid" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-          gap: isMobile ? 10 : 16 
-        }}>
+        <div
+          className="profile-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: isMobile ? 10 : 16,
+          }}
+        >
           {['name', 'email', 'phone', 'parentName', 'parentPhone', 'address'].map(field => (
             <div key={field}>
-              <label style={{ 
-                fontSize: isMobile ? 10 : 11, 
-                fontWeight: 600, 
-                color: t.textMuted, 
-                textTransform: 'uppercase', 
-                display: 'block', 
-                marginBottom: isMobile ? 2 : 4 
+              <label style={{
+                fontSize: isMobile ? 10 : 11, fontWeight: 600, color: t.textMuted,
+                textTransform: 'uppercase', display: 'block', marginBottom: isMobile ? 2 : 4,
               }}>
                 {field.replace(/([A-Z])/g, ' $1').trim()}
               </label>
               {editing ? (
-                <input 
-                  value={form[field]} 
-                  onChange={e => setForm({ ...form, [field]: e.target.value })} 
-                  style={{ 
-                    width: '100%', 
-                    padding: isMobile ? '6px 10px' : '8px 12px', 
-                    borderRadius: 6, 
-                    background: isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f5', 
-                    border: `1px solid ${t.border}`, 
-                    color: t.text, 
-                    fontSize: isMobile ? 12 : 13, 
-                    outline: 'none' 
-                  }} 
+                <input
+                  value={form[field]}
+                  onChange={e => setForm({ ...form, [field]: e.target.value })}
+                  style={{
+                    width: '100%', padding: isMobile ? '6px 10px' : '8px 12px',
+                    borderRadius: 6, background: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
+                    border: `1px solid ${t.border}`, color: t.text,
+                    fontSize: isMobile ? 12 : 13, outline: 'none',
+                  }}
                 />
               ) : (
-                <p style={{ 
-                  fontSize: isMobile ? 12 : 14, 
-                  fontWeight: 500, 
-                  color: t.text, 
-                  padding: isMobile ? '4px 0' : '8px 0' 
-                }}>
+                <p style={{ fontSize: isMobile ? 12 : 14, fontWeight: 500, color: t.text, padding: isMobile ? '4px 0' : '8px 0' }}>
                   {form[field] || 'Not set'}
                 </p>
               )}
@@ -1774,34 +1846,40 @@ const EditProfile = () => {
 };
 
 // ─────────────────────────────────────────────
-// STUDENT DASHBOARD
+// STUDENT DASHBOARD (MAIN)
 // ─────────────────────────────────────────────
 const StudentDashboard = () => {
-  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') !== 'light');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('sidebarCollapsed') === 'true');
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem('sidebarCollapsed') === 'true'
+  );
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
-  const [linkedParents, setLinkedParents] = useState([]);
+  const [linkedParents] = useState([]);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
   const [latestMarks, setLatestMarks] = useState([]);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const width = useWindowWidth();
+  const isMobile = width <= 768;
 
-  const toggle = () => setIsDark(d => { localStorage.setItem('theme', !d ? 'dark' : 'light'); return !d; });
-  const toggleCollapse = () => setSidebarCollapsed(prev => { localStorage.setItem('sidebarCollapsed', !prev); return !prev; });
+  const toggle = () => setIsDark(d => {
+    const next = !d;
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+    return next;
+  });
+
+  const toggleCollapse = () => setSidebarCollapsed(prev => {
+    const next = !prev;
+    localStorage.setItem('sidebarCollapsed', next);
+    return next;
+  });
+
   const t = tokens(isDark);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
-        setMobileSidebarOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (width > 768) setMobileSidebarOpen(false);
+  }, [width]);
 
   useEffect(() => { fetchInitialData(); }, []);
 
@@ -1809,52 +1887,59 @@ const StudentDashboard = () => {
     try {
       const userData = localStorage.getItem('user');
       if (!userData) { setLoading(false); return; }
-      
+
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
 
       try {
         const res = await api.get('/users/me/profile');
-        setStudentDetails(res.data);
-        const updatedUser = { ...parsedUser, ...res.data };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setUser(updatedUser);
+
+        const profileImage =
+          res.data.profileImage ||
+          res.data.profileImageUrl ||
+          res.data.avatar ||
+          res.data.image ||
+          '';
+
+        const merged = { ...parsedUser, ...res.data, profileImage };
+        setStudentDetails(merged);
+        setUser(merged);
+        localStorage.setItem('user', JSON.stringify(merged));
       } catch (err) {
+        console.warn('Failed to fetch profile, using cached user:', err);
         setStudentDetails(parsedUser);
       }
 
       const studentId = parsedUser._id || parsedUser.id;
-      try { const attRes = await api.get(`/attendance/student/${studentId}/summary`); if (attRes.data) setAttendanceSummary(attRes.data); } catch (err) {}
-      try { const marksRes = await api.get(`/marks/student/${studentId}/latest`); if (marksRes.data) setLatestMarks(Array.isArray(marksRes.data) ? marksRes.data : [marksRes.data]); } catch (err) {}
+      try {
+        const attRes = await api.get(`/attendance/student/${studentId}/summary`);
+        if (attRes.data) setAttendanceSummary(attRes.data);
+      } catch (err) { /* silent */ }
 
-    } catch (error) { console.error('Init error:', error); }
-    finally { setLoading(false); }
+      try {
+        const marksRes = await api.get(`/marks/student/${studentId}/latest`);
+        if (marksRes.data) setLatestMarks(Array.isArray(marksRes.data) ? marksRes.data : [marksRes.data]);
+      } catch (err) { /* silent */ }
+    } catch (error) {
+      console.error('Init error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
     return (
       <ThemeContext.Provider value={{ isDark, toggle }}>
         <GlobalStyles />
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          height: '100vh', 
-          background: t.bg, 
-          gap: 16 
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', height: '100vh', background: t.bg, gap: 16,
         }}>
-          <div style={{ 
-            width: isMobile ? 40 : 48, 
-            height: isMobile ? 40 : 48, 
-            borderRadius: 12, 
-            background: '#244955', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            color: '#fff', 
-            fontWeight: 800, 
-            fontSize: isMobile ? 16 : 20 
+          <div style={{
+            width: isMobile ? 40 : 48, height: isMobile ? 40 : 48,
+            borderRadius: 12, background: '#244955',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 800, fontSize: isMobile ? 16 : 20,
           }} className="anim-float">E</div>
           <Spinner color="#244955" />
           <p style={{ fontSize: isMobile ? 12 : 13, color: t.textMuted }}>Loading your dashboard…</p>
@@ -1863,72 +1948,34 @@ const StudentDashboard = () => {
     );
   }
 
-  // Mobile view
-  if (isMobile) {
-    return (
-      <ThemeContext.Provider value={{ isDark, toggle }}>
-        <GlobalStyles />
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: t.bg, overflow: 'hidden' }}>
-          <Sidebar 
-            user={user} 
-            studentDetails={studentDetails} 
-            open={mobileSidebarOpen} 
-            onClose={() => setMobileSidebarOpen(false)} 
-            collapsed={false} 
-            onToggleCollapse={toggleCollapse}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-            <Header 
-              user={user} 
-              studentDetails={studentDetails} 
-              onMobileMenuClick={() => setMobileSidebarOpen(true)} 
-              collapsed={false}
-            />
-            <main className="main-padding" style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 32px' }}>
-              <Routes>
-                <Route path="/" element={<StudentHome linkedParents={linkedParents} attendanceSummary={attendanceSummary} latestMarks={latestMarks} studentDetails={studentDetails} />} />
-                <Route path="/marks" element={<ViewMarks />} />
-                <Route path="/attendance" element={<ViewAttendance />} />
-                <Route path="/reports" element={<StudentReports />} />
-                <Route path="/news" element={<NewsFeedPage />} />
-                <Route path="/profile" element={<EditProfile />} />
-                <Route path="/download" element={<StudentIDCard />} />
-                <Route path="/certificate" element={<StudentCertificate />} />
-                <Route path="/password" element={<ChangePassword />} />
-                <Route path="/payment" element={<StudentPayment />} />
-              </Routes>
-            </main>
-          </div>
-        </div>
-      </ThemeContext.Provider>
-    );
-  }
+  const sidebarWidth = isMobile ? 0 : (sidebarCollapsed ? 72 : 240);
 
-  // Desktop view
   return (
     <ThemeContext.Provider value={{ isDark, toggle }}>
       <GlobalStyles />
-      <div style={{ display: 'flex', height: '100vh', background: t.bg, overflow: 'hidden' }}>
-        <Sidebar 
-          user={user} 
-          studentDetails={studentDetails} 
-          open={false} 
-          onClose={() => {}} 
+      <div style={{ display: 'flex', minHeight: '100vh', background: t.bg }}>
+        <Sidebar
+          user={user}
+          studentDetails={studentDetails}
+          open={mobileSidebarOpen}
+          onClose={() => setMobileSidebarOpen(false)}
           collapsed={sidebarCollapsed}
           onToggleCollapse={toggleCollapse}
         />
-        <div style={{ 
-          display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', 
-          marginLeft: sidebarCollapsed ? 72 : 240, 
-          transition: 'margin-left .3s cubic-bezier(.22,1,.36,1)' 
+
+        <div style={{
+          flex: 1,
+          marginLeft: sidebarWidth,
+          transition: 'margin-left .3s cubic-bezier(.22,1,.36,1)',
+          minWidth: 0,
         }}>
-          <Header 
-            user={user} 
-            studentDetails={studentDetails} 
-            onMobileMenuClick={() => {}} 
-            collapsed={sidebarCollapsed}
+          <Header
+            user={user}
+            studentDetails={studentDetails}
+            onMobileMenuClick={() => setMobileSidebarOpen(true)}
           />
-          <main className="main-padding" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px 48px' }}>
+
+          <main className="main-padding" style={{ padding: isMobile ? '16px 16px 32px' : '24px 28px 48px' }}>
             <Routes>
               <Route path="/" element={<StudentHome linkedParents={linkedParents} attendanceSummary={attendanceSummary} latestMarks={latestMarks} studentDetails={studentDetails} />} />
               <Route path="/marks" element={<ViewMarks />} />
