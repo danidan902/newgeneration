@@ -1,8 +1,9 @@
-// ManageStudents/index.jsx - Updated: green + blue only, responsive
+// ManageStudents/index.jsx - Updated: green + blue only, responsive, mobile fixes
 
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import api from '../../services/api';
 import { ICONS } from './Profile/constants';
 import { Avatar } from './Profile/Avatar';
@@ -97,7 +98,19 @@ const globalStyles = `
   .compact-table tbody tr:hover { background: #f8fafc; }
   
   .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+  /* Prevent iOS auto-zoom when focusing inputs */
+  @media (max-width: 768px) {
+    input, select, textarea { font-size: 16px !important; }
+  }
 `;
+
+// ============= HELPERS =============
+const cleanValue = (v) => {
+  if (typeof v !== 'string') return v;
+  // Strip NBSP (\u00A0) and other invisible whitespace, then trim
+  return v.replace(/\u00A0/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+};
 
 const ManageStudents = ({ isSuperAdmin = false }) => {
   const {
@@ -163,37 +176,73 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
+  // ============= CREATE =============
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    if (!formData.name || !formData.studentId || !formData.password || !formData.rollNumber || !formData.parentPhone || !formData.age) {
+
+    // ✅ Clean all string fields (mobile keyboards insert NBSP and invisible chars)
+    const cleaned = Object.fromEntries(
+      Object.entries(formData).map(([k, v]) => [k, cleanValue(v)])
+    );
+
+    if (
+      !cleaned.name ||
+      !cleaned.studentId ||
+      !cleaned.password ||
+      !cleaned.rollNumber ||
+      !cleaned.parentPhone ||
+      !cleaned.age
+    ) {
       toast.error('Please fill all required fields including Student ID');
       return;
     }
+
     setLoading(true);
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (key !== 'grade' && key !== 'programs' && key !== 'section' && key !== 'academicYear' && formData[key] && key !== 'age') {
-          formDataToSend.append(key, formData[key]);
-        }
+
+      // Append every cleaned field except special-cased ones
+      Object.entries(cleaned).forEach(([key, value]) => {
+        if (
+          key === 'grade' ||
+          key === 'programs' ||
+          key === 'section' ||
+          key === 'academicYear' ||
+          key === 'age'
+        ) return;
+        if (value === '' || value === undefined || value === null) return;
+        formDataToSend.append(key, value);
       });
+
       formDataToSend.append('role', 'student');
-      formDataToSend.append('baseGrade', formData.grade);
-      formDataToSend.append('baseAcademicYear', formData.academicYear);
-      if (formData.grade) formDataToSend.append('grade', `Grade ${formData.grade}`);
-      if (formData.programs) formDataToSend.append('programs', formData.programs);
-      if (formData.section) formDataToSend.append('section', formData.section);
-      if (formData.academicYear) formDataToSend.append('academicYear', formData.academicYear);
-      if (formData.parentPhone) formDataToSend.append('parentPhone', formData.parentPhone);
-      if (profileImage) formDataToSend.append('profileImage', profileImage);
-      if (formData.age) formDataToSend.append('age', formData.age);
 
-      await api.post('/users', formDataToSend, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      if (cleaned.grade) {
+        formDataToSend.append('baseGrade', cleaned.grade);
+        formDataToSend.append('grade', `Grade ${cleaned.grade}`);
+      }
+      if (cleaned.academicYear) {
+        formDataToSend.append('baseAcademicYear', cleaned.academicYear);
+        formDataToSend.append('academicYear', cleaned.academicYear);
+      }
+      if (cleaned.programs) formDataToSend.append('programs', cleaned.programs);
+      if (cleaned.section) formDataToSend.append('section', cleaned.section);
+      if (cleaned.parentPhone) formDataToSend.append('parentPhone', cleaned.parentPhone);
+      if (cleaned.age) formDataToSend.append('age', cleaned.age);
+      if (profileImage) formDataToSend.append('profileImage', profileImage);
+
+      const res = await api.post('/users', formDataToSend, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      toast.success(`🚀 Student added successfully! Student ID: ${formData.studentId}`);
+      const tempPass = res.data?.temporary_password;
+      toast.success(
+        tempPass
+          ? `🚀 Student added! Student ID: ${cleaned.studentId} · Temp password: ${tempPass}`
+          : `🚀 Student added successfully! Student ID: ${cleaned.studentId}`,
+        { duration: 8000 }
+      );
+
       resetForm();
       setShowForm(false);
       setCurrentPage(1);
@@ -202,19 +251,28 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       if (error.response?.status === 403) {
         toast.error('Access denied.');
         localStorage.clear();
-        setTimeout(() => window.location.href = '/login', 2000);
+        setTimeout(() => (window.location.href = '/login'), 2000);
       } else {
-        toast.error(error.response?.data?.error || 'Failed to add student');
+        const msg =
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to add student';
+        toast.error(msg);
+        console.error('Add student error:', error.response?.data || error);
       }
     } finally {
       setLoading(false);
     }
   };
 
+  // ============= EDIT OPEN =============
   const handleEditClick = async (student) => {
     setEditingStudent(student);
     try {
-      const response = await api.get(`/enrollments/student/${student._id}/current?academicYear=${selectedAcademicYear}`);
+      const response = await api.get(
+        `/enrollments/student/${student._id}/current?academicYear=${selectedAcademicYear}`
+      );
       const currentEnrollment = response.data.enrollment;
       let gradeNum = currentEnrollment?.grade || student.grade || '';
       if (gradeNum && gradeNum.includes('Grade')) gradeNum = gradeNum.split(' ')[1];
@@ -229,7 +287,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         password: '',
         age: student.age || '',
         academicYear: selectedAcademicYear,
-        parentPhone: student.parentPhone || ''
+        parentPhone: student.parentPhone || '',
       });
     } catch (error) {
       let gradeNum = student.grade || '';
@@ -245,45 +303,72 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         password: '',
         age: student.age || '',
         academicYear: selectedAcademicYear,
-        parentPhone: student.parentPhone || ''
+        parentPhone: student.parentPhone || '',
       });
     }
     setEditProfileImage(null);
   };
 
+  // ============= EDIT SUBMIT =============
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+
+    const cleaned = Object.fromEntries(
+      Object.entries(editFormData).map(([k, v]) => [k, cleanValue(v)])
+    );
+
     setLoading(true);
     try {
       const updateData = {
-        name: editFormData.name,
-        studentId: editFormData.studentId,
-        sex: editFormData.sex,
-        rollNumber: editFormData.rollNumber,
-        baseGrade: editingStudent.baseGrade || editFormData.grade,
-        baseAcademicYear: editingStudent.baseAcademicYear || editFormData.academicYear || '2019/2020',
-        grade: `Grade ${editFormData.grade}`,
-        programs: editFormData.programs,
-        section: editFormData.section,
-        academicYear: editFormData.academicYear || '2019/2020',
-        parentPhone: editFormData.parentPhone,
-        age: editFormData.age
+        name: cleaned.name,
+        studentId: cleaned.studentId,
+        sex: cleaned.sex,
+        rollNumber: cleaned.rollNumber,
+        baseGrade: editingStudent.baseGrade || cleaned.grade,
+        baseAcademicYear:
+          editingStudent.baseAcademicYear || cleaned.academicYear || '2019/2020',
+        grade: `Grade ${cleaned.grade}`,
+        programs: cleaned.programs,
+        section: cleaned.section,
+        academicYear: cleaned.academicYear || '2019/2020',
+        parentPhone: cleaned.parentPhone,
+        age: cleaned.age,
       };
-      if (editFormData.password) updateData.password = editFormData.password;
-      await api.put(`/users/${editingStudent._id}`, updateData);
+      if (cleaned.password) updateData.password = cleaned.password;
+
+      // If a new profile image was selected, send multipart
+      if (editProfileImage) {
+        const formDataToSend = new FormData();
+        Object.entries(updateData).forEach(([k, v]) => {
+          if (v !== undefined && v !== null && v !== '') formDataToSend.append(k, v);
+        });
+        formDataToSend.append('profileImage', editProfileImage);
+        await api.put(`/users/${editingStudent._id}`, formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        await api.put(`/users/${editingStudent._id}`, updateData);
+      }
+
       toast.success('✨ Student updated successfully!');
       setEditingStudent(null);
       setEditProfileImage(null);
       await fetchStudents();
     } catch (error) {
       console.error('Edit error:', error);
-      toast.error(error.response?.data?.error || 'Failed to update student');
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to update student';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  // ============= DELETE =============
   const handleDelete = async (id) => {
     if (!window.confirm('⚠️ Are you sure you want to delete this student? This action cannot be undone.')) return;
     try {
@@ -295,29 +380,28 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         localStorage.clear();
         window.location.href = '/login';
       } else {
-        toast.error('Failed to delete student');
+        toast.error(error.response?.data?.error || 'Failed to delete student');
       }
     }
   };
 
+  // ============= GRADUATE =============
   const handleMoveToGraduated = async (student) => {
     if (!window.confirm(`🎓 Move ${student.name} to Graduated Students list?`)) return;
     setLoading(true);
     try {
-      await api.put(`/enrollments/student/${student._id}`, {
-        academicYear: selectedAcademicYear,
-        status: 'graduated',
-        grade: 'Graduated'
-      });
+      // Prefer the dedicated graduate endpoint (works with current backend)
+      await api.post(`/users/${student._id}/graduate`);
       toast.success(`🎓 ${student.name} has been moved to Graduated Students`);
       await fetchStudents();
     } catch (error) {
-      toast.error('Failed to move student');
+      toast.error(error.response?.data?.error || 'Failed to move student');
     } finally {
       setLoading(false);
     }
   };
 
+  // ============= RESTORE =============
   const handleRestoreFromGraduated = async (student) => {
     if (!window.confirm(`↺ Restore ${student.name} to active students?`)) return;
     setLoading(true);
@@ -333,12 +417,17 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
+  // ============= BULK UPLOAD =============
   const handleBulkUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const ext = file.name.split('.').pop().toLowerCase();
     if (ext === 'csv') {
-      Papa.parse(file, { header: true, complete: async (r) => { await processBulkStudents(r.data); }, error: () => toast.error('Error parsing CSV file') });
+      Papa.parse(file, {
+        header: true,
+        complete: async (r) => { await processBulkStudents(r.data); },
+        error: () => toast.error('Error parsing CSV file'),
+      });
     } else if (ext === 'xlsx' || ext === 'xls') {
       const reader = new FileReader();
       reader.onload = async (ev) => {
@@ -355,17 +444,26 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     setBulkLoading(true);
     let ok = 0, fail = 0;
     for (const s of data) {
-      if (!s.name || !s.studentId || !s.password) { fail++; continue; }
+      const name = cleanValue(s.name);
+      const studentId = cleanValue(s.studentId);
+      const password = cleanValue(s.password);
+      if (!name || !studentId || !password) { fail++; continue; }
       try {
         await api.post('/users', {
-          name: s.name, studentId: s.studentId, password: s.password,
-          sex: s.sex || '', role: 'student',
-          rollNumber: s.rollNumber || s.rollnumber || s.roll_no || '',
-          baseGrade: s.grade || 9, baseAcademicYear: selectedAcademicYear,
+          name,
+          studentId,
+          password,
+          sex: cleanValue(s.sex) || '',
+          role: 'student',
+          rollNumber: cleanValue(s.rollNumber || s.rollnumber || s.roll_no) || '',
+          baseGrade: s.grade || 9,
+          baseAcademicYear: selectedAcademicYear,
           grade: s.grade ? `Grade ${s.grade}` : '',
-          program: s.programs || s.program || '', section: s.section || '',
-          age: s.age || '', academicYear: selectedAcademicYear,
-          parentPhone: s.parentPhone || ''
+          program: cleanValue(s.programs || s.program) || '',
+          section: cleanValue(s.section) || '',
+          age: cleanValue(s.age) || '',
+          academicYear: selectedAcademicYear,
+          parentPhone: cleanValue(s.parentPhone) || '',
         });
         ok++;
       } catch (error) {
@@ -373,7 +471,11 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         fail++;
       }
     }
-    if (ok > 0) { toast.success(`✅ Added ${ok} students`); setCurrentPage(1); await fetchStudents(); }
+    if (ok > 0) {
+      toast.success(`✅ Added ${ok} students`);
+      setCurrentPage(1);
+      await fetchStudents();
+    }
     if (fail > 0) toast.error(`❌ ${fail} students failed`);
     setBulkLoading(false);
     setShowBulkUpload(false);
@@ -391,6 +493,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     toast.success('📥 Template downloaded');
   };
 
+  // ============= PROMOTE ALL =============
   const handlePromoteAll = async () => {
     if (!isSuperAdmin) { toast.error('Only Super Admin can promote students'); return; }
     const nextYear = (() => {
@@ -412,7 +515,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     if (!window.confirm(confirmMessage)) return;
     setPromoting(true);
     try {
-      const response = await api.post('/users/promote-all', { fromYear: selectedAcademicYear, toYear: nextYear });
+      const response = await api.post('/users/promote-all', {
+        fromYear: selectedAcademicYear,
+        toYear: nextYear,
+      });
       if (response.data.success) {
         toast.success(`🎉 ${response.data.message}`);
         await fetchStudents();
@@ -427,6 +533,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
+  // ============= EXPORT =============
   const exportData = filteredStudents.map(s => {
     const computedGrade = getDisplayGrade(s, selectedAcademicYear);
     return {
@@ -479,7 +586,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   });
 
   const totalGraduatedPages = Math.ceil(filteredGraduated.length / graduatedPerPage);
-  const paginatedGraduated = filteredGraduated.slice((graduatedCurrentPage - 1) * graduatedPerPage, graduatedCurrentPage * graduatedPerPage);
+  const paginatedGraduated = filteredGraduated.slice(
+    (graduatedCurrentPage - 1) * graduatedPerPage,
+    graduatedCurrentPage * graduatedPerPage
+  );
 
   return (
     <>
@@ -544,7 +654,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
         {!showGraduatedList ? (
           <>
-            {/* Stats — responsive 1 / 2 / 4 cols */}
+            {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
               {[
                 { label: 'Active Students', value: stats.total, color: '#2563eb', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' },
@@ -586,7 +696,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               onClose={() => setShowBulkUpload(false)}
             />
 
-            {/* Search & Filter bar — responsive grid */}
+            {/* Search & Filter */}
             <div style={{
               background: '#fff',
               marginBottom: 12,
@@ -665,18 +775,22 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               )}
             </div>
 
-            {/* View + Export toolbar — responsive wrap */}
+            {/* View + Export toolbar */}
             <div style={{
               display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center',
               background: '#fff', padding: 10, borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 12,
             }}>
               <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                <button onClick={() => setViewMode('table')}
-                  style={{ padding: '6px 12px', border: 'none', cursor: 'pointer', background: viewMode === 'table' ? '#2563eb' : '#fff', color: viewMode === 'table' ? '#fff' : '#475569', fontWeight: 600, fontSize: 12 }}>
+                <button
+                  onClick={() => setViewMode('table')}
+                  style={{ padding: '6px 12px', border: 'none', cursor: 'pointer', background: viewMode === 'table' ? '#2563eb' : '#fff', color: viewMode === 'table' ? '#fff' : '#475569', fontWeight: 600, fontSize: 12 }}
+                >
                   Table
                 </button>
-                <button onClick={() => setViewMode('grid')}
-                  style={{ padding: '6px 12px', border: 'none', cursor: 'pointer', background: viewMode === 'grid' ? '#2563eb' : '#fff', color: viewMode === 'grid' ? '#fff' : '#475569', fontWeight: 600, fontSize: 12 }}>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  style={{ padding: '6px 12px', border: 'none', cursor: 'pointer', background: viewMode === 'grid' ? '#2563eb' : '#fff', color: viewMode === 'grid' ? '#fff' : '#475569', fontWeight: 600, fontSize: 12 }}
+                >
                   Grid
                 </button>
               </div>
@@ -703,12 +817,22 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
             {/* Students per page */}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, padding: '0 4px', fontSize: 12, color: '#64748b', gap: 8 }}>
-              <div>Showing <strong style={{ color: '#1e3a5f' }}>{paginatedStudents.length}</strong> of <strong style={{ color: '#1e3a5f' }}>{filteredStudents.length}</strong> active students</div>
+              <div>
+                Showing <strong style={{ color: '#1e3a5f' }}>{paginatedStudents.length}</strong> of{' '}
+                <strong style={{ color: '#1e3a5f' }}>{filteredStudents.length}</strong> active students
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>Rows:</span>
-                <select value={studentsPerPage} onChange={e => { setStudentsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                  style={{ padding: '4px 8px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12, fontWeight: 600, color: '#1e3a5f', cursor: 'pointer' }}>
-                  <option value={100}>100</option><option value={200}>200</option><option value={500}>500</option><option value={1000}>1000</option><option value={2000}>2000</option>
+                <select
+                  value={studentsPerPage}
+                  onChange={e => { setStudentsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                  style={{ padding: '4px 8px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12, fontWeight: 600, color: '#1e3a5f', cursor: 'pointer' }}
+                >
+                  <option value={100}>100</option>
+                  <option value={200}>200</option>
+                  <option value={500}>500</option>
+                  <option value={1000}>1000</option>
+                  <option value={2000}>2000</option>
                 </select>
               </div>
             </div>
@@ -773,7 +897,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           onCancel={() => setShowPromotionConfirm(false)}
         />
 
-        {/* View Student Modal — responsive stack */}
+        {/* View Student Modal */}
         {selectedStudent && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 12 }}>
             <div style={{ background: '#fff', width: '100%', maxWidth: 760, borderRadius: 12, overflow: 'hidden', maxHeight: '92vh', overflowY: 'auto' }}>
@@ -782,7 +906,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Student Profile</div>
                   <div style={{ fontSize: 11, color: '#bfdbfe' }}>Quick overview of the selected student</div>
                 </div>
-                <button onClick={() => setSelectedStudent(null)} style={{ border: 'none', background: '#f1f5f9', color: '#1e3a5f', width: 34, height: 34, borderRadius: 8, cursor: 'pointer', fontSize: 18, fontWeight: 700, flexShrink: 0 }}>×</button>
+                <button
+                  onClick={() => setSelectedStudent(null)}
+                  style={{ border: 'none', background: '#f1f5f9', color: '#1e3a5f', width: 34, height: 34, borderRadius: 8, cursor: 'pointer', fontSize: 18, fontWeight: 700, flexShrink: 0 }}
+                >
+                  ×
+                </button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14, padding: 16 }}>
                 <div style={{ background: '#2563eb', borderRadius: 12, padding: 16, textAlign: 'center' }}>
@@ -810,8 +939,16 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                     </div>
                   ))}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
-                    <button className="btn-primary" onClick={() => { setSelectedStudent(null); handleEditClick(selectedStudent); }} style={{ background: '#10b981' }}>Edit Student</button>
-                    <button className="btn-primary" onClick={() => setSelectedStudent(null)} style={{ background: '#2563eb' }}>Close</button>
+                    <button
+                      className="btn-primary"
+                      onClick={() => { setSelectedStudent(null); handleEditClick(selectedStudent); }}
+                      style={{ background: '#10b981' }}
+                    >
+                      Edit Student
+                    </button>
+                    <button className="btn-primary" onClick={() => setSelectedStudent(null)} style={{ background: '#2563eb' }}>
+                      Close
+                    </button>
                   </div>
                 </div>
               </div>
