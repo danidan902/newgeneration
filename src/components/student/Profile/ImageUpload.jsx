@@ -1,9 +1,22 @@
-// frontend/components/Profile/ImageUpload.jsx
+// components/Profile/ImageUpload.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { ICONS } from './constants';
 import { Icon } from '../ManageStudent';
 
+const sanitize = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim().replace(/^["']|["']$/g, '');
+  u = u.replace(/^http:\/\//i, 'https://');
+  if (u.includes('res.cloudinary.com') && u.includes('/upload/')) {
+    if (!/\/upload\/[^/]*(f_auto|q_auto)/.test(u)) {
+      u = u.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+  }
+  return u;
+};
+
+// Compress large photos before upload
 const compressImage = (file, maxDim = 1200, quality = 0.85) =>
   new Promise((resolve) => {
     const mime = (file.type || '').toLowerCase();
@@ -15,7 +28,7 @@ const compressImage = (file, maxDim = 1200, quality = 0.85) =>
     const url = URL.createObjectURL(file);
     img.onload = () => {
       URL.revokeObjectURL(url);
-      let { width, height } = img;
+      const { width, height } = img;
       if (width <= maxDim && height <= maxDim && file.size < 500 * 1024) {
         return resolve(file);
       }
@@ -23,12 +36,11 @@ const compressImage = (file, maxDim = 1200, quality = 0.85) =>
       const canvas = document.createElement('canvas');
       canvas.width = Math.round(width * scale);
       canvas.height = Math.round(height * scale);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(
         (blob) => {
           if (!blob) return resolve(file);
-          const out = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+          const out = new File([blob], (file.name || 'photo').replace(/\.[^.]+$/, '.jpg'), {
             type: 'image/jpeg',
           });
           resolve(out.size < file.size ? out : file);
@@ -53,24 +65,23 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
       reader.onload = (e) => setPreview(e.target.result);
       reader.readAsDataURL(value);
     } else {
-      setPreview(value || '');
+      setPreview(sanitize(value));
     }
   }, [value]);
 
   const handleFile = async (file) => {
     if (!file) return;
-
-    const mime = (file.mimetype || file.type || '').toLowerCase();
+    const mime = (file.type || '').toLowerCase();
     const name = (file.name || '').toLowerCase();
     const isImageMime = mime.startsWith('image/');
     const isImageExt = /\.(jpe?g|png|webp|gif|heic|heif)$/.test(name);
 
     if (!isImageMime && !isImageExt) {
-      toast.error('Please upload an image file (JPG, PNG, WEBP, HEIC)');
+      toast.error('Please upload an image');
       return;
     }
     if (file.size > 15 * 1024 * 1024) {
-      toast.error('Image too large (max 15 MB)');
+      toast.error('Image too large (max 15MB)');
       return;
     }
 
@@ -88,30 +99,16 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
   return (
     <div style={{ textAlign: 'center' }}>
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsDragging(false);
-          handleFile(e.dataTransfer.files[0]);
-        }}
+        onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFile(e.dataTransfer.files[0]); }}
         onClick={() => !disabled && !busy && inputRef.current?.click()}
         style={{
-          width: 130,
-          height: 130,
-          borderRadius: '20px',
+          width: 130, height: 130, borderRadius: 20,
           border: `3px dashed ${isDragging ? '#2563eb' : '#cbd5e1'}`,
-          background: isDragging
-            ? 'linear-gradient(135deg, #eff6ff, #dbeafe)'
-            : 'linear-gradient(135deg, #fafbfc, #f0f4ff)',
+          background: isDragging ? 'linear-gradient(135deg,#eff6ff,#dbeafe)' : '#fafbfc',
           cursor: disabled || busy ? 'not-allowed' : 'pointer',
-          margin: '0 auto 12px',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          margin: '0 auto 12px', position: 'relative', overflow: 'hidden',
           opacity: disabled ? 0.5 : 1,
         }}
       >
@@ -125,26 +122,13 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
             onError={() => setPreview('')}
           />
         ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: '#64748b',
-            }}
-          >
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', height: '100%', color: '#64748b',
+          }}>
             <Icon d={ICONS.camera} size={36} color="#94a3b8" />
-            <span
-              style={{
-                fontSize: 10.5,
-                marginTop: 6,
-                fontWeight: 600,
-                color: '#64748b',
-              }}
-            >
-              {busy ? 'Processing…' : isDragging ? '✨ Drop it!' : 'Upload Photo'}
+            <span style={{ fontSize: 10.5, marginTop: 6, fontWeight: 600 }}>
+              {busy ? 'Processing…' : isDragging ? 'Drop it!' : 'Upload'}
             </span>
           </div>
         )}
@@ -167,32 +151,19 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
           className="btn-primary"
           style={{ padding: '6px 14px', fontSize: 11.5 }}
         >
-          <Icon d={ICONS.upload} size={12} color="#fff" />
           {preview ? 'Change' : 'Choose'}
         </button>
         {preview && (
           <button
             type="button"
-            onClick={() => {
-              onChange(null);
-              setPreview('');
-            }}
+            onClick={() => { onChange(null); setPreview(''); }}
             disabled={disabled || busy}
             style={{
-              padding: '6px 14px',
-              borderRadius: 12,
-              border: '2px solid #dc2626',
-              background: '#fff',
-              color: '#dc2626',
-              fontSize: 11.5,
-              fontWeight: 600,
+              padding: '6px 14px', borderRadius: 12, border: '2px solid #dc2626',
+              background: '#fff', color: '#dc2626', fontSize: 11.5, fontWeight: 600,
               cursor: disabled || busy ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
             }}
           >
-            <Icon d={ICONS.trash} size={12} color="#dc2626" />
             Remove
           </button>
         )}
