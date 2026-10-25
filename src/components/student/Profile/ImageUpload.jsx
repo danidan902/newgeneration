@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { ICONS } from './constants';
-import { Icon } from '../ManageStudent';
+import { Icon } from '../index';
 
 const sanitize = (url) => {
   if (!url || typeof url !== 'string') return '';
@@ -16,7 +16,7 @@ const sanitize = (url) => {
   return u;
 };
 
-// Compress large photos before upload
+// Compress images client-side (up to 15MB → ~200KB)
 const compressImage = (file, maxDim = 1200, quality = 0.85) =>
   new Promise((resolve) => {
     const mime = (file.type || '').toLowerCase();
@@ -40,9 +40,11 @@ const compressImage = (file, maxDim = 1200, quality = 0.85) =>
       canvas.toBlob(
         (blob) => {
           if (!blob) return resolve(file);
-          const out = new File([blob], (file.name || 'photo').replace(/\.[^.]+$/, '.jpg'), {
-            type: 'image/jpeg',
-          });
+          const out = new File(
+            [blob],
+            (file.name || 'photo').replace(/\.[^.]+$/, '.jpg'),
+            { type: 'image/jpeg' }
+          );
           resolve(out.size < file.size ? out : file);
         },
         'image/jpeg',
@@ -71,13 +73,14 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
 
   const handleFile = async (file) => {
     if (!file) return;
+
     const mime = (file.type || '').toLowerCase();
     const name = (file.name || '').toLowerCase();
     const isImageMime = mime.startsWith('image/');
     const isImageExt = /\.(jpe?g|png|webp|gif|heic|heif)$/.test(name);
 
     if (!isImageMime && !isImageExt) {
-      toast.error('Please upload an image');
+      toast.error('Please upload an image file');
       return;
     }
     if (file.size > 15 * 1024 * 1024) {
@@ -88,8 +91,10 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
     try {
       setBusy(true);
       const processed = await compressImage(file);
-      onChange(processed);
-    } catch {
+      console.log('[ImageUpload] Sending to parent:', processed.name, processed.size, 'bytes');
+      onChange(processed);   // ← sends File to parent's setProfileImage
+    } catch (err) {
+      console.error('Compress error:', err);
       onChange(file);
     } finally {
       setBusy(false);
@@ -109,7 +114,7 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
           background: isDragging ? 'linear-gradient(135deg,#eff6ff,#dbeafe)' : '#fafbfc',
           cursor: disabled || busy ? 'not-allowed' : 'pointer',
           margin: '0 auto 12px', position: 'relative', overflow: 'hidden',
-          opacity: disabled ? 0.5 : 1,
+          opacity: disabled ? 0.5 : 1
         }}
       >
         {preview ? (
@@ -124,11 +129,11 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
         ) : (
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', height: '100%', color: '#64748b',
+            justifyContent: 'center', height: '100%', color: '#64748b'
           }}>
             <Icon d={ICONS.camera} size={36} color="#94a3b8" />
             <span style={{ fontSize: 10.5, marginTop: 6, fontWeight: 600 }}>
-              {busy ? 'Processing…' : isDragging ? 'Drop it!' : 'Upload'}
+              {busy ? 'Processing…' : isDragging ? 'Drop it!' : 'Upload Photo'}
             </span>
           </div>
         )}
@@ -159,9 +164,10 @@ export const ImageUpload = ({ value, onChange, disabled }) => {
             onClick={() => { onChange(null); setPreview(''); }}
             disabled={disabled || busy}
             style={{
-              padding: '6px 14px', borderRadius: 12, border: '2px solid #dc2626',
-              background: '#fff', color: '#dc2626', fontSize: 11.5, fontWeight: 600,
-              cursor: disabled || busy ? 'not-allowed' : 'pointer',
+              padding: '6px 14px', borderRadius: 12,
+              border: '2px solid #dc2626', background: '#fff',
+              color: '#dc2626', fontSize: 11.5, fontWeight: 600,
+              cursor: disabled || busy ? 'not-allowed' : 'pointer'
             }}
           >
             Remove
