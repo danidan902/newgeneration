@@ -1,4 +1,4 @@
-// ManageStudents/index.jsx — FINAL FIXED + FULLY RESPONSIVE
+// ManageStudents/index.jsx — Fixed upload, responsive, image display working
 import React, { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import Papa from 'papaparse';
@@ -23,7 +23,6 @@ import { exportExcel } from '../../utils/exportExcel';
 import { exportCSV } from '../../utils/exportCSV';
 import './styles.css';
 
-// ─── Helpers ─────────────────────────────────────────────────────────
 const sanitizeImage = (url) => {
   if (!url || typeof url !== 'string') return '';
   let u = url.trim().replace(/^["']|["']$/g, '');
@@ -59,7 +58,6 @@ export const Icon = ({ d, size = 18, strokeWidth = 1.5, color = 'currentColor', 
 
 const globalStyles = `
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
   @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
   .btn-primary {
@@ -69,57 +67,29 @@ const globalStyles = `
     justify-content: center; gap: 6px; min-height: 40px;
   }
   .btn-primary:hover { background: #1d4ed8; }
-  .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
   .btn-success { background: #10b981; }
   .btn-success:hover { background: #059669; }
   .btn-danger { background: #dc2626; }
-  .btn-danger:hover { background: #b91c1c; }
-  .btn-warning { background: #d97706; }
-  .btn-warning:hover { background: #b45309; }
-
-  .pagination-btn {
-    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0;
-    background: white; color: #475569; font-weight: 600; font-size: 13px;
-    cursor: pointer; transition: all 0.2s; display: flex;
-    align-items: center; justify-content: center;
-  }
-  .pagination-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
-  .pagination-btn.active { background: #2563eb; color: white; border-color: transparent; }
-
-  .compact-table td, .compact-table th { padding: 8px 10px; }
-  .compact-table th {
-    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: #475569; padding: 8px 10px;
-    border-bottom: 2px solid #cbd5e1; background: #f8fafc;
-    white-space: nowrap; position: sticky; top: 0; z-index: 10;
-  }
-  .compact-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12.5px; }
-  .compact-table tbody tr:hover { background: #f8fafc; }
-
-  .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
 
   .pi { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0;
     border-radius: 8px; background: #fff; font-size: 13px; color: #1e293b;
-    outline: none; transition: all 0.3s; min-height: 42px; }
+    outline: none; min-height: 42px; }
   .pi:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
   .ps { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0;
     border-radius: 8px; background: #fff; font-size: 13px; color: #1e293b;
-    outline: none; cursor: pointer; appearance: none; transition: all 0.3s; min-height: 42px; }
+    outline: none; cursor: pointer; min-height: 42px; }
   .ps:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
-  /* Prevent iOS zoom */
+  .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
   @media (max-width: 768px) {
     input, select, textarea { font-size: 16px !important; }
   }
-
-  /* Mobile stats grid — 2 columns */
   @media (max-width: 640px) {
     .ms-stats { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
     .ms-page { padding: 12px !important; }
-    .ms-toolbar { gap: 6px !important; }
-    .ms-toolbar > button, .ms-toolbar > div { flex: 1 1 auto; }
   }
 `;
 
@@ -135,24 +105,18 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     totalPages, programs
   } = useStudents(isSuperAdmin);
 
-  // ✅ Image cache — keeps image visible after refetch
   const [imageCache, setImageCache] = useState({});
-
   const [showForm, setShowForm] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
-  const [graduatedSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [editProfileImage, setEditProfileImage] = useState(null);
-  const [graduatedCurrentPage] = useState(1);
-  const [graduatedPerPage] = useState(50);
   const [viewMode, setViewMode] = useState('table');
   const [showPromotionConfirm, setShowPromotionConfirm] = useState(false);
   const [showGraduatedList, setShowGraduatedList] = useState(false);
 
-  const fileInputRef = useRef(null);
   const searchInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -183,7 +147,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         if (window.confirm('Cancel? All entered data will be lost.')) {
           resetForm();
           setShowForm(false);
-          toast.info('Form cancelled');
         }
       } else {
         resetForm();
@@ -192,7 +155,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
-  // ✅ FIXED: removed Content-Type header, cached image, debug log
+  // ═══════════════════════════════════════════════════════
+  // ✅ FIXED handleSubmit — parentPhone appended ONCE, file appended ONCE
+  // ═══════════════════════════════════════════════════════
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -206,14 +171,13 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     setLoading(true);
     try {
       const fd = new FormData();
+
+      // Append all text fields ONCE. parentPhone is included here.
       Object.keys(formData).forEach(key => {
-        if (
-          key !== 'grade' && key !== 'programs' && key !== 'section' &&
-          key !== 'academicYear' && formData[key] && key !== 'age'
-        ) {
-          fd.append(key, formData[key]);
-        }
+        if (['grade', 'programs', 'section', 'academicYear', 'age'].includes(key)) return;
+        if (formData[key]) fd.append(key, formData[key]);
       });
+
       fd.append('role', 'student');
       fd.append('baseGrade', formData.grade);
       fd.append('baseAcademicYear', formData.academicYear);
@@ -222,11 +186,18 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       if (formData.programs) fd.append('programs', formData.programs);
       if (formData.section) fd.append('section', formData.section);
       if (formData.academicYear) fd.append('academicYear', formData.academicYear);
-      if (formData.parentPhone) fd.append('parentPhone', formData.parentPhone);
-      if (profileImage) fd.append('profileImage', profileImage);
       if (formData.age) fd.append('age', formData.age);
 
-      // ✅ THE FIX: no Content-Type — axios sets multipart boundary automatically
+      // ⚠️ parentPhone is already appended by the loop above — do NOT append again
+      // ⚠️ profileImage appended ONLY once, right here:
+      if (profileImage) {
+        fd.append('profileImage', profileImage);
+        console.log('[UPLOAD] File:', profileImage.name, profileImage.size);
+      } else {
+        console.warn('[UPLOAD] profileImage is null');
+      }
+
+      // ✅ NO Content-Type header
       const res = await api.post('/users', fd);
       const createdUser = res.data?.user;
 
@@ -234,7 +205,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         setImageCache(prev => ({ ...prev, [createdUser._id]: createdUser.profileImage }));
       }
 
-      console.log('[DEBUG] Created user profileImage:', createdUser?.profileImage);
+      console.log('[UPLOAD] Server saved:', createdUser?.profileImage);
 
       toast.success(`🚀 Student added! Student ID: ${formData.studentId}`);
       resetForm();
@@ -536,46 +507,32 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     <style>body{font-family:system-ui;margin:24px;color:#1e293b}
     h1{font-size:22px}table{width:100%;border-collapse:collapse;font-size:12px}
     th{background:#2563eb;color:#fff;padding:10px;text-align:left}
-    td{padding:8px 10px;border-bottom:1px solid #cbd5e1}
-    tr:nth-child(even) td{background:#f8fafc}</style></head><body>
+    td{padding:8px 10px;border-bottom:1px solid #cbd5e1}</style></head><body>
     <h1>Students List</h1><p>${filteredStudents.length} records · ${new Date().toLocaleString()}</p>
-    <table><thead><tr><th>ID</th><th>Roll</th><th>Name</th><th>Age</th><th>Sex</th><th>Grade</th><th>Program</th></tr></thead>
+    <table><thead><tr><th>ID</th><th>Name</th><th>Grade</th></tr></thead>
     <tbody>${filteredStudents.map(s => `<tr>
-      <td>${s.studentId || '-'}</td><td>${s.rollNumber || '-'}</td>
-      <td>${s.name}</td><td>${s.age || '-'}</td><td>${s.sex || '-'}</td>
-      <td>${getDisplayGrade(s, selectedAcademicYear)}</td>
-      <td>${s.program || s.programs || '-'}</td></tr>`).join('')}
+      <td>${s.studentId || '-'}</td><td>${s.name}</td>
+      <td>${getDisplayGrade(s, selectedAcademicYear)}</td></tr>`).join('')}
     </tbody></table><script>window.onload=()=>{window.print();setTimeout(()=>window.close(),800)}<\/script>
     </body></html>`);
   };
 
-  const filteredGraduated = graduatedStudents.filter(s => {
-    const q = graduatedSearchTerm.toLowerCase();
-    return !q || (s.name?.toLowerCase().includes(q) || s.studentId?.toLowerCase().includes(q));
-  });
-  const paginatedGraduated = filteredGraduated.slice(0, graduatedPerPage);
-
-  // ✅ Helper: attach cached image
   const withCachedImage = (s) => ({
     ...s,
     profileImage: s.profileImage || imageCache[s._id] || null
   });
 
-  // ─── RENDER ────────────────────────────────────────────────────────
+  const paginatedGraduated = graduatedStudents.slice(0, 50);
+
   return (
     <>
       <style>{globalStyles}</style>
 
-      <div
-        className="ms-page"
-        style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          padding: isMobile ? 12 : '24px 32px',
-          background: '#f0f4ff',
-          minHeight: '100vh'
-        }}
-      >
+      <div className="ms-page" style={{
+        maxWidth: 1400, margin: '0 auto',
+        padding: isMobile ? 12 : '24px 32px',
+        background: '#f0f4ff', minHeight: '100vh'
+      }}>
         {(loading || promoting) && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, height: 3,
@@ -583,7 +540,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           }} />
         )}
 
-        {/* Header */}
         <div style={{ marginBottom: isMobile ? 12 : 24 }}>
           <div style={{
             display: 'flex',
@@ -593,14 +549,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
             gap: 12
           }}>
             <div>
-              <h1 style={{
-                fontSize: isMobile ? 20 : 28,
-                fontWeight: 700, color: '#1e3a5f', margin: 0
-              }}>Student Management</h1>
-              <p style={{
-                fontSize: isMobile ? 12 : 14,
-                color: '#64748b', margin: '4px 0 0 0'
-              }}>Manage all students</p>
+              <h1 style={{ fontSize: isMobile ? 20 : 28, fontWeight: 700, color: '#1e3a5f', margin: 0 }}>
+                Student Management
+              </h1>
+              <p style={{ fontSize: isMobile ? 12 : 14, color: '#64748b', margin: '4px 0 0 0' }}>
+                Manage all students
+              </p>
             </div>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -609,7 +563,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 onClick={() => setShowGraduatedList(!showGraduatedList)}
                 style={{ background: showGraduatedList ? '#2563eb' : '#64748b', flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto' }}
               >
-                <Icon d="M12 14l9-5-9-5-9 5 9 5z" size={15} color="#fff" />
                 {showGraduatedList ? 'Active' : `Graduated (${stats.graduated})`}
               </button>
 
@@ -632,7 +585,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   }}
                   style={{ background: showForm ? '#dc2626' : '#2563eb', flex: isMobile ? '1 1 100%' : '0 0 auto' }}
                 >
-                  <Icon d={showForm ? 'M18 6L6 18M6 6l12 12' : 'M12 5v14M5 12h14'} size={15} color="#fff" strokeWidth={2} />
                   {showForm ? 'Cancel' : 'Add Student'}
                 </button>
               )}
@@ -642,16 +594,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
         {!showGraduatedList ? (
           <>
-            {/* Stats */}
-            <div
-              className="ms-stats"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                gap: isMobile ? 10 : 16,
-                marginBottom: isMobile ? 12 : 24
-              }}
-            >
+            <div className="ms-stats" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: isMobile ? 10 : 16,
+              marginBottom: isMobile ? 12 : 24
+            }}>
               {[
                 { label: 'Active', value: stats.total, color: '#2563eb' },
                 { label: 'Male', value: stats.male, color: '#10b981' },
@@ -661,8 +609,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 <div key={label} style={{
                   background: 'white',
                   padding: isMobile ? '10px 12px' : '16px 20px',
-                  borderRadius: 12,
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 12, border: '1px solid #e2e8f0'
                 }}>
                   <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{label}</p>
                   <p style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color, margin: '2px 0 0 0' }}>
@@ -692,25 +639,15 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               onClose={() => setShowBulkUpload(false)}
             />
 
-            {/* Filters */}
             <div style={{
-              background: 'white',
-              marginBottom: 12,
-              padding: isMobile ? 10 : 16,
-              borderRadius: 12,
+              background: 'white', marginBottom: 12,
+              padding: isMobile ? 10 : 16, borderRadius: 12,
               border: '1px solid #e2e8f0',
               display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
-              gap: 10,
-              flexWrap: 'wrap'
+              gap: 10, flexWrap: 'wrap'
             }}>
               <div style={{ position: 'relative', flex: '1 1 200px' }}>
-                <div style={{
-                  position: 'absolute', left: 12, top: '50%',
-                  transform: 'translateY(-50%)', zIndex: 1
-                }}>
-                  <Icon d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" size={16} color="#64748b" strokeWidth={2} />
-                </div>
                 <input
                   ref={searchInputRef}
                   className="pi"
@@ -718,7 +655,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  style={{ paddingLeft: 38 }}
                 />
               </div>
 
@@ -750,11 +686,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               )}
             </div>
 
-            {/* Toolbar */}
-            <div className="ms-toolbar" style={{
+            <div style={{
               background: 'white', marginBottom: 12,
-              padding: isMobile ? 10 : 14,
-              borderRadius: 12, border: '1px solid #e2e8f0',
+              padding: isMobile ? 10 : 14, borderRadius: 12,
+              border: '1px solid #e2e8f0',
               display: 'flex', flexWrap: 'wrap',
               alignItems: 'center', gap: 8
             }}>
@@ -762,24 +697,18 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 display: 'flex', borderRadius: 8, overflow: 'hidden',
                 border: '1px solid #e2e8f0', flex: isMobile ? '1 1 100%' : '0 0 auto'
               }}>
-                <button
-                  onClick={() => setViewMode('table')}
-                  style={{
-                    flex: 1, padding: '8px 12px', border: 'none', cursor: 'pointer',
-                    background: viewMode === 'table' ? '#2563eb' : '#fff',
-                    color: viewMode === 'table' ? '#fff' : '#475569',
-                    fontWeight: 600, fontSize: 12
-                  }}
-                >Table</button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  style={{
-                    flex: 1, padding: '8px 12px', border: 'none', cursor: 'pointer',
-                    background: viewMode === 'grid' ? '#2563eb' : '#fff',
-                    color: viewMode === 'grid' ? '#fff' : '#475569',
-                    fontWeight: 600, fontSize: 12
-                  }}
-                >Grid</button>
+                <button onClick={() => setViewMode('table')} style={{
+                  flex: 1, padding: '8px 12px', border: 'none', cursor: 'pointer',
+                  background: viewMode === 'table' ? '#2563eb' : '#fff',
+                  color: viewMode === 'table' ? '#fff' : '#475569',
+                  fontWeight: 600, fontSize: 12
+                }}>Table</button>
+                <button onClick={() => setViewMode('grid')} style={{
+                  flex: 1, padding: '8px 12px', border: 'none', cursor: 'pointer',
+                  background: viewMode === 'grid' ? '#2563eb' : '#fff',
+                  color: viewMode === 'grid' ? '#fff' : '#475569',
+                  fontWeight: 600, fontSize: 12
+                }}>Grid</button>
               </div>
 
               <button className="btn-primary" onClick={copyAll} style={{ background: '#64748b', flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto', fontSize: 12, padding: '8px 12px' }}>Copy</button>
@@ -788,7 +717,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               <button className="btn-primary" onClick={printTable} style={{ background: '#2563eb', flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto', fontSize: 12, padding: '8px 12px' }}>Print</button>
             </div>
 
-            {/* Showing count */}
             <div style={{
               display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
@@ -819,7 +747,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
             </div>
 
-            {/* Table / Grid */}
             {viewMode === 'table' ? (
               <StudentTable
                 students={paginatedStudents.map(withCachedImage)}
@@ -873,18 +800,15 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           onCancel={() => setShowPromotionConfirm(false)}
         />
 
-        {/* View Student Modal — responsive + image from cache */}
         {selectedStudent && (
           <div style={{
             position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)',
             display: 'flex', alignItems: isMobile ? 'flex-start' : 'center',
             justifyContent: 'center', zIndex: 1200,
-            padding: isMobile ? 0 : 16, overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            padding: isMobile ? 0 : 16, overflowY: 'auto'
           }}>
             <div style={{
-              background: 'white',
-              width: '100%',
+              background: 'white', width: '100%',
               maxWidth: isMobile ? '100%' : 760,
               borderRadius: isMobile ? 0 : 12,
               maxHeight: isMobile ? '100vh' : '92vh',
@@ -914,9 +838,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 gridTemplateColumns: isMobile ? '1fr' : '1fr 1.1fr',
                 gap: 14, padding: 16
               }}>
-                <div style={{
-                  background: '#2563eb', borderRadius: 12, padding: 16, textAlign: 'center'
-                }}>
+                <div style={{ background: '#2563eb', borderRadius: 12, padding: 16, textAlign: 'center' }}>
                   <Avatar
                     name={selectedStudent.name}
                     image={sanitizeImage(selectedStudent.profileImage || imageCache[selectedStudent._id])}
@@ -927,10 +849,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   </div>
                   <div style={{ fontSize: 11, color: '#bfdbfe', marginTop: 4 }}>
                     Student ID: {selectedStudent.studentId || 'N/A'}
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', marginTop: 10 }}>
-                    <Badge variant="primary">Roll {selectedStudent.rollNumber || '—'}</Badge>
-                    <Badge variant="gradient">{getDisplayGrade(selectedStudent, selectedAcademicYear)}</Badge>
                   </div>
                 </div>
 
