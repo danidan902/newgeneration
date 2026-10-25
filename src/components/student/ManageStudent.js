@@ -1,4 +1,4 @@
-// ManageStudents/index.jsx - Fixed: remove manual multipart header, mobile-safe
+// ManageStudents/index.jsx - Fixed: remove manual multipart header, mobile-safe, sanitized image
 
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
@@ -99,7 +99,6 @@ const globalStyles = `
   
   .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 
-  /* Prevent iOS auto-zoom when focusing inputs */
   @media (max-width: 768px) {
     input, select, textarea { font-size: 16px !important; }
   }
@@ -109,6 +108,20 @@ const globalStyles = `
 const cleanValue = (v) => {
   if (typeof v !== 'string') return v;
   return v.replace(/\u00A0/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+};
+
+// ✅ NEW — sanitize Cloudinary URLs so they load on PC and phone
+const sanitizeImage = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim().replace(/^["']|["']$/g, '');
+  if (!u) return '';
+  u = u.replace(/^http:\/\//i, 'https://');
+  if (u.includes('res.cloudinary.com') && u.includes('/upload/')) {
+    if (!/\/upload\/[^/]*(f_auto|q_auto)/.test(u)) {
+      u = u.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+  }
+  return u;
 };
 
 const ManageStudents = ({ isSuperAdmin = false }) => {
@@ -228,9 +241,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       if (cleaned.age) formDataToSend.append('age', cleaned.age);
       if (profileImage) formDataToSend.append('profileImage', profileImage);
 
-      // ✅ FIX: Do NOT set Content-Type manually.
-      // Axios detects FormData and sets the correct multipart boundary automatically.
       const res = await api.post('/users', formDataToSend);
+
+      // ✅ Debug — open browser console to inspect the URL from server
+      console.log('[DEBUG] Created user profileImage:', res.data?.user?.profileImage);
 
       const tempPass = res.data?.temporary_password;
       toast.success(
@@ -341,8 +355,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           if (v !== undefined && v !== null && v !== '') formDataToSend.append(k, v);
         });
         formDataToSend.append('profileImage', editProfileImage);
-
-        // ✅ FIX: Do NOT set Content-Type manually
         await api.put(`/users/${editingStudent._id}`, formDataToSend);
       } else {
         await api.put(`/users/${editingStudent._id}`, updateData);
@@ -599,12 +611,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         background: '#f0f4ff',
         minHeight: '100vh',
       }}>
-        {/* Loading bar */}
         {(loading || promoting) && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, height: 3, background: '#2563eb' }} />
         )}
 
-        {/* Header */}
         <div style={{ marginBottom: 16, animation: 'fadeInUp 0.6s ease' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
@@ -651,7 +661,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
         {!showGraduatedList ? (
           <>
-            {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
               {[
                 { label: 'Active Students', value: stats.total, color: '#2563eb', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' },
@@ -693,7 +702,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               onClose={() => setShowBulkUpload(false)}
             />
 
-            {/* Search & Filter */}
             <div style={{
               background: '#fff',
               marginBottom: 12,
@@ -772,7 +780,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               )}
             </div>
 
-            {/* View + Export toolbar */}
             <div style={{
               display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center',
               background: '#fff', padding: 10, borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 12,
@@ -812,7 +819,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
             </div>
 
-            {/* Students per page */}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, padding: '0 4px', fontSize: 12, color: '#64748b', gap: 8 }}>
               <div>
                 Showing <strong style={{ color: '#1e3a5f' }}>{paginatedStudents.length}</strong> of{' '}
@@ -894,7 +900,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           onCancel={() => setShowPromotionConfirm(false)}
         />
 
-        {/* View Student Modal */}
+        {/* View Student Modal — image now sanitized */}
         {selectedStudent && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 12 }}>
             <div style={{ background: '#fff', width: '100%', maxWidth: 760, borderRadius: 12, overflow: 'hidden', maxHeight: '92vh', overflowY: 'auto' }}>
@@ -912,7 +918,11 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14, padding: 16 }}>
                 <div style={{ background: '#2563eb', borderRadius: 12, padding: 16, textAlign: 'center' }}>
-                  <Avatar name={selectedStudent.name} image={selectedStudent.profileImage} size={80} />
+                  <Avatar
+                    name={selectedStudent.name}
+                    image={sanitizeImage(selectedStudent.profileImage)}
+                    size={80}
+                  />
                   <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginTop: 10, wordBreak: 'break-word' }}>{selectedStudent.name}</div>
                   <div style={{ fontSize: 11, color: '#bfdbfe', marginTop: 4 }}>Student ID: {selectedStudent.studentId || 'N/A'}</div>
                   <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', marginTop: 10 }}>
