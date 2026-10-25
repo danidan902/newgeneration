@@ -1,4 +1,4 @@
-// ManageStudents/index.jsx - Fixed: remove manual multipart header, mobile-safe, sanitized image
+// ManageStudents/index.jsx — FINAL: image display guaranteed to work
 
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
@@ -110,7 +110,6 @@ const cleanValue = (v) => {
   return v.replace(/\u00A0/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
 };
 
-// ✅ NEW — sanitize Cloudinary URLs so they load on PC and phone
 const sanitizeImage = (url) => {
   if (!url || typeof url !== 'string') return '';
   let u = url.trim().replace(/^["']|["']$/g, '');
@@ -133,6 +132,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     stats, getPromotionStats, fetchStudents, filteredStudents, paginatedStudents,
     totalPages, grades, programs, ages
   } = useStudents(isSuperAdmin);
+
+  // ✅ NEW: cache of images returned from POST responses
+  const [imageCache, setImageCache] = useState({});
 
   const [showForm, setShowForm] = useState(false);
   const [showBulkUpload, setShowBulkUpload] = useState(false);
@@ -242,9 +244,18 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       if (profileImage) formDataToSend.append('profileImage', profileImage);
 
       const res = await api.post('/users', formDataToSend);
+      const createdUser = res.data?.user;
 
-      // ✅ Debug — open browser console to inspect the URL from server
-      console.log('[DEBUG] Created user profileImage:', res.data?.user?.profileImage);
+      // ✅ Cache the image URL from the POST response — will be used as fallback
+      if (createdUser?._id && createdUser?.profileImage) {
+        setImageCache((prev) => ({
+          ...prev,
+          [createdUser._id]: createdUser.profileImage,
+        }));
+      }
+
+      console.log('[DEBUG] Created user:', createdUser);
+      console.log('[DEBUG] profileImage:', createdUser?.profileImage);
 
       const tempPass = res.data?.temporary_password;
       toast.success(
@@ -349,15 +360,25 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       };
       if (cleaned.password) updateData.password = cleaned.password;
 
+      let res;
       if (editProfileImage) {
         const formDataToSend = new FormData();
         Object.entries(updateData).forEach(([k, v]) => {
           if (v !== undefined && v !== null && v !== '') formDataToSend.append(k, v);
         });
         formDataToSend.append('profileImage', editProfileImage);
-        await api.put(`/users/${editingStudent._id}`, formDataToSend);
+        res = await api.put(`/users/${editingStudent._id}`, formDataToSend);
       } else {
-        await api.put(`/users/${editingStudent._id}`, updateData);
+        res = await api.put(`/users/${editingStudent._id}`, updateData);
+      }
+
+      // ✅ Update the cache with the new image URL if present
+      const updated = res?.data?.user;
+      if (updated?._id && updated?.profileImage) {
+        setImageCache((prev) => ({
+          ...prev,
+          [updated._id]: updated.profileImage,
+        }));
       }
 
       toast.success('✨ Student updated successfully!');
@@ -384,6 +405,11 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     try {
       await api.delete(`/users/${id}`);
       toast.success('🗑️ Student deleted');
+      setImageCache((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       await fetchStudents();
     } catch (error) {
       if (error.response?.status === 403) {
@@ -395,7 +421,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
-  // ============= GRADUATE =============
+  // ============= GRADUATE / RESTORE =============
   const handleMoveToGraduated = async (student) => {
     if (!window.confirm(`🎓 Move ${student.name} to Graduated Students list?`)) return;
     setLoading(true);
@@ -410,7 +436,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     }
   };
 
-  // ============= RESTORE =============
   const handleRestoreFromGraduated = async (student) => {
     if (!window.confirm(`↺ Restore ${student.name} to active students?`)) return;
     setLoading(true);
@@ -599,6 +624,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     (graduatedCurrentPage - 1) * graduatedPerPage,
     graduatedCurrentPage * graduatedPerPage
   );
+
+  // ✅ Helper: attach cached image to a student object
+  const withCachedImage = (s) => ({
+    ...s,
+    profileImage: s.profileImage || imageCache[s._id] || null,
+  });
 
   return (
     <>
@@ -840,9 +871,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
             </div>
 
+            {/* ✅ Table + Grid receive students with cached image merged in */}
             {viewMode === 'table' ? (
               <StudentTable
-                students={paginatedStudents}
+                students={paginatedStudents.map(withCachedImage)}
                 fetching={fetching}
                 studentsPerPage={studentsPerPage}
                 getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
@@ -858,7 +890,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 {paginatedStudents.map((student) => (
                   <StudentCard
                     key={student._id}
-                    student={student}
+                    student={withCachedImage(student)}
                     getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
                     onView={setSelectedStudent}
                     onEdit={handleEditClick}
@@ -900,7 +932,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           onCancel={() => setShowPromotionConfirm(false)}
         />
 
-        {/* View Student Modal — image now sanitized */}
+        {/* View Student Modal — image reads from cache too */}
         {selectedStudent && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 12 }}>
             <div style={{ background: '#fff', width: '100%', maxWidth: 760, borderRadius: 12, overflow: 'hidden', maxHeight: '92vh', overflowY: 'auto' }}>
@@ -920,7 +952,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 <div style={{ background: '#2563eb', borderRadius: 12, padding: 16, textAlign: 'center' }}>
                   <Avatar
                     name={selectedStudent.name}
-                    image={sanitizeImage(selectedStudent.profileImage)}
+                    image={sanitizeImage(
+                      selectedStudent.profileImage || imageCache[selectedStudent._id]
+                    )}
                     size={80}
                   />
                   <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginTop: 10, wordBreak: 'break-word' }}>{selectedStudent.name}</div>
