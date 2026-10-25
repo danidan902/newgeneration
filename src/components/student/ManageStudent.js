@@ -1,4 +1,4 @@
-// ManageStudents/index.jsx - Updated: green + blue only, responsive, mobile fixes
+// ManageStudents/index.jsx - Fixed: remove manual multipart header, mobile-safe
 
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
@@ -108,7 +108,6 @@ const globalStyles = `
 // ============= HELPERS =============
 const cleanValue = (v) => {
   if (typeof v !== 'string') return v;
-  // Strip NBSP (\u00A0) and other invisible whitespace, then trim
   return v.replace(/\u00A0/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
 };
 
@@ -181,7 +180,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     e.preventDefault();
     if (loading) return;
 
-    // ✅ Clean all string fields (mobile keyboards insert NBSP and invisible chars)
     const cleaned = Object.fromEntries(
       Object.entries(formData).map(([k, v]) => [k, cleanValue(v)])
     );
@@ -202,7 +200,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     try {
       const formDataToSend = new FormData();
 
-      // Append every cleaned field except special-cased ones
       Object.entries(cleaned).forEach(([key, value]) => {
         if (
           key === 'grade' ||
@@ -231,9 +228,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       if (cleaned.age) formDataToSend.append('age', cleaned.age);
       if (profileImage) formDataToSend.append('profileImage', profileImage);
 
-      const res = await api.post('/users', formDataToSend, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // ✅ FIX: Do NOT set Content-Type manually.
+      // Axios detects FormData and sets the correct multipart boundary automatically.
+      const res = await api.post('/users', formDataToSend);
 
       const tempPass = res.data?.temporary_password;
       toast.success(
@@ -256,6 +253,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         const msg =
           error.response?.data?.error ||
           error.response?.data?.message ||
+          error.userMessage ||
           error.message ||
           'Failed to add student';
         toast.error(msg);
@@ -337,16 +335,15 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       };
       if (cleaned.password) updateData.password = cleaned.password;
 
-      // If a new profile image was selected, send multipart
       if (editProfileImage) {
         const formDataToSend = new FormData();
         Object.entries(updateData).forEach(([k, v]) => {
           if (v !== undefined && v !== null && v !== '') formDataToSend.append(k, v);
         });
         formDataToSend.append('profileImage', editProfileImage);
-        await api.put(`/users/${editingStudent._id}`, formDataToSend, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+
+        // ✅ FIX: Do NOT set Content-Type manually
+        await api.put(`/users/${editingStudent._id}`, formDataToSend);
       } else {
         await api.put(`/users/${editingStudent._id}`, updateData);
       }
@@ -360,6 +357,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       const msg =
         error.response?.data?.error ||
         error.response?.data?.message ||
+        error.userMessage ||
         error.message ||
         'Failed to update student';
       toast.error(msg);
@@ -390,7 +388,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     if (!window.confirm(`🎓 Move ${student.name} to Graduated Students list?`)) return;
     setLoading(true);
     try {
-      // Prefer the dedicated graduate endpoint (works with current backend)
       await api.post(`/users/${student._id}/graduate`);
       toast.success(`🎓 ${student.name} has been moved to Graduated Students`);
       await fetchStudents();
