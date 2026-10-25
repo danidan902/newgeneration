@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import api from '../../services/api';
 import { ICONS } from './Profile/constants';
 import { Avatar } from './Profile/Avatar';
@@ -171,21 +172,21 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     setLoading(true);
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (key !== 'grade' && key !== 'programs' && key !== 'section' && key !== 'academicYear' && formData[key] && key !== 'age') {
-          formDataToSend.append(key, formData[key]);
-        }
+      // Send primitive string fields first
+      ['name', 'studentId', 'password', 'rollNumber', 'sex', 'parentPhone'].forEach(k => {
+        if (formData[k]) formDataToSend.append(k, formData[k]);
       });
       formDataToSend.append('role', 'student');
-      formDataToSend.append('baseGrade', formData.grade);
-      formDataToSend.append('baseAcademicYear', formData.academicYear);
+
+      // Numeric / enum fields — cast safely
+      if (formData.grade) formDataToSend.append('baseGrade', Number(formData.grade));
+      if (formData.age) formDataToSend.append('age', Number(formData.age));
+      if (formData.academicYear) formDataToSend.append('baseAcademicYear', formData.academicYear);
       if (formData.grade) formDataToSend.append('grade', `Grade ${formData.grade}`);
       if (formData.programs) formDataToSend.append('programs', formData.programs);
       if (formData.section) formDataToSend.append('section', formData.section);
       if (formData.academicYear) formDataToSend.append('academicYear', formData.academicYear);
-      if (formData.parentPhone) formDataToSend.append('parentPhone', formData.parentPhone);
       if (profileImage) formDataToSend.append('profileImage', profileImage);
-      if (formData.age) formDataToSend.append('age', formData.age);
 
       await api.post('/users', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -202,6 +203,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         localStorage.clear();
         setTimeout(() => window.location.href = '/login', 2000);
       } else {
+        console.error('Add student error:', error.response?.data || error.message);
         toast.error(error.response?.data?.error || 'Failed to add student');
       }
     } finally {
@@ -222,7 +224,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         sex: student.sex || '',
         rollNumber: student.rollNumber || '',
         grade: gradeNum,
-        programs: currentEnrollment?.program || student.program || '',
+        programs: currentEnrollment?.program || student.program || student.programs || '',
         section: currentEnrollment?.section || student.section || '',
         password: '',
         age: student.age || '',
@@ -255,27 +257,31 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     setLoading(true);
     try {
       const updateData = {
-        name: editFormData.name,
-        studentId: editFormData.studentId,
-        sex: editFormData.sex,
-        rollNumber: editFormData.rollNumber,
-        baseGrade: editingStudent.baseGrade || editFormData.grade,
+        name: editFormData.name || undefined,
+        studentId: editFormData.studentId || undefined,
+        sex: editFormData.sex || undefined,
+        rollNumber: editFormData.rollNumber || undefined,
+        baseGrade: editingStudent.baseGrade ?? (editFormData.grade ? Number(editFormData.grade) : undefined),
         baseAcademicYear: editingStudent.baseAcademicYear || editFormData.academicYear || '2019/2020',
-        grade: `Grade ${editFormData.grade}`,
-        programs: editFormData.programs,
-        section: editFormData.section,
+        grade: editFormData.grade ? `Grade ${editFormData.grade}` : undefined,
+        programs: editFormData.programs || undefined,
+        section: editFormData.section || undefined,
         academicYear: editFormData.academicYear || '2019/2020',
-        parentPhone: editFormData.parentPhone,
-        age: editFormData.age
+        parentPhone: editFormData.parentPhone || undefined,
+        age: editFormData.age ? Number(editFormData.age) : undefined,
       };
       if (editFormData.password) updateData.password = editFormData.password;
+
+      // Strip undefined to avoid backend overwriting with null
+      Object.keys(updateData).forEach(k => updateData[k] === undefined && delete updateData[k]);
+
       await api.put(`/users/${editingStudent._id}`, updateData);
       toast.success('✨ Student updated successfully!');
       setEditingStudent(null);
       setEditProfileImage(null);
       await fetchStudents();
     } catch (error) {
-      console.error('Edit error:', error);
+      console.error('Edit error:', error.response?.data || error.message);
       toast.error(error.response?.data?.error || 'Failed to update student');
     } finally {
       setLoading(false);
@@ -293,7 +299,8 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         localStorage.clear();
         window.location.href = '/login';
       } else {
-        toast.error('Failed to delete student');
+        console.error('Delete error:', error.response?.data || error.message);
+        toast.error(error.response?.data?.error || 'Failed to delete student');
       }
     }
   };
@@ -302,15 +309,31 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     if (!window.confirm(`🎓 Move ${student.name} to Graduated Students list?`)) return;
     setLoading(true);
     try {
-      await api.put(`/enrollments/student/${student._id}`, {
-        academicYear: selectedAcademicYear,
-        status: 'graduated',
-        grade: 'Graduated'
-      });
+      // First ensure an enrollment exists for the current academic year
+      try {
+        await api.put(`/enrollments/student/${student._id}`, {
+          academicYear: selectedAcademicYear,
+          status: 'graduated',
+          grade: 'Graduated'
+        });
+      } catch (innerErr) {
+        // Fallback: create enrollment then graduate
+        if (innerErr.response?.status === 404) {
+          await api.post('/enrollments', {
+            student: student._id,
+            academicYear: selectedAcademicYear,
+            grade: 'Graduated',
+            status: 'graduated'
+          });
+        } else {
+          throw innerErr;
+        }
+      }
       toast.success(`🎓 ${student.name} has been moved to Graduated Students`);
       await fetchStudents();
     } catch (error) {
-      toast.error('Failed to move student');
+      console.error('Graduate error:', error.response?.data || error.message);
+      toast.error(error.response?.data?.error || 'Failed to move student');
     } finally {
       setLoading(false);
     }
@@ -320,11 +343,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     if (!window.confirm(`↺ Restore ${student.name} to active students?`)) return;
     setLoading(true);
     try {
-      await api.post(`/users/${student._id}/restore`, { newGrade: '12' });
+      await api.post(`/users/${student._id}/restore`, { newGrade: 12 });
       toast.success(`✅ ${student.name} restored to active students`);
       await fetchStudents();
       setShowGraduatedList(false);
     } catch (error) {
+      console.error('Restore error:', error.response?.data || error.message);
       toast.error(error.response?.data?.error || 'Failed to restore student');
     } finally {
       setLoading(false);
@@ -355,16 +379,25 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     for (const s of data) {
       if (!s.name || !s.studentId || !s.password) { fail++; continue; }
       try {
-        await api.post('/users', {
-          name: s.name, studentId: s.studentId, password: s.password,
-          sex: s.sex || '', role: 'student',
+        const payload = {
+          name: s.name,
+          studentId: s.studentId,
+          password: s.password,
+          sex: s.sex || '',
+          role: 'student',
           rollNumber: s.rollNumber || s.rollnumber || s.roll_no || '',
-          baseGrade: s.grade || 9, baseAcademicYear: selectedAcademicYear,
+          baseGrade: s.grade ? Number(s.grade) : 9,
+          baseAcademicYear: selectedAcademicYear,
           grade: s.grade ? `Grade ${s.grade}` : '',
-          program: s.programs || s.program || '', section: s.section || '',
-          age: s.age || '', academicYear: selectedAcademicYear,
+          programs: s.programs || s.program || '',
+          section: s.section || '',
+          age: s.age ? Number(s.age) : undefined,
+          academicYear: selectedAcademicYear,
           parentPhone: s.parentPhone || ''
-        });
+        };
+        // strip undefined
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        await api.post('/users', payload);
         ok++;
       } catch (error) {
         console.error('Failed to add student:', error.response?.data?.error || error.message);
@@ -417,7 +450,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         setSelectedAcademicYear(nextYear);
       }
     } catch (error) {
-      console.error('Promotion error:', error);
+      console.error('Promotion error:', error.response?.data || error.message);
       toast.error(error.response?.data?.error || 'Failed to promote students');
     } finally {
       setPromoting(false);
@@ -542,7 +575,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
         {!showGraduatedList ? (
           <>
-            {/* Stats — responsive 1 / 2 / 4 cols */}
+            {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
               {[
                 { label: 'Active Students', value: stats.total, color: '#2563eb', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' },
@@ -584,7 +617,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               onClose={() => setShowBulkUpload(false)}
             />
 
-            {/* Search & Filter bar — responsive grid */}
+            {/* Search & Filter bar */}
             <div style={{
               background: '#fff',
               marginBottom: 12,
@@ -663,7 +696,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               )}
             </div>
 
-            {/* View + Export toolbar — responsive wrap */}
+            {/* View + Export toolbar */}
             <div style={{
               display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center',
               background: '#fff', padding: 10, borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 12,
@@ -771,7 +804,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           onCancel={() => setShowPromotionConfirm(false)}
         />
 
-        {/* View Student Modal — responsive stack */}
+        {/* View Student Modal */}
         {selectedStudent && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 12 }}>
             <div style={{ background: '#fff', width: '100%', maxWidth: 760, borderRadius: 12, overflow: 'hidden', maxHeight: '92vh', overflowY: 'auto' }}>
