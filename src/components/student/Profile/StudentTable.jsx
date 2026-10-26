@@ -38,7 +38,7 @@ export const StudentTable = ({
             <tbody>
               {Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i}>
-                  {Array.from({ length: 9 }).map((_, j) => (
+                  {Array.from({ length: 8 }).map((_, j) => (
                     <td key={j}><div className="skeleton" /></td>
                   ))}
                 </tr>
@@ -127,33 +127,27 @@ export const StudentTable = ({
       <style jsx>{`
         .table-container {
           background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          /* FIX: allow the inner wrapper to actually scroll horizontally */
+         
           overflow: hidden;
-          width: 100%;
+          border: 1px solid #e2e8f0;
         }
 
-        /* FIX: this block was commented out — restored so the table can scroll */
-        .table-wrapper {
-          width: 100%;
-          overflow-x: auto;
-          overflow-y: auto;
-          max-height: 75vh;
-          -webkit-overflow-scrolling: touch;
-        }
+        // .table-wrapper {
+        //   overflow-x: auto;
+        //   overflow-y: auto;
+        //   max-height: 200vh;
+        // }
 
         .student-table {
           width: 100%;
           border-collapse: collapse;
           font-size: 12px;
           font-family: system-ui, -apple-system, sans-serif;
-          /* Force a min width so on phones the table overflows and scrolls */
           min-width: 900px;
         }
 
         .student-table thead th {
-          background: #2563eb;
+          background: #4365ff;
           color: #ffffff;
           padding: 10px 14px;
           text-align: left;
@@ -171,7 +165,6 @@ export const StudentTable = ({
           color: #1e293b;
           font-size: 12px;
           vertical-align: middle;
-          white-space: nowrap;
         }
 
         .student-table tbody tr:nth-child(even) td {
@@ -195,7 +188,6 @@ export const StudentTable = ({
         .student-details {
           display: flex;
           flex-direction: column;
-          min-width: 0;
         }
 
         .student-name {
@@ -210,8 +202,8 @@ export const StudentTable = ({
         }
 
         .grade-badge {
-          color: #1e3a5f;
-          background: #dbeafe;
+        
+          color: black;
           padding: 2px 10px;
           border-radius: 12px;
           font-size: 11px;
@@ -243,25 +235,24 @@ export const StudentTable = ({
           transform: scale(1.1);
         }
 
-        /* GREEN + BLUE only */
         .view-btn:hover {
           background: #dbeafe;
           color: #2563eb;
         }
 
         .edit-btn:hover {
-          background: #d1fae5;
-          color: #10b981;
+          background: #fef3c7;
+          color: #d97706;
         }
 
         .graduate-btn:hover {
-          background: #d1fae5;
-          color: #10b981;
+          background: #faf5ff;
+          color: #7c3aed;
         }
 
         .delete-btn:hover {
-          background: #dbeafe;
-          color: #2563eb;
+          background: #fef2f2;
+          color: #dc2626;
         }
 
         /* Empty State */
