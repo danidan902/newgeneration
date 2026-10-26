@@ -62,6 +62,7 @@ const globalStyles = `
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
   }
   
   .btn-primary:hover {
@@ -74,29 +75,12 @@ const globalStyles = `
     transform: translateY(0);
   }
   
-  .btn-success {
-    background: #10b981;
-  }
-  
-  .btn-success:hover {
-    background: #059669;
-  }
-  
-  .btn-danger {
-    background: #dc2626;
-  }
-  
-  .btn-danger:hover {
-    background: #b91c1c;
-  }
-  
-  .btn-warning {
-    background: #d97706;
-  }
-  
-  .btn-warning:hover {
-    background: #b45309;
-  }
+  .btn-success { background: #10b981; }
+  .btn-success:hover { background: #059669; }
+  .btn-danger { background: #dc2626; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-warning { background: #d97706; }
+  .btn-warning:hover { background: #b45309; }
   
   .btn-outline {
     background: transparent;
@@ -213,6 +197,7 @@ const globalStyles = `
     color: #1e293b;
     outline: none;
     transition: all 0.3s;
+    box-sizing: border-box;
   }
   
   .pi:focus {
@@ -232,11 +217,326 @@ const globalStyles = `
     cursor: pointer;
     appearance: none;
     transition: all 0.3s;
+    box-sizing: border-box;
   }
   
   .ps:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  /* ===== RESPONSIVE UTILITIES ===== */
+  .ms-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    background: #f0f4ff;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .ms-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .ms-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .ms-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .ms-filter-bar {
+    background: white;
+    margin-bottom: 16px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+  }
+
+  .ms-search-wrap {
+    position: relative;
+    flex: 3;
+    min-width: 200px;
+  }
+
+  .ms-select-wrap {
+    position: relative;
+    min-width: 140px;
+  }
+
+  .ms-select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .ms-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  .ms-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f1f5f9;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .ms-actions-right {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+  .ms-view-toggle {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .ms-view-btn {
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .ms-perpage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+    font-size: 13px;
+    color: #64748b;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ms-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #64748b;
+    padding: 0 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ms-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .ms-modal-card {
+    background: white;
+    width: 100%;
+    max-width: 760px;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .ms-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 18px;
+    padding: 20px;
+  }
+
+  /* ===== TABLET ===== */
+  @media (max-width: 992px) {
+    .ms-page { padding: 20px 20px; }
+    .ms-stats-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 768px) {
+    .ms-page {
+      padding: 14px 12px;
+      min-height: 100vh;
+    }
+
+    .ms-header-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .ms-header-actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ms-header-actions .btn-primary {
+      width: 100%;
+      justify-content: center;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    .ms-stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ms-stats-grid > div {
+      padding: 12px 14px !important;
+    }
+
+    .ms-stats-grid p:first-child { font-size: 11px !important; }
+    .ms-stats-grid p:last-child { font-size: 18px !important; }
+
+    .ms-filter-bar {
+      padding: 12px;
+      gap: 10px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ms-search-wrap {
+      min-width: 0;
+      width: 100%;
+      flex: none;
+    }
+
+    .ms-select-wrap {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .ms-actions-right {
+      margin-left: 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .ms-actions-right .btn-primary {
+      width: 100%;
+      justify-content: center;
+      font-size: 11px !important;
+      padding: 8px 6px !important;
+    }
+
+    .ms-view-toggle {
+      grid-column: span 3;
+      width: 100%;
+    }
+
+    .ms-view-toggle .ms-view-btn {
+      flex: 1;
+      padding: 8px 12px;
+    }
+
+    .ms-perpage-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .ms-footer-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .grid-view {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .ms-modal-overlay { padding: 10px; }
+
+    .ms-modal-card {
+      max-width: 100%;
+      max-height: 94vh;
+    }
+
+    .ms-modal-body {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .compact-table th { font-size: 9.5px; padding: 6px 8px; }
+    .compact-table td { font-size: 11.5px; padding: 6px 8px; }
+  }
+
+  /* ===== SMALL MOBILE ===== */
+  @media (max-width: 420px) {
+    .ms-page { padding: 12px 8px; }
+
+    .ms-header-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .ms-stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ms-stats-grid > div {
+      padding: 10px 12px !important;
+    }
+
+    .ms-actions-right {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ms-view-toggle {
+      grid-column: span 2;
+    }
+
+    .btn-primary {
+      font-size: 12px;
+      padding: 9px 14px;
+    }
   }
 `;
 
@@ -290,52 +590,42 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   const searchInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    name: '', 
-    studentId: '',     // Student ID is REQUIRED for login
-    password: '', 
+    name: '',
+    studentId: '',
+    password: '',
     rollNumber: '',
-    sex: '', 
-    grade: '', 
-    programs: '', 
-    section: '', 
-    academicYear: '2019/2020', 
-    parentPhone: '', 
+    sex: '',
+    grade: '',
+    programs: '',
+    section: '',
+    academicYear: '2019/2020',
+    parentPhone: '',
     age: ''
   });
 
   const [editFormData, setEditFormData] = useState({
-    name: '', 
-    studentId: '',     // Student ID is REQUIRED for login
-    sex: '', 
+    name: '',
+    studentId: '',
+    sex: '',
     rollNumber: '',
-    grade: '', 
-    programs: '', 
-    section: '', 
-    password: '', 
-    academicYear: '2019/2020', 
-    parentPhone: '', 
+    grade: '',
+    programs: '',
+    section: '',
+    password: '',
+    academicYear: '2019/2020',
+    parentPhone: '',
     age: ''
   });
 
-  // Reset form function
   const resetForm = () => {
     setFormData({
-      name: '', 
-      studentId: '', 
-      password: '', 
-      rollNumber: '',
-      sex: '', 
-      grade: '', 
-      programs: '', 
-      section: '', 
-      academicYear: '2019/2020', 
-      parentPhone: '', 
-      age: ''
+      name: '', studentId: '', password: '', rollNumber: '',
+      sex: '', grade: '', programs: '', section: '',
+      academicYear: '2019/2020', parentPhone: '', age: ''
     });
     setProfileImage(null);
   };
 
-  // Handle Cancel
   const handleCancelForm = () => {
     if (showForm) {
       const hasValues = Object.values(formData).some(val => val !== '' && val !== '2019/2020');
@@ -355,17 +645,16 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    
-    // Validate required fields - Student ID is now REQUIRED
+
     if (!formData.name || !formData.studentId || !formData.password || !formData.rollNumber || !formData.parentPhone || !formData.age) {
       toast.error('Please fill all required fields including Student ID');
       return;
     }
-    
+
     setLoading(true);
     try {
       const formDataToSend = new FormData();
-      
+
       Object.keys(formData).forEach(key => {
         if (key !== 'grade' && key !== 'programs' && key !== 'section' && key !== 'academicYear' && formData[key] && key !== 'age') {
           formDataToSend.append(key, formData[key]);
@@ -374,7 +663,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       formDataToSend.append('role', 'student');
       formDataToSend.append('baseGrade', formData.grade);
       formDataToSend.append('baseAcademicYear', formData.academicYear);
-      
+
       if (formData.grade) formDataToSend.append('grade', `Grade ${formData.grade}`);
       if (formData.programs) formDataToSend.append('programs', formData.programs);
       if (formData.section) formDataToSend.append('section', formData.section);
@@ -386,7 +675,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       await api.post('/users', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
       toast.success(`🚀 Student added successfully! Student ID: ${formData.studentId}`);
       resetForm();
       setShowForm(false);
@@ -410,15 +699,15 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     try {
       const response = await api.get(`/enrollments/student/${student._id}/current?academicYear=${selectedAcademicYear}`);
       const currentEnrollment = response.data.enrollment;
-      
+
       let gradeNum = currentEnrollment?.grade || student.grade || '';
       if (gradeNum && gradeNum.includes('Grade')) {
         gradeNum = gradeNum.split(' ')[1];
       }
-      
+
       setEditFormData({
         name: student.name || '',
-        studentId: student.studentId || '',  // Get existing Student ID
+        studentId: student.studentId || '',
         sex: student.sex || '',
         rollNumber: student.rollNumber || '',
         grade: gradeNum,
@@ -436,7 +725,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       }
       setEditFormData({
         name: student.name || '',
-        studentId: student.studentId || '',  // Get existing Student ID
+        studentId: student.studentId || '',
         sex: student.sex || '',
         rollNumber: student.rollNumber || '',
         grade: gradeNum,
@@ -455,11 +744,11 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
-    
+
     try {
       const updateData = {
         name: editFormData.name,
-        studentId: editFormData.studentId,  // Send Student ID to update
+        studentId: editFormData.studentId,
         sex: editFormData.sex,
         rollNumber: editFormData.rollNumber,
         baseGrade: editingStudent.baseGrade || editFormData.grade,
@@ -471,18 +760,18 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         parentPhone: editFormData.parentPhone,
         age: editFormData.age
       };
-      
+
       if (editFormData.password) {
         updateData.password = editFormData.password;
       }
-      
+
       await api.put(`/users/${editingStudent._id}`, updateData);
-      
+
       toast.success('✨ Student updated successfully!');
       setEditingStudent(null);
       setEditProfileImage(null);
       await fetchStudents();
-      
+
     } catch (error) {
       console.error('Edit error:', error);
       toast.error(error.response?.data?.error || 'Failed to update student');
@@ -562,7 +851,6 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
     setBulkLoading(true);
     let ok = 0, fail = 0;
     for (const s of data) {
-      // Student ID is now REQUIRED
       if (!s.name || !s.studentId || !s.password) {
         console.warn('Missing required fields:', s);
         fail++;
@@ -571,7 +859,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       try {
         await api.post('/users', {
           name: s.name,
-          studentId: s.studentId,  // Student ID is REQUIRED
+          studentId: s.studentId,
           password: s.password,
           sex: s.sex || '',
           role: 'student',
@@ -603,30 +891,30 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
   const downloadTemplate = () => {
     const t = [
-      { 
-        name: 'John Doe', 
-        studentId: 'STU2024001',  // Student ID is REQUIRED
-        email: 'john@school.com', 
-        password: 'pass123', 
-        rollNumber: '2024001', 
-        sex: 'Male', 
-        grade: '10', 
-        programs: 'Natural Science', 
-        section: 'A', 
+      {
+        name: 'John Doe',
+        studentId: 'STU2024001',
+        email: 'john@school.com',
+        password: 'pass123',
+        rollNumber: '2024001',
+        sex: 'Male',
+        grade: '10',
+        programs: 'Natural Science',
+        section: 'A',
         academicYear: selectedAcademicYear,
         age: '16',
         parentPhone: '0912345678'
       },
-      { 
-        name: 'Jane Smith', 
-        studentId: 'STU2024002',  // Student ID is REQUIRED
-        email: 'jane@school.com', 
-        password: 'pass123', 
-        rollNumber: '2024002', 
-        sex: 'Female', 
-        grade: '9', 
-        programs: 'Social Science', 
-        section: 'B', 
+      {
+        name: 'Jane Smith',
+        studentId: 'STU2024002',
+        email: 'jane@school.com',
+        password: 'pass123',
+        rollNumber: '2024002',
+        sex: 'Female',
+        grade: '9',
+        programs: 'Social Science',
+        section: 'B',
         academicYear: selectedAcademicYear,
         age: '15',
         parentPhone: '0923456789'
@@ -644,7 +932,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       toast.error('Only Super Admin can promote students');
       return;
     }
-    
+
     const nextYear = (() => {
       if (selectedAcademicYear.includes('/')) {
         const [start, end] = selectedAcademicYear.split('/');
@@ -654,7 +942,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         return `${start + 1}/${start + 2}`;
       }
     })();
-    
+
     const promotionStats = getPromotionStats();
     const confirmMessage = `⚠️ PROMOTE ALL STUDENTS\n\nFrom: ${selectedAcademicYear}\nTo: ${nextYear}\n\n` +
       `📊 Current Active Students:\n` +
@@ -663,16 +951,16 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
       `• Grade 11: ${promotionStats.grade11} → Grade 12\n` +
       `• Grade 12: ${promotionStats.grade12} → Graduated\n\n` +
       `Total: ${students.length} active students\n\nAre you sure?`;
-    
+
     if (!window.confirm(confirmMessage)) return;
-    
+
     setPromoting(true);
     try {
       const response = await api.post('/users/promote-all', {
         fromYear: selectedAcademicYear,
         toYear: nextYear
       });
-      
+
       if (response.data.success) {
         toast.success(`🎉 ${response.data.message}`);
         await fetchStudents();
@@ -690,7 +978,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   const exportData = filteredStudents.map(s => {
     const computedGrade = getDisplayGrade(s, selectedAcademicYear);
     return {
-      'Student ID': s.studentId || '-',  // Show Student ID
+      'Student ID': s.studentId || '-',
       'Roll Number': s.rollNumber || '-',
       Name: s.name,
       Sex: s.sex || '-',
@@ -706,7 +994,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   });
 
   const exportGraduatedData = graduatedStudents.map(s => ({
-    'Student ID': s.studentId || '-',  // Show Student ID
+    'Student ID': s.studentId || '-',
     'Roll Number': s.rollNumber || '-',
     Name: s.name,
     Sex: s.sex || '-',
@@ -743,29 +1031,20 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
   return (
     <>
-      <style>{`
-        ${globalStyles}
-      `}</style>
+      <style>{globalStyles}</style>
 
-      <div style={{ 
-        maxWidth: 1400, 
-        margin: '0 auto', 
-        padding: '24px 32px', 
-        background: '#f0f4ff',
-        minHeight: '100vh',
-      }}>
+      <div className="ms-page">
         {/* Loading Bar */}
         {(loading || promoting) && (
-          <div style={{ 
-            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, 
-            height: '3px', 
-            background: '#2563eb',
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
+            height: '3px', background: '#2563eb',
           }} />
         )}
 
         {/* Header Section */}
         <div style={{ marginBottom: 24, animation: 'fadeInUp 0.6s ease' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <div className="ms-header-row">
             <div>
               <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1e3a5f', margin: 0 }}>
                 Student Management
@@ -774,18 +1053,16 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 Manage all students across the school
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <button 
-                className="btn-primary" 
+            <div className="ms-header-actions">
+              <button
+                className="btn-primary"
                 onClick={() => setShowGraduatedList(!showGraduatedList)}
-                style={{ 
-                  background: showGraduatedList ? '#2563eb' : '#64748b',
-                }}
+                style={{ background: showGraduatedList ? '#2563eb' : '#64748b' }}
               >
                 <Icon d="M12 14l9-5-9-5-9 5 9 5z" size={15} color="#fff" />
                 {showGraduatedList ? '📚 Active Students' : `🎓 Graduated (${stats.graduated})`}
               </button>
-              
+
               {isSuperAdmin && !showGraduatedList && (
                 <button className="btn-primary" onClick={() => { setShowBulkUpload(!showBulkUpload); setShowForm(false); }}
                   style={{ background: showBulkUpload ? '#64748b' : '#2563eb' }}>
@@ -794,7 +1071,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                 </button>
               )}
               {!showGraduatedList && (
-                <button className="btn-primary" onClick={() => { 
+                <button className="btn-primary" onClick={() => {
                   if (showForm) {
                     handleCancelForm();
                   } else {
@@ -803,9 +1080,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                     resetForm();
                   }
                 }}
-                style={{ 
-                  background: showForm ? '#dc2626' : '#2563eb'
-                }}>
+                style={{ background: showForm ? '#dc2626' : '#2563eb' }}>
                   <Icon d={showForm ? "M18 6L6 18M6 6l12 12" : "M12 5v14M5 12h14"} size={15} color="#fff" strokeWidth={2} />
                   {showForm ? 'Cancel' : 'Add Student'}
                 </button>
@@ -817,10 +1092,10 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         {!showGraduatedList ? (
           <>
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div className="ms-stats-grid">
               <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#2563eb', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ background: '#2563eb', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -831,7 +1106,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
               <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#10b981', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ background: '#10b981', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -842,7 +1117,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
               <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#8b5cf6', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ background: '#8b5cf6', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -853,7 +1128,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
               <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#d97706', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ background: '#d97706', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Icon d="M4 6h16M4 12h16M4 18h16" size={18} color="#fff" />
                   </div>
                   <div>
@@ -866,7 +1141,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
             {/* Add Student Form */}
             {showForm && (
-              <StudentForm 
+              <StudentForm
                 formData={formData}
                 setFormData={setFormData}
                 profileImage={profileImage}
@@ -878,7 +1153,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
             )}
 
             {/* Bulk Upload */}
-            <BulkUpload 
+            <BulkUpload
               showBulkUpload={showBulkUpload}
               bulkLoading={bulkLoading}
               handleBulkUpload={handleBulkUpload}
@@ -886,193 +1161,119 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               onClose={() => setShowBulkUpload(false)}
             />
 
- {/* Search & Filter Bar - NOT STICKY, scrolls with page */}
-<div style={{ 
-  background: 'white', 
-  marginBottom: 16, 
-  padding: '16px 20px', 
-  display: 'flex', 
-  gap: 12, 
-  alignItems: 'center', 
-  flexWrap: 'wrap', 
-  borderRadius: 12, 
-  border: '1px solid #e2e8f0',
-  // REMOVE position: sticky
-  // REMOVE top: 0
-  // REMOVE zIndex: 100
-  // REMOVE boxShadow
-  // REMOVE backdropFilter
-  // REMOVE backgroundColor
-}}>
-  <div style={{ position: 'relative', flex: 3, minWidth: 200 }}>
-    <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', zIndex: 1 }}>
-      <Icon d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" size={16} color="#64748b" strokeWidth={2} />
-    </div>
-    <input 
-      ref={searchInputRef} 
-      className="pi" 
-      type="text" 
-      placeholder="Search by name, Student ID, roll number..." 
-      value={searchTerm} 
-      onChange={e => setSearchTerm(e.target.value)} 
-      style={{ paddingLeft: 38, fontSize: 13 }} 
-    />
-    {searchTerm && (
-      <button 
-        onClick={() => { 
-          setSearchTerm(''); 
-          searchInputRef.current?.focus(); 
-        }} 
-        style={{ 
-          position: 'absolute', 
-          right: 12, 
-          top: '50%', 
-          transform: 'translateY(-50%)', 
-          background: '#f1f5f9', 
-          border: 'none', 
-          cursor: 'pointer', 
-          padding: '4px 8px', 
-          borderRadius: 6 
-        }}
-      >
-        <Icon d="M18 6L6 18M6 6l12 12" size={14} color="#64748b" strokeWidth={2} />
-      </button>
-    )}
-  </div>
-  
-  <div style={{ position: 'relative', minWidth: 140 }}>
-    <select 
-      className="ps" 
-      value={selectedGrade} 
-      onChange={e => setSelectedGrade(e.target.value)} 
-      style={{ paddingRight: 32, fontSize: 13 }}
-    >
-      <option value=""> All Grades</option>
-      {[9,10,11,12].map(g => <option key={g} value={g}>Grade {g}</option>)}
-    </select>
-    <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-      <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
-    </div>
-  </div>
-  
-  <div style={{ position: 'relative', minWidth: 150 }}>
-    <select 
-      className="ps" 
-      value={selectedProgram} 
-      onChange={e => setSelectedProgram(e.target.value)} 
-      style={{ paddingRight: 32, fontSize: 13 }}
-    >
-      <option value=""> All Programs</option>
-      {programs.map(p => <option key={p} value={p}>{p}</option>)}
-    </select>
-    <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-      <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
-    </div>
-  </div>
-  
-  <div style={{ position: 'relative', minWidth: 150 }}>
-    <select 
-      className="ps" 
-      value={selectedAcademicYear} 
-      onChange={e => setSelectedAcademicYear(e.target.value)} 
-      style={{ paddingRight: 32, fontSize: 13 }}
-    >
-      <option value="2019/2020">2019/2020</option>
-      <option value="2020/2021">2020/2021</option>
-      <option value="2021/2022">2021/2022</option>
-      <option value="2022/2023">2022/2023</option>
-      <option value="2023/2024">2023/2024</option>
-      <option value="2024/2025">2024/2025</option>
-      <option value="2025/2026">2025/2026</option>
-    </select>
-    <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-      <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
-    </div>
-  </div>
-  
-  {isSuperAdmin && (
-    <button 
-      className="btn-primary btn-success" 
-      onClick={() => setShowPromotionConfirm(true)} 
-      disabled={promoting}
-      style={{ fontSize: 12, padding: '8px 16px' }}
-    >
-      {promoting ? (
-        <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'rotate 0.6s linear infinite' }} /> Promoting...</>
-      ) : (
-        <><Icon d="M12 14l9-5-9-5-9 5 9 5z" size={13} color="#fff" /> Promote All</>
-      )}
-    </button>
-  )}
-  
-  <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}>
-    <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-      <button 
-        onClick={() => setViewMode('table')} 
-        style={{ 
-          padding: '6px 12px', 
-          border: 'none', 
-          cursor: 'pointer', 
-          background: viewMode === 'table' ? '#2563eb' : '#fff', 
-          color: viewMode === 'table' ? '#fff' : '#475569', 
-          fontWeight: 600, 
-          fontSize: 12 
-        }}
-      >
-        Table
-      </button>
-      <button 
-        onClick={() => setViewMode('grid')} 
-        style={{ 
-          padding: '6px 12px', 
-          border: 'none', 
-          cursor: 'pointer', 
-          background: viewMode === 'grid' ? '#2563eb' : '#fff', 
-          color: viewMode === 'grid' ? '#fff' : '#475569', 
-          fontWeight: 600, 
-          fontSize: 12 
-        }}
-      >
-        Grid
-      </button>
-    </div>
-    <button 
-      className="btn-primary" 
-      onClick={copyAll} 
-      style={{ background: '#64748b', fontSize: 12, padding: '6px 12px' }}
-    >
-      <Icon d="M8 7v8a2 2 0 0 0 2 2h6M8 7V5a2 2 0 0 1 2-2h4.586a1 1 0 0 1 .707.293l4.414 4.414a1 1 0 0 1 .293.707V15a2 2 0 0 1-2 2h-2M8 7H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2" size={13} color="#fff" strokeWidth={2} />
-      Copy
-    </button>
-    <button 
-      className="btn-primary" 
-      onClick={() => exportExcel(exportData, 'students')} 
-      style={{ background: '#10b981', fontSize: 12, padding: '6px 12px' }}
-    >
-      <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" size={13} color="#fff" strokeWidth={2} />
-      Excel
-    </button>
-    <button 
-      className="btn-primary" 
-      onClick={() => exportCSV(exportData, 'students')} 
-      style={{ background: '#2563eb', fontSize: 12, padding: '6px 12px' }}
-    >
-      <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" size={13} color="#fff" strokeWidth={2} />
-      CSV
-    </button>
-    <button 
-      className="btn-primary" 
-      onClick={printTable} 
-      style={{ background: '#2563eb', fontSize: 12, padding: '6px 12px' }}
-    >
-      <Icon d="M19 8H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2zm-2 0V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4m8 8h.01" size={13} color="#fff" strokeWidth={2} />
-      Print
-    </button>
-  </div>
-</div>
- 
+            {/* Search & Filter Bar */}
+            <div className="ms-filter-bar">
+              <div className="ms-search-wrap">
+                <div className="ms-search-icon">
+                  <Icon d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" size={16} color="#64748b" strokeWidth={2} />
+                </div>
+                <input
+                  ref={searchInputRef}
+                  className="pi"
+                  type="text"
+                  placeholder="Search by name, Student ID, roll number..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  style={{ paddingLeft: 38, fontSize: 13 }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => { setSearchTerm(''); searchInputRef.current?.focus(); }}
+                    className="ms-search-clear"
+                  >
+                    <Icon d="M18 6L6 18M6 6l12 12" size={14} color="#64748b" strokeWidth={2} />
+                  </button>
+                )}
+              </div>
+
+              <div className="ms-select-wrap">
+                <select className="ps" value={selectedGrade} onChange={e => setSelectedGrade(e.target.value)} style={{ paddingRight: 32, fontSize: 13 }}>
+                  <option value="">All Grades</option>
+                  {[9, 10, 11, 12].map(g => <option key={g} value={g}>Grade {g}</option>)}
+                </select>
+                <div className="ms-select-arrow">
+                  <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
+                </div>
+              </div>
+
+              <div className="ms-select-wrap">
+                <select className="ps" value={selectedProgram} onChange={e => setSelectedProgram(e.target.value)} style={{ paddingRight: 32, fontSize: 13 }}>
+                  <option value="">All Programs</option>
+                  {programs.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <div className="ms-select-arrow">
+                  <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
+                </div>
+              </div>
+
+              <div className="ms-select-wrap">
+                <select className="ps" value={selectedAcademicYear} onChange={e => setSelectedAcademicYear(e.target.value)} style={{ paddingRight: 32, fontSize: 13 }}>
+                  <option value="2019/2020">2019/2020</option>
+                  <option value="2020/2021">2020/2021</option>
+                  <option value="2021/2022">2021/2022</option>
+                  <option value="2022/2023">2022/2023</option>
+                  <option value="2023/2024">2023/2024</option>
+                  <option value="2024/2025">2024/2025</option>
+                  <option value="2025/2026">2025/2026</option>
+                </select>
+                <div className="ms-select-arrow">
+                  <Icon d="M6 9l6 6 6-6" size={14} color="#64748b" strokeWidth={2} />
+                </div>
+              </div>
+
+              {isSuperAdmin && (
+                <button
+                  className="btn-primary btn-success"
+                  onClick={() => setShowPromotionConfirm(true)}
+                  disabled={promoting}
+                  style={{ fontSize: 12, padding: '8px 16px' }}
+                >
+                  {promoting ? (
+                    <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'rotate 0.6s linear infinite' }} /> Promoting...</>
+                  ) : (
+                    <><Icon d="M12 14l9-5-9-5-9 5 9 5z" size={13} color="#fff" /> Promote All</>
+                  )}
+                </button>
+              )}
+
+              <div className="ms-actions-right">
+                <div className="ms-view-toggle">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className="ms-view-btn"
+                    style={{ background: viewMode === 'table' ? '#2563eb' : '#fff', color: viewMode === 'table' ? '#fff' : '#475569' }}
+                  >
+                    Table
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className="ms-view-btn"
+                    style={{ background: viewMode === 'grid' ? '#2563eb' : '#fff', color: viewMode === 'grid' ? '#fff' : '#475569' }}
+                  >
+                    Grid
+                  </button>
+                </div>
+                <button className="btn-primary" onClick={copyAll} style={{ background: '#64748b', fontSize: 12, padding: '6px 12px' }}>
+                  <Icon d="M8 7v8a2 2 0 0 0 2 2h6M8 7V5a2 2 0 0 1 2-2h4.586a1 1 0 0 1 .707.293l4.414 4.414a1 1 0 0 1 .293.707V15a2 2 0 0 1-2 2h-2M8 7H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2" size={13} color="#fff" strokeWidth={2} />
+                  Copy
+                </button>
+                <button className="btn-primary" onClick={() => exportExcel(exportData, 'students')} style={{ background: '#10b981', fontSize: 12, padding: '6px 12px' }}>
+                  <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" size={13} color="#fff" strokeWidth={2} />
+                  Excel
+                </button>
+                <button className="btn-primary" onClick={() => exportCSV(exportData, 'students')} style={{ background: '#2563eb', fontSize: 12, padding: '6px 12px' }}>
+                  <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" size={13} color="#fff" strokeWidth={2} />
+                  CSV
+                </button>
+                <button className="btn-primary" onClick={printTable} style={{ background: '#2563eb', fontSize: 12, padding: '6px 12px' }}>
+                  <Icon d="M19 8H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2zm-2 0V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4m8 8h.01" size={13} color="#fff" strokeWidth={2} />
+                  Print
+                </button>
+              </div>
+            </div>
+
             {/* Students Per Page */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 4px', fontSize: 13, color: '#64748b' }}>
+            <div className="ms-perpage-row">
               <div>Showing <strong style={{ color: '#1e3a5f' }}>{paginatedStudents.length}</strong> of <strong style={{ color: '#1e3a5f' }}>{filteredStudents.length}</strong> active students</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>Rows per page:</span>
@@ -1084,7 +1285,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
             {/* Active Students View */}
             {viewMode === 'table' ? (
-              <StudentTable 
+              <StudentTable
                 students={paginatedStudents}
                 fetching={fetching}
                 studentsPerPage={studentsPerPage}
@@ -1099,7 +1300,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
             ) : (
               <div className="grid-view">
                 {paginatedStudents.map((student) => (
-                  <StudentCard 
+                  <StudentCard
                     key={student._id}
                     student={student}
                     getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
@@ -1114,13 +1315,13 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
-            {!fetching && (<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, fontSize: 12, color: '#64748b', padding: '0 4px' }}>
+            {!fetching && (<div className="ms-footer-row">
               <div>Updated: <strong style={{ color: '#1e3a5f' }}>{new Date().toLocaleTimeString()}</strong></div>
               <div>Total: <strong style={{ color: '#1e3a5f' }}>{students.length}</strong> active students</div>
             </div>)}
           </>
         ) : (
-          <GraduateTable 
+          <GraduateTable
             graduatedStudents={graduatedStudents}
             paginatedGraduated={paginatedGraduated}
             selectedAcademicYear={selectedAcademicYear}
@@ -1133,7 +1334,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         )}
 
         {/* Modals */}
-        <PromotionModal 
+        <PromotionModal
           showPromotionConfirm={showPromotionConfirm}
           selectedAcademicYear={selectedAcademicYear}
           promotionStats={getPromotionStats()}
@@ -1144,16 +1345,16 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
         {/* View Student Modal */}
         {selectedStudent && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 16 }}>
-            <div style={{ background: 'white', width: '100%', maxWidth: 760, borderRadius: 12, padding: 0, overflow: 'hidden' }}>
+          <div className="ms-modal-overlay">
+            <div className="ms-modal-card">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #e2e8f0', background: '#2563eb' }}>
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>Student Profile</div>
                   <div style={{ fontSize: 12, color: '#bfdbfe' }}>Quick overview of the selected student</div>
                 </div>
-                <button onClick={() => setSelectedStudent(null)} style={{ border: 'none', background: '#f1f5f9', color: '#1e3a5f', width: 36, height: 36, borderRadius: 8, cursor: 'pointer', fontSize: 18, fontWeight: 700 }}>×</button>
+                <button onClick={() => setSelectedStudent(null)} style={{ border: 'none', background: '#f1f5f9', color: '#1e3a5f', width: 36, height: 36, borderRadius: 8, cursor: 'pointer', fontSize: 18, fontWeight: 700, flexShrink: 0 }}>×</button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 18, padding: 20 }}>
+              <div className="ms-modal-body">
                 <div style={{ background: '#2563eb', borderRadius: 12, padding: 18, textAlign: 'center' }}>
                   <Avatar name={selectedStudent.name} image={selectedStudent.profileImage} size={88} />
                   <div style={{ fontSize: 18, fontWeight: 700, color: 'white', marginTop: 12 }}>{selectedStudent.name}</div>
@@ -1178,7 +1379,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                       <div style={{ fontSize: 13, color: '#1e3a5f', fontWeight: 600, marginTop: 4 }}>{value}</div>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4, flexWrap: 'wrap' }}>
                     <button className="btn-primary" onClick={() => { setSelectedStudent(null); handleEditClick(selectedStudent); }} style={{ background: '#d97706' }}>Edit Student</button>
                     <button className="btn-primary" onClick={() => setSelectedStudent(null)} style={{ background: '#64748b' }}>Close</button>
                   </div>
@@ -1189,7 +1390,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         )}
 
         {/* Edit Student Modal */}
-        <EditStudentModal 
+        <EditStudentModal
           editingStudent={editingStudent}
           editFormData={editFormData}
           setEditFormData={setEditFormData}
