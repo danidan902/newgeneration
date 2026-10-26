@@ -63,6 +63,7 @@ const globalStyles = `
     align-items: center;
     gap: 6px;
     white-space: nowrap;
+    box-sizing: border-box;
   }
   
   .btn-primary:hover {
@@ -120,6 +121,11 @@ const globalStyles = `
     color: white;
     border-color: transparent;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+  
+  .compact-table {
+    width: 100%;
+    border-collapse: collapse;
   }
   
   .compact-table td, .compact-table th {
@@ -225,7 +231,7 @@ const globalStyles = `
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
 
-  /* ===== RESPONSIVE UTILITIES ===== */
+  /* ===== PAGE WRAPPER ===== */
   .ms-page {
     max-width: 1400px;
     margin: 0 auto;
@@ -233,8 +239,10 @@ const globalStyles = `
     background: #f0f4ff;
     min-height: 100vh;
     box-sizing: border-box;
+    overflow-x: hidden;
   }
 
+  /* ===== HEADER ===== */
   .ms-header-row {
     display: flex;
     justify-content: space-between;
@@ -249,6 +257,7 @@ const globalStyles = `
     flex-wrap: wrap;
   }
 
+  /* ===== STATS ===== */
   .ms-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -256,6 +265,31 @@ const globalStyles = `
     margin-bottom: 24px;
   }
 
+  .ms-stat-card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+  }
+
+  .ms-stat-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ms-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ===== FILTER BAR ===== */
   .ms-filter-bar {
     background: white;
     margin-bottom: 16px;
@@ -313,6 +347,7 @@ const globalStyles = `
     gap: 6px;
     margin-left: auto;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .ms-view-toggle {
@@ -320,6 +355,7 @@ const globalStyles = `
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #e2e8f0;
+    flex-shrink: 0;
   }
 
   .ms-view-btn {
@@ -328,8 +364,10 @@ const globalStyles = `
     cursor: pointer;
     font-weight: 600;
     font-size: 12px;
+    white-space: nowrap;
   }
 
+  /* ===== PER PAGE + FOOTER ===== */
   .ms-perpage-row {
     display: flex;
     justify-content: space-between;
@@ -354,6 +392,41 @@ const globalStyles = `
     gap: 8px;
   }
 
+  /* ===== TABLE HORIZONTAL SCROLL WRAPPER ===== */
+  .ms-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    box-sizing: border-box;
+  }
+
+  .ms-table-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .ms-table-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .ms-table-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+  }
+
+  .ms-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  .ms-table-scroll .compact-table {
+    min-width: 900px;
+    width: 100%;
+  }
+
+  /* ===== MODAL ===== */
   .ms-modal-overlay {
     position: fixed;
     inset: 0;
@@ -375,6 +448,30 @@ const globalStyles = `
     overflow: hidden;
     max-height: 90vh;
     overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .ms-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #2563eb;
+    gap: 12px;
+  }
+
+  .ms-modal-close {
+    border: none;
+    background: #f1f5f9;
+    color: #1e3a5f;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 
   .ms-modal-body {
@@ -382,6 +479,37 @@ const globalStyles = `
     grid-template-columns: 1fr 1.1fr;
     gap: 18px;
     padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .ms-profile-card {
+    background: #2563eb;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .ms-info-grid {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .ms-info-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+
+  .ms-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+    flex-wrap: wrap;
   }
 
   /* ===== TABLET ===== */
@@ -394,7 +522,6 @@ const globalStyles = `
   @media (max-width: 768px) {
     .ms-page {
       padding: 14px 12px;
-      min-height: 100vh;
     }
 
     .ms-header-row {
@@ -423,12 +550,12 @@ const globalStyles = `
       margin-bottom: 16px;
     }
 
-    .ms-stats-grid > div {
-      padding: 12px 14px !important;
+    .ms-stat-card {
+      padding: 12px 14px;
     }
 
-    .ms-stats-grid p:first-child { font-size: 11px !important; }
-    .ms-stats-grid p:last-child { font-size: 18px !important; }
+    .ms-stat-card p:first-child { font-size: 11px !important; }
+    .ms-stat-card p:last-child { font-size: 18px !important; }
 
     .ms-filter-bar {
       padding: 12px;
@@ -437,15 +564,11 @@ const globalStyles = `
       align-items: stretch;
     }
 
-    .ms-search-wrap {
+    .ms-search-wrap,
+    .ms-select-wrap {
       min-width: 0;
       width: 100%;
       flex: none;
-    }
-
-    .ms-select-wrap {
-      width: 100%;
-      min-width: 0;
     }
 
     .ms-actions-right {
@@ -491,6 +614,13 @@ const globalStyles = `
       gap: 12px;
     }
 
+    .ms-table-scroll .compact-table {
+      min-width: 800px;
+    }
+
+    .compact-table th { font-size: 9.5px; padding: 6px 8px; }
+    .compact-table td { font-size: 11.5px; padding: 6px 8px; }
+
     .ms-modal-overlay { padding: 10px; }
 
     .ms-modal-card {
@@ -503,9 +633,6 @@ const globalStyles = `
       gap: 14px;
       padding: 14px;
     }
-
-    .compact-table th { font-size: 9.5px; padding: 6px 8px; }
-    .compact-table td { font-size: 11.5px; padding: 6px 8px; }
   }
 
   /* ===== SMALL MOBILE ===== */
@@ -521,9 +648,7 @@ const globalStyles = `
       gap: 8px;
     }
 
-    .ms-stats-grid > div {
-      padding: 10px 12px !important;
-    }
+    .ms-stat-card { padding: 10px 12px; }
 
     .ms-actions-right {
       grid-template-columns: repeat(2, 1fr);
@@ -536,6 +661,10 @@ const globalStyles = `
     .btn-primary {
       font-size: 12px;
       padding: 9px 14px;
+    }
+
+    .ms-table-scroll .compact-table {
+      min-width: 720px;
     }
   }
 `;
@@ -1093,9 +1222,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
           <>
             {/* Stats Grid */}
             <div className="ms-stats-grid">
-              <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#2563eb', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div className="ms-stat-card">
+                <div className="ms-stat-inner">
+                  <div className="ms-stat-icon" style={{ background: '#2563eb' }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -1104,9 +1233,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   </div>
                 </div>
               </div>
-              <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#10b981', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div className="ms-stat-card">
+                <div className="ms-stat-inner">
+                  <div className="ms-stat-icon" style={{ background: '#10b981' }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -1115,9 +1244,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   </div>
                 </div>
               </div>
-              <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#8b5cf6', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div className="ms-stat-card">
+                <div className="ms-stat-inner">
+                  <div className="ms-stat-icon" style={{ background: '#8b5cf6' }}>
                     <Icon d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" size={18} color="#fff" />
                   </div>
                   <div>
@@ -1126,9 +1255,9 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                   </div>
                 </div>
               </div>
-              <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ background: '#d97706', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div className="ms-stat-card">
+                <div className="ms-stat-inner">
+                  <div className="ms-stat-icon" style={{ background: '#d97706' }}>
                     <Icon d="M4 6h16M4 12h16M4 18h16" size={18} color="#fff" />
                   </div>
                   <div>
@@ -1285,18 +1414,20 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
 
             {/* Active Students View */}
             {viewMode === 'table' ? (
-              <StudentTable
-                students={paginatedStudents}
-                fetching={fetching}
-                studentsPerPage={studentsPerPage}
-                getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
-                onView={setSelectedStudent}
-                onEdit={handleEditClick}
-                onGraduate={handleMoveToGraduated}
-                onDelete={handleDelete}
-                isSuperAdmin={isSuperAdmin}
-                selectedAcademicYear={selectedAcademicYear}
-              />
+              <div className="ms-table-scroll">
+                <StudentTable
+                  students={paginatedStudents}
+                  fetching={fetching}
+                  studentsPerPage={studentsPerPage}
+                  getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
+                  onView={setSelectedStudent}
+                  onEdit={handleEditClick}
+                  onGraduate={handleMoveToGraduated}
+                  onDelete={handleDelete}
+                  isSuperAdmin={isSuperAdmin}
+                  selectedAcademicYear={selectedAcademicYear}
+                />
+              </div>
             ) : (
               <div className="grid-view">
                 {paginatedStudents.map((student) => (
@@ -1347,15 +1478,15 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
         {selectedStudent && (
           <div className="ms-modal-overlay">
             <div className="ms-modal-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #e2e8f0', background: '#2563eb' }}>
+              <div className="ms-modal-header">
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>Student Profile</div>
                   <div style={{ fontSize: 12, color: '#bfdbfe' }}>Quick overview of the selected student</div>
                 </div>
-                <button onClick={() => setSelectedStudent(null)} style={{ border: 'none', background: '#f1f5f9', color: '#1e3a5f', width: 36, height: 36, borderRadius: 8, cursor: 'pointer', fontSize: 18, fontWeight: 700, flexShrink: 0 }}>×</button>
+                <button onClick={() => setSelectedStudent(null)} className="ms-modal-close">×</button>
               </div>
               <div className="ms-modal-body">
-                <div style={{ background: '#2563eb', borderRadius: 12, padding: 18, textAlign: 'center' }}>
+                <div className="ms-profile-card">
                   <Avatar name={selectedStudent.name} image={selectedStudent.profileImage} size={88} />
                   <div style={{ fontSize: 18, fontWeight: 700, color: 'white', marginTop: 12 }}>{selectedStudent.name}</div>
                   <div style={{ fontSize: 12, color: '#bfdbfe', marginTop: 4 }}>Student ID: {selectedStudent.studentId || 'N/A'}</div>
@@ -1365,7 +1496,7 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                     <Badge variant="success">{selectedStudent.program || selectedStudent.programs || '—'}</Badge>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gap: 10 }}>
+                <div className="ms-info-grid">
                   {[
                     ['Student ID', selectedStudent.studentId || '—'],
                     ['Gender', selectedStudent.sex || '—'],
@@ -1374,12 +1505,12 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
                     ['Age', selectedStudent.age || '—'],
                     ['Parent Phone', selectedStudent.parentPhone || '—'],
                   ].map(([label, value]) => (
-                    <div key={label} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 12px' }}>
+                    <div key={label} className="ms-info-item">
                       <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b', fontWeight: 700 }}>{label}</div>
                       <div style={{ fontSize: 13, color: '#1e3a5f', fontWeight: 600, marginTop: 4 }}>{value}</div>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4, flexWrap: 'wrap' }}>
+                  <div className="ms-modal-actions">
                     <button className="btn-primary" onClick={() => { setSelectedStudent(null); handleEditClick(selectedStudent); }} style={{ background: '#d97706' }}>Edit Student</button>
                     <button className="btn-primary" onClick={() => setSelectedStudent(null)} style={{ background: '#64748b' }}>Close</button>
                   </div>
