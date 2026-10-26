@@ -231,7 +231,7 @@ const globalStyles = `
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
 
-  /* ===== PAGE WRAPPER ===== */
+  /* ===== PAGE WRAPPER (NO overflow-x hidden — it was breaking scroll) ===== */
   .ms-page {
     max-width: 1400px;
     margin: 0 auto;
@@ -239,7 +239,6 @@ const globalStyles = `
     background: #f0f4ff;
     min-height: 100vh;
     box-sizing: border-box;
-    overflow-x: hidden;
   }
 
   /* ===== HEADER ===== */
@@ -392,19 +391,24 @@ const globalStyles = `
     gap: 8px;
   }
 
-  /* ===== TABLE HORIZONTAL SCROLL WRAPPER ===== */
+  /* ===== HORIZONTAL SCROLL FOR TABLE ===== */
   .ms-table-scroll {
+    display: block;
     width: 100%;
-    overflow-x: auto;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
     background: white;
     box-sizing: border-box;
+    /* extra safety */
+    touch-action: pan-x pan-y;
   }
 
   .ms-table-scroll::-webkit-scrollbar {
-    height: 8px;
+    height: 10px;
   }
 
   .ms-table-scroll::-webkit-scrollbar-track {
@@ -419,11 +423,6 @@ const globalStyles = `
 
   .ms-table-scroll::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
-  }
-
-  .ms-table-scroll .compact-table {
-    min-width: 900px;
-    width: 100%;
   }
 
   /* ===== MODAL ===== */
@@ -514,7 +513,7 @@ const globalStyles = `
 
   /* ===== TABLET ===== */
   @media (max-width: 992px) {
-    .ms-page { padding: 20px 20px; }
+    .ms-page { padding: 20px 16px; }
     .ms-stats-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   }
 
@@ -614,10 +613,6 @@ const globalStyles = `
       gap: 12px;
     }
 
-    .ms-table-scroll .compact-table {
-      min-width: 800px;
-    }
-
     .compact-table th { font-size: 9.5px; padding: 6px 8px; }
     .compact-table td { font-size: 11.5px; padding: 6px 8px; }
 
@@ -661,10 +656,6 @@ const globalStyles = `
     .btn-primary {
       font-size: 12px;
       padding: 9px 14px;
-    }
-
-    .ms-table-scroll .compact-table {
-      min-width: 720px;
     }
   }
 `;
@@ -1158,6 +1149,26 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
   const totalGraduatedPages = Math.ceil(filteredGraduated.length / graduatedPerPage);
   const paginatedGraduated = filteredGraduated.slice((graduatedCurrentPage - 1) * graduatedPerPage, graduatedCurrentPage * graduatedPerPage);
 
+  // Inline style for guaranteed horizontal scroll (cannot be overridden by styles.css)
+  const tableScrollStyle = {
+    display: 'block',
+    width: '100%',
+    maxWidth: '100%',
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    WebkitOverflowScrolling: 'touch',
+    border: '1px solid #e2e8f0',
+    borderRadius: 12,
+    background: 'white',
+    boxSizing: 'border-box',
+  };
+
+  const tableInnerStyle = {
+    display: 'inline-block',
+    minWidth: 900,
+    width: '100%',
+  };
+
   return (
     <>
       <style>{globalStyles}</style>
@@ -1412,21 +1423,23 @@ const ManageStudents = ({ isSuperAdmin = false }) => {
               </div>
             </div>
 
-            {/* Active Students View */}
+            {/* Active Students View — HORIZONTAL SCROLL WRAPPER (inline styles = guaranteed) */}
             {viewMode === 'table' ? (
-              <div className="ms-table-scroll">
-                <StudentTable
-                  students={paginatedStudents}
-                  fetching={fetching}
-                  studentsPerPage={studentsPerPage}
-                  getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
-                  onView={setSelectedStudent}
-                  onEdit={handleEditClick}
-                  onGraduate={handleMoveToGraduated}
-                  onDelete={handleDelete}
-                  isSuperAdmin={isSuperAdmin}
-                  selectedAcademicYear={selectedAcademicYear}
-                />
+              <div style={tableScrollStyle}>
+                <div style={tableInnerStyle}>
+                  <StudentTable
+                    students={paginatedStudents}
+                    fetching={fetching}
+                    studentsPerPage={studentsPerPage}
+                    getDisplayGrade={(student) => getDisplayGrade(student, selectedAcademicYear)}
+                    onView={setSelectedStudent}
+                    onEdit={handleEditClick}
+                    onGraduate={handleMoveToGraduated}
+                    onDelete={handleDelete}
+                    isSuperAdmin={isSuperAdmin}
+                    selectedAcademicYear={selectedAcademicYear}
+                  />
+                </div>
               </div>
             ) : (
               <div className="grid-view">
