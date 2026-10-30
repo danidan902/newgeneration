@@ -404,7 +404,7 @@ const Header = ({ user, collapsed, onMenuToggle }) => {
         </div>
       </div>
 
-      <div style={{ display:'flex',alignItems:'center',gap:12 }}>
+      <div style={{ display:'flex',alignItems:'center',gap:12}}>
         <button style={{
           width:38,height:38,borderRadius:9,
           background: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9',
@@ -601,7 +601,7 @@ const TeacherHome = () => {
         </GlassCard>
       )}
 
-      {/* Subject Breakdown */}
+    
       {marksData.length > 0 && (
         <GlassCard style={{ padding: 28, marginBottom: 20 }} className="fadeup s4">
           <p style={{ fontWeight: 700, fontSize: 17, color: t.text, marginBottom: 22 }}>
@@ -622,7 +622,7 @@ const TeacherHome = () => {
         </GlassCard>
       )}
 
-      {/* Classes Grid */}
+     
       <GlassCard style={{ padding: 28 }} className="fadeup s5">
         <p style={{ fontWeight: 700, fontSize: 17, color: t.text, marginBottom: 22 }}>
           <GradText grad="linear-gradient(135deg, #1565c0, #0d47a1)">My Classes</GradText>
