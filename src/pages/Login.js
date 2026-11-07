@@ -5,7 +5,7 @@ import api from '../services/api';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, ArrowRight, Key, User } from 'lucide-react';
 
 export default function Login() {
-  const [identifier, setIdentifier] = useState(''); // Can be Student ID or Email
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +24,6 @@ export default function Login() {
     }
   }, []);
 
-  // Detect if identifier is email or student ID
   const isEmail = (value) => {
     return value.includes('@') && value.includes('.');
   };
@@ -42,7 +41,6 @@ export default function Login() {
         return;
       }
 
-      // Determine if it's an email or student ID
       if (isEmail(identifier)) {
         loginData.email = identifier;
       } else {
@@ -122,16 +120,15 @@ export default function Login() {
     }
   };
 
-  // Redirect state
   if (redirectMessage) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
+      <div className="min-h-screen flex flex-col sm:items-center sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
           <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
           <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
           <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
         </div>
-        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4">
+        <div className="relative z-20 bg-white w-full max-w-none sm:max-w-[440px] px-[35px] py-[45px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl text-center mt-auto sm:mt-0 mx-0 sm:mx-4">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full border-4 border-[#1565c0] border-t-transparent animate-spin" />
           <h2 className="text-2xl font-bold text-[#0a3d80] mb-2">
             Taking you to set a new password
@@ -142,17 +139,16 @@ export default function Login() {
     );
   }
 
-  // Forgot password state
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
+      <div className="min-h-screen flex flex-col sm:items-center sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
           <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
           <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
           <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
         </div>
         
-        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl mx-4">
+        <div className="relative z-20 bg-white w-full max-w-none sm:max-w-[440px] px-[35px] py-[45px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl mt-auto sm:mt-0 mx-0 sm:mx-4">
           <button
             onClick={() => setShowForgotPassword(false)}
             className="mb-6 flex items-center text-sm text-[#7d8590] hover:text-[#0a3d80] transition-colors"
@@ -207,30 +203,32 @@ export default function Login() {
     );
   }
 
-  // Main sign-in view
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
+    <div className="min-h-screen flex flex-col sm:items-center sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
       
-      {/* Background Shapes */}
+      {/* Background Shapes - blue area on mobile, full bg on desktop */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
         <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
         <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
         <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
       </div>
 
-      {/* Login Card Container */}
-      <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4">
+      {/* Mobile-only hero/brand area at top (visible above the white card) */}
+      <div className="relative z-20 w-full sm:hidden pt-16 pb-10 px-8 text-center text-white">
+        <h1 className="text-[32px] font-bold tracking-tight mb-2">Welcome</h1>
+        <p className="text-[13px] text-white/80">Sign in to your account to continue</p>
+      </div>
+
+      {/* Login Card Container - sits at bottom on mobile */}
+      <div className="relative z-20 bg-white w-full max-w-none sm:max-w-[440px] px-[35px] py-[45px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl text-center mt-auto sm:mt-0 mx-0 sm:mx-4">
         
-        {/* Header Typography */}
         <h2 className="text-[28px] font-bold text-[#0a3d80] mb-1 tracking-tight">Sign in</h2>
         <p className="text-[11px] text-[#7d8590] mb-7">
           Welcome back! Please sign in to continue.
         </p>
 
-        {/* Form Elements */}
         <form onSubmit={handleSubmit} className="flex flex-col">
           
-          {/* Single Field - accepts both Student ID and Email */}
           <div className="mb-4">
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
@@ -246,10 +244,8 @@ export default function Login() {
                 autoFocus
               />
             </div>
-           
           </div>
           
-          {/* Password Field */}
           <div className="mb-2">
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#a0a6b2]" />
@@ -296,10 +292,6 @@ export default function Login() {
             </button>
           </div>
 
-          {/* Login Type Hint */}
-         
-
-          {/* Primary Button */}
           <button 
             type="submit"
             disabled={loading}
@@ -315,14 +307,11 @@ export default function Login() {
             )}
           </button>
 
-          {/* Divider */}
           <div className="flex items-center text-[11px] text-[#a0a6b2] my-4">
             <div className="flex-1 border-b border-[#e2e8f0]"></div>
             <span className="px-3">or</span>
             <div className="flex-1 border-b border-[#e2e8f0]"></div>
           </div>
-
-     
         </form>
       </div>
     </div>
