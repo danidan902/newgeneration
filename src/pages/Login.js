@@ -34,7 +34,7 @@ export default function Login() {
 
     try {
       let loginData = { password };
-      
+
       if (!identifier) {
         toast.error('Please enter your Student ID or Email');
         setLoading(false);
@@ -122,13 +122,14 @@ export default function Login() {
 
   if (redirectMessage) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-end sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white relative overflow-hidden font-sans">
+        {/* Blue band at top on phone, full on desktop */}
+        <div className="absolute top-0 left-0 right-0 h-[55%] sm:h-full z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
           <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
           <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
           <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
         </div>
-        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4 mb-6 sm:mb-0">
+        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full border-4 border-[#1565c0] border-t-transparent animate-spin" />
           <h2 className="text-2xl font-bold text-[#0a3d80] mb-2">
             Taking you to set a new password
@@ -141,14 +142,15 @@ export default function Login() {
 
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-end sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white relative overflow-hidden font-sans">
+        {/* Blue band at top on phone, full on desktop */}
+        <div className="absolute top-0 left-0 right-0 h-[55%] sm:h-full z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
           <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
           <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
           <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
         </div>
-        
-        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl mx-4 mb-6 sm:mb-0">
+
+        <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl mx-4">
           <button
             onClick={() => setShowForgotPassword(false)}
             className="mb-6 flex items-center text-sm text-[#7d8590] hover:text-[#0a3d80] transition-colors"
@@ -204,18 +206,18 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-end sm:justify-center bg-[#0d47a1] relative overflow-hidden font-sans">
-      
-      {/* Background Shapes */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white relative overflow-hidden font-sans">
+
+      {/* Background Shapes — blue band on phone, full screen on desktop */}
+      <div className="absolute top-0 left-0 right-0 h-[55%] sm:h-full z-0 bg-gradient-to-br from-[#1565c0] to-[#0d47a1]">
         <div className="absolute top-[-250px] right-[-150px] w-[700px] h-[700px] bg-white rounded-full"></div>
         <div className="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-[#1e88e5] rounded-full"></div>
         <div className="absolute bottom-[-50px] right-[-100px] w-[350px] h-[350px] bg-[#1565c0] rounded-full z-10"></div>
       </div>
 
       {/* Login Card Container */}
-      <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4 mb-6 sm:mb-0">
-        
+      <div className="relative z-20 bg-white w-full max-w-[440px] px-[35px] py-[45px] rounded-[24px] shadow-2xl text-center mx-4">
+
         {/* Header Typography */}
         <h2 className="text-[28px] font-bold text-[#0a3d80] mb-1 tracking-tight">Sign in</h2>
         <p className="text-[11px] text-[#7d8590] mb-7">
@@ -224,34 +226,34 @@ export default function Login() {
 
         {/* Form Elements */}
         <form onSubmit={handleSubmit} className="flex flex-col">
-          
+
           {/* Single Field - accepts both Student ID and Email */}
           <div className="mb-4">
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
                 <Key className="h-5 w-5 text-[#a0a6b2]" />
               </div>
-              <input 
+              <input
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Student ID or Email" 
+                placeholder="Student ID or Email"
                 className="w-full pl-12 pr-4 py-[15px] bg-[#f5f7fb] border border-transparent rounded-xl text-[13px] text-[#333] placeholder-[#a0a6b2] focus:outline-none focus:bg-white focus:border-[#1565c0] focus:ring-4 focus:ring-[#1565c0]/10 transition-all"
                 required
                 autoFocus
               />
             </div>
           </div>
-          
+
           {/* Password Field */}
           <div className="mb-2">
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#a0a6b2]" />
-              <input 
+              <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password" 
+                placeholder="Password"
                 className="w-full pl-12 pr-12 py-[15px] bg-[#f5f7fb] border border-transparent rounded-xl text-[13px] text-[#333] placeholder-[#a0a6b2] focus:outline-none focus:bg-white focus:border-[#1565c0] focus:ring-4 focus:ring-[#1565c0]/10 transition-all"
                 required
               />
@@ -291,7 +293,7 @@ export default function Login() {
           </div>
 
           {/* Primary Button */}
-          <button 
+          <button
             type="submit"
             disabled={loading}
             className="w-full py-[15px] bg-[#1565c0] text-white text-[14px] font-semibold rounded-xl hover:bg-[#0d47a1] hover:shadow-lg hover:shadow-blue-900/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
